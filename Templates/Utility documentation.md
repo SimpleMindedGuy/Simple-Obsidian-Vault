@@ -1,6 +1,11 @@
+# Important 
+To be able to use the commands, you need to have a templater command 
+- `<%* tp.user.NewDocument(tp,true) %>` 
+	if you are trying read the commands in the current file 
+- `<%* tp.user.NewDocument(tp,false) %>`
+	if you are trying to read the commands in the 'NewDocument' File
+
 # Keywords
-
-
 
 ## Description File
 The main file of specific document, any document that is made will look for template folders, the main document file template would be called `Description Template`.
