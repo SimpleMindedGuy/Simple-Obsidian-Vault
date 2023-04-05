@@ -1,0 +1,39 @@
+{
+  "userAdmonitions": {
+    "msg-to": {
+      "type": "msg-to",
+      "color": "73, 33, 166",
+      "icon": {
+        "name": "speech-bubble",
+        "type": "rpg"
+      },
+      "command": false,
+      "title": "Me",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    },
+    "msg-from": {
+      "type": "msg-from",
+      "color": "3, 0, 153",
+      "icon": {
+        "name": "speech-bubble",
+        "type": "rpg"
+      },
+      "command": false,
+      "title": "them",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    }
+  },
+  "syntaxHighlight": true,
+  "copyButton": false,
+  "version": "6.7.2",
+  "autoCollapse": true,
+  "defaultCollapseType": "open",
+  "syncLinks": true,
+  "enableMarkdownProcessor": true,
+  "injectColor": true,
+  "parseTitles": true
+}

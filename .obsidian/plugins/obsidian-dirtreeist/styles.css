@@ -1,0 +1,9 @@
+.block-language-dirtree {
+	font-family: "MS ゴシック", Osaka-等幅, monospace;
+    word-spacing: normal;
+	white-space: pre;
+	color: var(--code-normal);
+	background-color: var(--code-background);
+	padding: var(--size-4-4);
+	font-size: var(--code-size);
+}

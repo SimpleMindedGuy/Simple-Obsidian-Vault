@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 58 58" xml:space="preserve">
+<polygon style="fill:#C5411E;" points="0,12 0,17 5,17 5,54 14,54 14,58 43,58 43,54 53,54 53,17 58,17 58,12 "/>
+<rect x="0" y="54" style="fill:#B02721;" width="14" height="4"/>
+<rect x="43" y="54" style="fill:#B02721;" width="14" height="4"/>
+<polygon style="fill:#47363D;" points="47,54 47,27 11,27 11,54 14,54 14,58 43,58 43,54 "/>
+<rect x="5" y="46" style="fill:#B02721;" width="6" height="4"/>
+<rect x="5" y="38" style="fill:#B02721;" width="6" height="4"/>
+<rect x="5" y="30" style="fill:#B02721;" width="6" height="4"/>
+<rect x="47" y="46" style="fill:#B02721;" width="6" height="4"/>
+<rect x="47" y="38" style="fill:#B02721;" width="6" height="4"/>
+<rect x="47" y="30" style="fill:#B02721;" width="6" height="4"/>
+<rect x="18.172" y="17.172" transform="matrix(0.7071 0.7071 -0.7071 0.7071 20.2929 -8.9914)" style="fill:#ED8A19;" width="5.657" height="5.657"/>
+<rect x="26.172" y="17.172" transform="matrix(0.7071 0.7071 -0.7071 0.7071 22.636 -14.6482)" style="fill:#ED8A19;" width="5.657" height="5.657"/>
+<rect x="34.172" y="17.172" transform="matrix(0.7071 0.7071 -0.7071 0.7071 24.9792 -20.3051)" style="fill:#ED8A19;" width="5.657" height="5.657"/>
+<line style="fill:none;stroke:#B02721;stroke-width:2;stroke-miterlimit:10;" x1="5" y1="18" x2="11" y2="18"/>
+<line style="fill:none;stroke:#B02721;stroke-width:2;stroke-miterlimit:10;" x1="47" y1="18" x2="53" y2="18"/>
+<path style="fill:#ED8A19;" d="M36.508,41.879l-2.359-2.687c-0.327,2.971-1.177,5.261-1.177,5.261c0-3.922-1.412-7.408-3.224-10.274
+	l-0.289-0.329l-2.303,2.624c-2.972,3.385-4.234,7.982-3.257,12.379c0.009,0.039,0.017,0.077,0.026,0.116c0,0-1.786-2.527-2.6-5.653
+	c-2.216,3.539-1.914,8.19,0.92,11.418c3.796,4.325,10.509,4.356,14.346,0.093C39.881,51.173,39.751,45.573,36.508,41.879z"/>
+<path style="fill:#61B872;" d="M37.84,12h-3.281c-0.239,0-0.381-0.266-0.249-0.465l5.601-8.402C39.967,3.05,40.06,3,40.16,3h3.281
+	c0.239,0,0.381,0.266,0.249,0.465l-5.601,8.402C38.033,11.95,37.94,12,37.84,12z"/>
+<rect x="44" y="0" style="fill:#3083C9;" width="4" height="12"/>
+<rect x="48" y="2" style="fill:#EBBA16;" width="4" height="10"/>
+<path style="fill:#C7CAC7;" d="M15,8H1c1.105,0,4,0.895,4,2c0,0.449,0,2,0,2h6c0,0,0-1.551,0-2C11,8.895,13.895,8,15,8z"/>
+<path style="fill:#C7CAC7;" d="M32,8H18c1.105,0,4,0.895,4,2c0,0.449,0,2,0,2h6c0,0,0-1.551,0-2C28,8.895,30.895,8,32,8z"/>
+<line style="fill:none;stroke:#949493;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;" x1="1" y1="8" x2="15" y2="8"/>
+<line style="fill:none;stroke:#949493;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;" x1="18" y1="8" x2="32" y2="8"/>
+<path style="fill:#EFCE4A;" d="M32.81,50.303l-1.126-1.283c-0.156,1.418-0.562,2.512-0.562,2.512c0-1.873-0.674-3.537-1.539-4.905
+	l-0.138-0.157l-1.1,1.253c-1.419,1.616-2.021,3.811-1.555,5.91c0.004,0.018,0.008,0.037,0.013,0.056c0,0-0.853-1.207-1.241-2.699
+	c-1.058,1.69-0.914,3.91,0.439,5.451c1.812,2.065,5.017,2.079,6.849,0.044C34.42,54.74,34.359,52.067,32.81,50.303z"/>
+</svg>

@@ -1,0 +1,50 @@
+:root{
+    --file-line-width : 80%;
+}
+
+.modal-title{
+    word-wrap: break-word;
+    white-space: pre-line;
+    text-align:  start;
+}
+
+.markdown-source-view.mod-cm6 .cm-sizer 
+{
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    place-self: center;
+    margin: auto;
+    place-content: center;
+    /* max-width: 1200px; */
+    /* max-width: var(--file-line-width); */
+}
+
+
+.markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer
+{
+    max-width: 100%;
+    /* max-width: 1200px; */
+    /* max-width: var(--file-line-width); */
+}
+
+.markdown-source-view.mod-cm6.is-readable-line-width .cm-line 
+{
+    max-width: 100%;
+    /* max-width: 1200px; */
+}
+
+
+.markdown-preview-view.is-readable-line-width .markdown-preview-sizer
+{
+    /* max-width: 65%; */
+    width: 100%;
+    max-width: 1200px;
+}
+
+
+
+.markdown-preview-view .plyr.plyr--video:not(:fullscreen) video {
+    width: 100%;
+    margin: auto;
+}

@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "migrated": true,
+    "iconPacksPath": "Gallery/Icons",
+    "fontSize": 20,
+    "emojiStyle": "native",
+    "iconColor": null,
+    "recentlyUsedIcons": [
+      "MiMemory",
+      "MiArchive2"
+    ],
+    "recentlyUsedIconsSize": 15,
+    "rules": [],
+    "extraMargin": {
+      "top": 0,
+      "right": 1,
+      "bottom": 0,
+      "left": 0
+    }
+  },
+  "Diary": {
+    "iconName": null,
+    "inheritanceIcon": "MiNote3"
+  }
+}

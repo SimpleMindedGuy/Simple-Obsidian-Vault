@@ -1,0 +1,128 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": false,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "tag:#Video",
+      "color": {
+        "a": 1,
+        "rgb": 16384000
+      }
+    },
+    {
+      "query": "tag:#Project",
+      "color": {
+        "a": 1,
+        "rgb": 505069
+      }
+    },
+    {
+      "query": "tag:#Book",
+      "color": {
+        "a": 1,
+        "rgb": 1453801
+      }
+    },
+    {
+      "query": "tag:#Blog",
+      "color": {
+        "a": 1,
+        "rgb": 16749824
+      }
+    },
+    {
+      "query": "tag:#University",
+      "color": {
+        "a": 1,
+        "rgb": 2481677
+      }
+    },
+    {
+      "query": "tag:#Learning",
+      "color": {
+        "a": 1,
+        "rgb": 16771584
+      }
+    },
+    {
+      "query": "tag:#overview",
+      "color": {
+        "a": 1,
+        "rgb": 5188814
+      }
+    },
+    {
+      "query": "tag:#sub_note",
+      "color": {
+        "a": 1,
+        "rgb": 6454916
+      }
+    },
+    {
+      "query": "tag:#progress",
+      "color": {
+        "a": 1,
+        "rgb": 5677788
+      }
+    },
+    {
+      "query": "tag:#diary",
+      "color": {
+        "a": 1,
+        "rgb": 7558815
+      }
+    },
+    {
+      "query": "tag:#excalidraw",
+      "color": {
+        "a": 1,
+        "rgb": 10546853
+      }
+    },
+    {
+      "query": "tag:#tracking",
+      "color": {
+        "a": 1,
+        "rgb": 15100779
+      }
+    },
+    {
+      "query": "tag:#problem",
+      "color": {
+        "a": 1,
+        "rgb": 11276561
+      }
+    },
+    {
+      "query": "tag:#people",
+      "color": {
+        "a": 1,
+        "rgb": 5347969
+      }
+    },
+    {
+      "query": "tag:#home",
+      "color": {
+        "a": 1,
+        "rgb": 16753152
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": false,
+  "textFadeMultiplier": -3,
+  "nodeSizeMultiplier": 2.1671875,
+  "lineSizeMultiplier": 1.56744791666667,
+  "collapse-forces": false,
+  "centerStrength": 0.216145833333333,
+  "repelStrength": 17.9947916666667,
+  "linkStrength": 0.67578125,
+  "linkDistance": 500,
+  "scale": 0.046830244422547296,
+  "close": false
+}

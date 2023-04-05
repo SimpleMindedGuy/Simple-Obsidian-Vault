@@ -1,0 +1,37 @@
+{
+  "ProgressProperties": {
+    "enabled": false,
+    "properties": [
+      {
+        "name": "",
+        "type": "Total Tasks"
+      }
+    ]
+  },
+  "IgnoredProperties": {
+    "enabled": false,
+    "properties": []
+  },
+  "AutoProperties": {
+    "enabled": true,
+    "properties": [
+      {
+        "name": "",
+        "choices": [
+          ""
+        ]
+      }
+    ]
+  },
+  "EditMode": {
+    "mode": "Some Multi",
+    "properties": []
+  },
+  "KanbanHelper": {
+    "enabled": true,
+    "boards": []
+  },
+  "UIElements": {
+    "enabled": true
+  }
+}

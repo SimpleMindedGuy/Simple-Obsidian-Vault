@@ -1,0 +1,72 @@
+{
+  "userAdmonitions": {
+    "msg-to": {
+      "type": "msg-to",
+      "color": "73, 33, 166",
+      "icon": {
+        "name": "speech-bubble",
+        "type": "rpg"
+      },
+      "command": false,
+      "title": "Me",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    },
+    "msg-from": {
+      "type": "msg-from",
+      "color": "3, 0, 153",
+      "icon": {
+        "name": "speech-bubble",
+        "type": "rpg"
+      },
+      "command": false,
+      "title": "them",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    },
+    "idea": {
+      "type": "idea",
+      "color": "32, 207, 123",
+      "icon": {
+        "name": "brain",
+        "type": "font-awesome"
+      },
+      "command": false,
+      "title": "Idea",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    }
+  },
+  "syntaxHighlight": true,
+  "copyButton": false,
+  "version": "9.0.3",
+  "autoCollapse": true,
+  "defaultCollapseType": "open",
+  "injectColor": true,
+  "parseTitles": true,
+  "dropShadow": true,
+  "hideEmpty": false,
+  "open": {
+    "admonitions": true,
+    "icons": true,
+    "other": true,
+    "advanced": false
+  },
+  "icons": [
+    "rpg"
+  ],
+  "useFontAwesome": true,
+  "rpgDownloadedOnce": true,
+  "msDocConverted": false,
+  "useSnippet": false,
+  "snippetPath": "custom-admonitions.5840d1",
+  "warnedAboutNC": true,
+  "syncLinks": true,
+  "enableMarkdownProcessor": true,
+  "allowMSSyntax": true,
+  "msSyntaxIndented": true,
+  "livePreviewMS": true
+}

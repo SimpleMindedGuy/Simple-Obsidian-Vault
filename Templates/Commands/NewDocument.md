@@ -1,0 +1,1 @@
+<%* tp.user.NewDocument(tp,false) %>

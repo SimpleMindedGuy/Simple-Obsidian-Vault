@@ -1,0 +1,54 @@
+{
+  "userAdmonitions": {
+    "msg-to": {
+      "type": "msg-to",
+      "color": "73, 33, 166",
+      "icon": {
+        "name": "speech-bubble",
+        "type": "rpg"
+      },
+      "command": false,
+      "title": "Me",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    },
+    "msg-from": {
+      "type": "msg-from",
+      "color": "3, 0, 153",
+      "icon": {
+        "name": "speech-bubble",
+        "type": "rpg"
+      },
+      "command": false,
+      "title": "them",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    },
+    "idea": {
+      "type": "idea",
+      "color": "32, 207, 123",
+      "icon": {
+        "name": "brain",
+        "type": "font-awesome"
+      },
+      "command": false,
+      "title": "Idea",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": false
+    }
+  },
+  "syntaxHighlight": true,
+  "copyButton": false,
+  "version": "6.9.6",
+  "autoCollapse": true,
+  "defaultCollapseType": "open",
+  "syncLinks": true,
+  "enableMarkdownProcessor": true,
+  "injectColor": true,
+  "parseTitles": true,
+  "allowMSSyntax": true,
+  "livePreviewMS": true
+}

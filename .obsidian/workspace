@@ -1,0 +1,237 @@
+{
+  "main": {
+    "id": "b6be2056f8c6f62c",
+    "type": "split",
+    "children": [
+      {
+        "id": "b74ee14d111b997e",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Diary/2022-10-13.md",
+            "mode": "source",
+            "backlinks": true,
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "689fadd1cbfe9775",
+    "type": "split",
+    "children": [
+      {
+        "id": "cc9aaa7762441c95",
+        "type": "tabs",
+        "dimension": 57.78748180494906,
+        "children": [
+          {
+            "id": "ccfa9f300fd13d9c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "cb0f9e3485236cb9",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": true,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "byModifiedTime"
+              }
+            }
+          },
+          {
+            "id": "6105e24508c2c739",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "1d5bf0ca5b853099",
+        "type": "tabs",
+        "dimension": 42.21251819505094,
+        "children": [
+          {
+            "id": "bb313d1d6f37e2d8",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Diary/2022-10-13.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 296.5
+  },
+  "right": {
+    "id": "cf0c977f7f90dfd4",
+    "type": "split",
+    "children": [
+      {
+        "id": "df3c6adccae220d8",
+        "type": "tabs",
+        "dimension": 64.19213973799127,
+        "children": [
+          {
+            "id": "d68af655d2a4b9ac",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {}
+            }
+          },
+          {
+            "id": "412d47ec24500a09",
+            "type": "leaf",
+            "state": {
+              "type": "todo",
+              "state": {}
+            }
+          },
+          {
+            "id": "9f988d869d42ad72",
+            "type": "leaf",
+            "state": {
+              "type": "reminder-list",
+              "state": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "6aa5e20b69b42b13",
+        "type": "tabs",
+        "dimension": 35.80786026200873,
+        "children": [
+          {
+            "id": "15611f77987447d8",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {}
+            }
+          },
+          {
+            "id": "adc0b6a2fd6fe96f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "74f905f6442c0d00",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Diary/2022-10-13.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "f182945107d9f033",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Diary/2022-10-13.md",
+                "collapseAll": true,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "bfeee1f4389a762d",
+            "type": "leaf",
+            "state": {
+              "type": "localgraph",
+              "state": {
+                "file": "Diary/2022-10-13.md",
+                "options": {
+                  "collapse-filter": true,
+                  "search": "",
+                  "localJumps": 1,
+                  "localBacklinks": true,
+                  "localForelinks": true,
+                  "localInterlinks": false,
+                  "showTags": false,
+                  "showAttachments": false,
+                  "hideUnresolved": false,
+                  "collapse-color-groups": false,
+                  "colorGroups": [],
+                  "collapse-display": true,
+                  "showArrow": false,
+                  "textFadeMultiplier": 0,
+                  "nodeSizeMultiplier": 1,
+                  "lineSizeMultiplier": 1,
+                  "collapse-forces": false,
+                  "centerStrength": 0.518713248970312,
+                  "repelStrength": 10,
+                  "linkStrength": 1,
+                  "linkDistance": 250,
+                  "scale": 0.08150214675999257,
+                  "close": true
+                }
+              }
+            }
+          },
+          {
+            "id": "7b0ebd17665f7629",
+            "type": "leaf",
+            "state": {
+              "type": "mindmap",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 5
+      }
+    ],
+    "direction": "horizontal",
+    "width": 269.5,
+    "collapsed": true
+  },
+  "active": "b74ee14d111b997e",
+  "lastOpenFiles": [
+    "Templates/Diary.md",
+    "Diary/2022-10-13.md",
+    "Home.md",
+    "Diary/2022-10-11.md",
+    "Diary/2022-10-12.md",
+    "Activities/Books/Books.md",
+    "Diary/2022-10-09.md",
+    "Activities/Projects/Program/0001 - Simple Web App (React) /Simple Web App (React)  Tracking.md",
+    "Activities/Projects/Program/0001 - Simple Web App (React) /Progress.md",
+    "Diary/2022-05-29.md"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "prepend-archive-date": false,
+  "show-checkboxes": true,
+  "hide-tags-in-title": true,
+  "hide-tags-display": true,
+  "link-date-to-daily-note": true,
+  "new-card-insertion-method": "append",
+  "hide-card-count": false,
+  "tag-colors": [],
+  "metadata-keys": [],
+  "lane-width": 300,
+  "show-relative-date": true
+}

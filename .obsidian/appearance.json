@@ -1,0 +1,16 @@
+{
+  "baseFontSize": 17,
+  "translucency": false,
+  "cssTheme": "Tokyo Night",
+  "theme": "obsidian",
+  "baseFontSizeAction": true,
+  "interfaceFontFamily": "",
+  "textFontFamily": "",
+  "monospaceFontFamily": "",
+  "enabledCssSnippets": [
+    "MyStyle"
+  ],
+  "accentColor": "#9372fd",
+  "showViewHeader": true,
+  "nativeMenus": false
+}
