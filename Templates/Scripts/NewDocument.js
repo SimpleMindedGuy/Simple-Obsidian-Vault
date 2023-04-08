@@ -648,32 +648,8 @@ async function BuildDocument(tp)
 
     await CreateDescriptionFile(DocumentFolder,DefaultTemplate,Templates,tp)
     
-    if(OverView.Layer && OverView.key)
-    {
-        const OV = await GetOverviewFile(DocumentFolder,OverviewTemplate,tp)
-        
-        let OvData = await app.vault.read(OV)
-
-        let OveExp = new RegExp(/^\%{2}\=\>\%{2}/gmi)
-
-
-        OvData = Thumb ?  
-        await OvData.replace(OveExp,`%%=>%%\n- [ ] [[${DocumentFolder.path}/${Meta[Title]} Description|${Meta[Title]}]]\n![[${Path}/${Meta[Title]} Thumbnail]]`):
-        await OvData.replace(OveExp,`%%=>%%\n- [ ] [[${DocumentFolder.path}/${Meta[Title]} Description|${Meta[Title]}]]`)
-
-        
-        await app.vault.modify(
-            OV,
-            OvData
-        )
-        .then(()=>{
-            new Notice("Added Card to overview");
-        })
-        .catch((err)=>{
-            console.log(err)
-            new Notice("Failed Card to overview");
-        })
-    }
+    await AddCardToOverView(DocumentFolder,OverviewTemplate,Path,tp)
+    
 
 }
 
@@ -1476,12 +1452,12 @@ async function AddCardToOverView(DocumentFolder,OverviewTemplate,Path,tp){
         
         let OvData = await app.vault.read(OV)
 
-        let OveExp = new RegExp(/^\%{2}\=\>\%{2}/gmi)
+        let OvExp = new RegExp(/\#{2}\ .+/)
 
-
+        let FistList =  await OvData.match(OvExp)
         OvData = Thumb ?  
-        await OvData.replace(OveExp,`%%=>%%\n- [ ] [[${DocumentFolder.path}/${Meta[Title]} Description|${Meta[Title]}]]\n![[${Path}/${Meta[Title]} Thumbnail]]`):
-        await OvData.replace(OveExp,`%%=>%%\n- [ ] [[${DocumentFolder.path}/${Meta[Title]} Description|${Meta[Title]}]]`)
+        await OvData.replace(OvExp,`${FistList}\n- [ ] [[${DocumentFolder.path}/${Meta[Title]} Description|${Meta[Title]}]]\n![[${Path}/${Meta[Title]} Thumbnail]]`):
+        await OvData.replace(OvExp,`${FistList}\n- [ ] [[${DocumentFolder.path}/${Meta[Title]} Description|${Meta[Title]}]]`)
 
         await app.vault.modify(
             OV,
