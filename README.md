@@ -1,11 +1,18 @@
 # Simple-Obsidian-Vault
 
+## Important
+Thanx to my bad writing skills, and bad way of documentaion.
+it's better to just download this vault and view it in obsidian, because the way I was linking Images and formating the document and such wont work as intended on github.
+
+you stil should be able to roughly understand what I'm doing here, but I don't have time to fix it now.
+
 ## Introduction
 
 This is my obsidian vault self up with all my scripts, and utilities. 
 
 The goal of this setup is to make Creating documents and Organizing them much easier, as well as Habit tracking and data visualization.
 It is still under development, and the script could still needs a lot of documentation, but this version works almost perfectly, If you find any bugs please report that in the issues section.
+
 
 ## How it works
 This setup provides a few tools/Utilities to make Creating documents easier. 
