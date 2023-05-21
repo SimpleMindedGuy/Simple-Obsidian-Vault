@@ -1,0 +1,19 @@
+.parentDiv {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+}
+
+.matrixDiv {
+	display: grid;
+	gap: 5px;
+}
+
+.settingsDiv {
+
+}
+
+.matrixInput {
+	width: 50px;
+	text-align: center;
+}

@@ -4,32 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "2a990df66f21e3ee",
+        "id": "1756b77314defa85",
         "type": "tabs",
         "children": [
           {
-            "id": "97ea4d3da0c4e366",
+            "id": "e76d9df2ad1885af",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Journal/Weekly/2023-W14.md",
-                "mode": "source",
+                "file": "Home.md",
+                "mode": "preview",
                 "backlinks": true,
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "fcb64af685758f72",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Templates/Journal/Weekly.md",
-                "mode": "source",
-                "backlinks": true,
-                "source": false
+                "source": true
               }
             }
           }
@@ -45,7 +32,7 @@
       {
         "id": "cc9aaa7762441c95",
         "type": "tabs",
-        "dimension": 59.16585838991271,
+        "dimension": 71.25,
         "children": [
           {
             "id": "ccfa9f300fd13d9c",
@@ -65,9 +52,9 @@
               "state": {
                 "query": "",
                 "matchingCase": true,
-                "explainSearch": false,
+                "explainSearch": true,
                 "collapseAll": false,
-                "extraContext": false,
+                "extraContext": true,
                 "sortOrder": "byModifiedTime"
               }
             }
@@ -75,15 +62,15 @@
         ]
       },
       {
-        "id": "69692f523657cb20",
+        "id": "434ddfbb5353f396",
         "type": "tabs",
-        "dimension": 40.83414161008729,
+        "dimension": 28.749999999999996,
         "children": [
           {
-            "id": "6105e24508c2c739",
+            "id": "a9064e1b1ef5af44",
             "type": "leaf",
             "state": {
-              "type": "starred",
+              "type": "bookmarks",
               "state": {}
             }
           }
@@ -91,19 +78,30 @@
       }
     ],
     "direction": "horizontal",
-    "width": 276.5
+    "width": 297
   },
   "right": {
     "id": "cf0c977f7f90dfd4",
     "type": "split",
     "children": [
       {
-        "id": "df3c6adccae220d8",
+        "id": "5cc77365d0d8e474",
         "type": "tabs",
-        "dimension": 35.15625,
+        "dimension": 49.18032786885246,
         "children": [
           {
-            "id": "982e81cb5588d270",
+            "id": "d0d83656605c5435",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "206300cfce5ca9b9",
             "type": "leaf",
             "state": {
               "type": "calendar",
@@ -111,13 +109,28 @@
             }
           },
           {
-            "id": "adc0b6a2fd6fe96f",
+            "id": "3fbde7499720fdc0",
             "type": "leaf",
             "state": {
-              "type": "tag",
+              "type": "todo",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 1
+      },
+      {
+        "id": "6aa5e20b69b42b13",
+        "type": "tabs",
+        "dimension": 50.81967213114754,
+        "children": [
+          {
+            "id": "6311cc4f6775fc4d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
               "state": {
-                "sortOrder": "frequency",
-                "useHierarchy": false
+                "file": "Home.md"
               }
             }
           },
@@ -127,9 +140,9 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Journal/Weekly/2023-W14.md",
+                "file": "Home.md",
                 "linksCollapsed": false,
-                "unlinkedCollapsed": true
+                "unlinkedCollapsed": false
               }
             }
           },
@@ -139,7 +152,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Journal/Weekly/2023-W14.md",
+                "file": "Home.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -150,107 +163,81 @@
               }
             }
           }
-        ]
-      },
-      {
-        "id": "6aa5e20b69b42b13",
-        "type": "tabs",
-        "dimension": 64.84375,
-        "children": [
-          {
-            "id": "15611f77987447d8",
-            "type": "leaf",
-            "state": {
-              "type": "advanced-tables-toolbar",
-              "state": {}
-            }
-          },
-          {
-            "id": "6311cc4f6775fc4d",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "Journal/Weekly/2023-W14.md"
-              }
-            }
-          }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
-    "width": 332.5
+    "width": 350
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Open quick switcher": false,
+      "homepage:Open homepage": false,
       "graph:Open graph view": false,
+      "obsidian-gallery:Gallery": false,
+      "audio-recorder:Start/stop recording": false,
+      "switcher:Open quick switcher": false,
       "canvas:Create new canvas": false,
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
       "markdown-importer:Open format converter": false,
       "zk-prefixer:Create new unique note": false,
-      "audio-recorder:Start/stop recording": false,
       "workspaces:Manage workspace layouts": false,
-      "templater-obsidian:Templater": false,
-      "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "dbfolder:Create a new database table": false,
       "obsidian-excalidraw-plugin:Create new drawing": false,
-      "obsidian-gallery:Gallery": false,
-      "homepage:Open homepage": false,
-      "periodic-notes:Open today": false,
-      "dbfolder:Create a new database table": false
+      "templater-obsidian:Templater": false,
+      "periodic-notes:Open today": false
     }
   },
-  "active": "97ea4d3da0c4e366",
+  "active": "e76d9df2ad1885af",
   "lastOpenFiles": [
-    "Gallery/Icons/",
-    "Gallery/Icons",
-    "Templates/Journal/Weekly.md",
-    "Journal/Daily/2023-04-02.md",
-    "Journal/Weekly/2023-W14.md",
-    "Journal/Daily/Drawing 2023-04-05 13.59.59.excalidraw.md",
-    "Templates/Journal/Daily.md",
-    "Templates/Utility documentation.md",
-    "Journal/Daily/2023-04-04.md",
-    "Templates/Excalidraw SubNote.md",
-    "Templates/Topic SubNote.md",
-    "Journal Files/Year-2023/Month-04/Day-01",
-    "Journal Files/Year-2023/Month-04",
-    "Journal Files/Year-2023",
+    "02-Monthly/2023/2023-05.md",
+    "00-Daily/2023/2023-05-20.md",
+    "92-FolderDB/DialyDB.md",
+    "03-Yearly/2022.md",
+    "03-Yearly/2023.md",
+    "02-Monthly/2023/2023-01.md",
+    "02-Monthly/2023/2023-04.md",
+    "02-Monthly/2023/2023-02.md",
+    "01-Weekly/2023/2023-W19.md",
+    "01-Weekly/2023/2023-W20.md",
+    "99-Templates/01-Weekly/Weekly.md",
+    "00-Daily/2023/2023-05-14.md",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-17_01-53-07.332_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-17_01-52-23.259_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-17_01-52-27.537_1920x1080.png",
     "Home.md",
-    "Activity/Project/Project.md",
-    "Activity/Project/Program/0001 - Hello world/Hello world Description.md",
-    "Activity/Project/Program/0001 - Hello world/SubNotes/0002 - hello.md",
-    "Activity/Project/Program/0001 - Hello world/Hello world Tracking.md",
-    "Templates/Commands/UpdateTarget.md",
-    "Templates/Commands/MakeDocumentvideo.md",
-    "Templates/Commands/MakeSubNote.md",
-    "Templates/Commands/MoveDiaryMedia.md",
-    "Templates/Commands/MoveDocumentMedia.md",
-    "Templates/Commands/MoveWeeklyMedia.md",
-    "Templates/Commands/NewDocument.md",
-    "Journal/Daily/DialyDB.md",
-    "Templates/NewDocument.md",
-    "Activity/Project/Program/0001 - Hello world/SubNotes/0001 - sub.md",
-    "Templates/Activity/Activity.md",
-    "Activity/Project/Program/0001 - Hello world/SubNotes",
-    "Activity/Project/Program/0001 - Hello world",
-    "Activity/Project/Program",
-    "Activity/Project",
-    "Activity",
-    "Journal Files/Year-/2023/Month-/04/Day-01",
-    "Gallery/icons/icon-brew/DisplayZoom.svg",
-    "Gallery/icons/icon-brew/WebsiteWithImage.svg",
-    "Gallery/icons/icon-brew/Film.svg",
-    "Gallery/icons/icon-brew/ArrowCircleBackwardFiveteen.svg",
-    "Gallery/icons/icon-brew/TreeMapRight.svg",
-    "Gallery/icons/icon-brew/LightBulb.svg",
-    "Gallery/icons/icon-brew/RectangleOnRectangleVertical.svg",
-    "Gallery/icons/icon-brew/ArrowUpRight.svg",
-    "Gallery/icons/icon-brew/Productivity.svg",
-    "Gallery/icons/icon-brew/ArrowUp.svg",
+    "15-University/0009 - test subject/test subject Description.md",
+    "15-University/0009 - test subject",
+    "00-Daily/2023/2023-05-12.md",
+    "00-Daily/2023/2023-05-13.md",
+    "00-Daily/2023/2023-05-15.md",
+    "00-Daily/2023/2023-05-16.md",
+    "00-Daily/2023/2023-05-17.md",
+    "00-Daily/2023/2023-05-10.md",
+    "00-Daily/2023/2023-05-18.md",
+    "15-University/0008 - Numerical Analysis/Numerical Analysis.pdf",
+    "15-University/0008 - Numerical Analysis/Numerical Analysis Description.md",
+    "15-University/0008 - Numerical Analysis/Media",
+    "9999 - Accounts.md",
+    "00-Daily/2023/2023-01-11.md",
+    "Testing.md",
+    "wishlist.md",
+    "12-Video/0003-Clips/0005 - mhw - when the cool move work",
+    "12-Video/0007-03-Clips",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile56588-1.pdf",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile56588-0.html",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile66032-1.pdf",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile66032-0.html",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile65083-1.pdf",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_23-36-28.337_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_23-36-25.954_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_22-24-49.761_7680x4320.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_22-23-31.315_2560x1440.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/Screenshot_20230117_020055.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/Screenshot_20230117_012150.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/Screenshot_20230117_011519.png",
     "Templates/Activity/Canvas Subnote.canvas"
   ]
 }

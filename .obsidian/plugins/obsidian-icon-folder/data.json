@@ -1,25 +1,260 @@
 {
   "settings": {
     "migrated": true,
-    "iconPacksPath": "Gallery/Icons",
-    "fontSize": 20,
+    "iconPacksPath": "80-Gallery/Icons",
+    "fontSize": 24,
     "emojiStyle": "native",
-    "iconColor": null,
-    "recentlyUsedIcons": [
-      "MiMemory",
-      "MiArchive2"
-    ],
+    "iconColor": "#9e9e9e",
+    "recentlyUsedIcons": [],
     "recentlyUsedIconsSize": 15,
-    "rules": [],
+    "rules": [
+      {
+        "rule": ".*(.gif|.GIF)$",
+        "icon": "MyPicture2",
+        "for": "everything"
+      },
+      {
+        "rule": ".*(.jpe?g|.JPE?G|PNG|png|webm|WEBM)$",
+        "icon": "MyPicture6",
+        "for": "everything"
+      },
+      {
+        "rule": ".*(.MP4|.mp4|.mov|.MOV|.webm|.WEBM|.mkv|.MKV)$",
+        "icon": "MyVideo",
+        "for": "everything"
+      },
+      {
+        "rule": ".*(.svg|.SVG)",
+        "icon": "MyMath3",
+        "for": "everything"
+      },
+      {
+        "rule": ".*DB",
+        "icon": "MyDevice17",
+        "for": "everything"
+      },
+      {
+        "rule": "(Day|Week)\\-\\d{2}",
+        "icon": "MyFolder7",
+        "for": "everything"
+      },
+      {
+        "rule": "(Excalidraw)|(draw)|(Thumbnail)",
+        "icon": "🖌",
+        "for": "everything"
+      },
+      {
+        "rule": "\\d{2}\\-.*Files$",
+        "icon": "MyArchive",
+        "for": "everything"
+      },
+      {
+        "rule": "^Journal Files$",
+        "icon": "MyArchive",
+        "for": "everything"
+      },
+      {
+        "rule": "^Journal$",
+        "icon": "MyBook32",
+        "for": "everything"
+      },
+      {
+        "rule": "^Personal$",
+        "icon": "MyDefultuser",
+        "for": "everything"
+      },
+      {
+        "rule": "Activity",
+        "icon": "MyClipboard5",
+        "for": "everything"
+      },
+      {
+        "rule": "Addiction",
+        "icon": "🌀",
+        "for": "everything"
+      },
+      {
+        "rule": "Banner",
+        "icon": "MyBanner",
+        "for": "everything"
+      },
+      {
+        "rule": "Blog",
+        "icon": "MyPaper6",
+        "for": "everything"
+      },
+      {
+        "rule": "Book",
+        "icon": "MyLybrary4",
+        "for": "everything"
+      },
+      {
+        "rule": "Calendar",
+        "icon": "📅",
+        "for": "everything"
+      },
+      {
+        "rule": "Clips",
+        "icon": "MyClip2",
+        "for": "everything"
+      },
+      {
+        "rule": "Computer science",
+        "icon": "MyDevice30",
+        "for": "everything"
+      },
+      {
+        "rule": "Cover Letter",
+        "icon": "MyPaper10",
+        "for": "everything"
+      },
+      {
+        "rule": "CustomJS|Scripts?",
+        "icon": "MyScreen10",
+        "for": "everything"
+      },
+      {
+        "rule": "Daily",
+        "icon": "MyBook32",
+        "for": "everything"
+      },
+      {
+        "rule": "Data(V|view)|(View)s?",
+        "icon": "MyScreen4",
+        "for": "everything"
+      },
+      {
+        "rule": "DB.md",
+        "icon": "MyDevice37",
+        "for": "everything"
+      },
+      {
+        "rule": "Dictionary",
+        "icon": "MyBook9",
+        "for": "everything"
+      },
+      {
+        "rule": "Gallery",
+        "icon": "MyAlbum",
+        "for": "everything"
+      },
+      {
+        "rule": "Home",
+        "icon": "MyHome2",
+        "for": "everything"
+      },
+      {
+        "rule": "Learning",
+        "icon": "MyHat2",
+        "for": "everything"
+      },
+      {
+        "rule": "Math",
+        "icon": "MyMath1",
+        "for": "everything"
+      },
+      {
+        "rule": "Memories",
+        "icon": "MyMemory",
+        "for": "everything"
+      },
+      {
+        "rule": "Month\\-\\d{2}",
+        "icon": "MyFolder8",
+        "for": "everything"
+      },
+      {
+        "rule": "Monthly",
+        "icon": "MyBook25",
+        "for": "everything"
+      },
+      {
+        "rule": "People",
+        "icon": "MyCard2",
+        "for": "everything"
+      },
+      {
+        "rule": "Problem",
+        "icon": "MyMazesvgrepocom",
+        "for": "everything"
+      },
+      {
+        "rule": "Program",
+        "icon": "MyScreen5",
+        "for": "everything"
+      },
+      {
+        "rule": "Project",
+        "icon": "MyBlueprint",
+        "for": "everything"
+      },
+      {
+        "rule": "Quotes",
+        "icon": "MyAudio5",
+        "for": "everything"
+      },
+      {
+        "rule": "Simple Rant",
+        "icon": "💢",
+        "for": "everything"
+      },
+      {
+        "rule": "Subject",
+        "icon": "MyBook28",
+        "for": "everything"
+      },
+      {
+        "rule": "Templates?",
+        "icon": "MyTemplate4",
+        "for": "everything"
+      },
+      {
+        "rule": "The Simple Podcast",
+        "icon": "MyMic4",
+        "for": "everything"
+      },
+      {
+        "rule": "Trackers?",
+        "icon": "MyStatistics3",
+        "for": "everything"
+      },
+      {
+        "rule": "University",
+        "icon": "MyBuilding3",
+        "for": "everything"
+      },
+      {
+        "rule": "Video",
+        "icon": "📼",
+        "for": "everything"
+      },
+      {
+        "rule": "Weekly",
+        "icon": "MyBook21",
+        "for": "everything"
+      },
+      {
+        "rule": "Year\\-\\d{4}",
+        "icon": "MyArchive13",
+        "for": "everything"
+      },
+      {
+        "rule": "Yearly",
+        "icon": "MyBook18",
+        "for": "everything"
+      },
+      {
+        "rule": "Daily",
+        "icon": "MyBook32",
+        "for": "everything"
+      }
+    ],
     "extraMargin": {
       "top": 0,
-      "right": 1,
+      "right": 0,
       "bottom": 0,
       "left": 0
-    }
-  },
-  "Diary": {
-    "iconName": null,
-    "inheritanceIcon": "MiNote3"
+    },
+    "iconInTabsEnabled": true
   }
 }

@@ -86,15 +86,7 @@
       "key": ";"
     }
   ],
-  "obsidian-excalidraw-plugin:insert-link": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "L"
-    }
-  ],
+  "obsidian-excalidraw-plugin:insert-link": [],
   "obsidian-mind-map:app:markmap-preview": [
     {
       "modifiers": [
@@ -129,41 +121,7 @@
       "key": "Enter"
     }
   ],
-  "obsidian-heading-shifter:increase-heading": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "."
-    }
-  ],
-  "obsidian-heading-shifter:decrease-heading": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": ","
-    }
-  ],
   "obsidian-excalidraw-plugin:save": [],
-  "workspace:next-tab": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "."
-    }
-  ],
-  "workspace:previous-tab": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": ","
-    }
-  ],
   "app:open-settings": [
     {
       "modifiers": [
@@ -199,7 +157,12 @@
       "key": "C"
     }
   ],
-  "auto-card-link:auto-card-link-paste-and-enhance": [
+  "auto-card-link:auto-card-link-paste-and-enhance": [],
+  "obsidian-outliner:fold": [],
+  "obsidian-outliner:unfold": [],
+  "various-complements:add-word-custom-dictionary": [],
+  "various-complements:reload-custom-dictionaries": [],
+  "various-complements:toggle-complement-automatically": [
     {
       "modifiers": [
         "Mod",
@@ -208,6 +171,242 @@
       "key": "X"
     }
   ],
-  "obsidian-outliner:fold": [],
-  "obsidian-outliner:unfold": []
+  "obsidian-excalidraw-plugin:toggle-lock": [],
+  "markdown-importer:open": [
+    {
+      "modifiers": [
+        "Alt",
+        "Mod"
+      ],
+      "key": "C"
+    }
+  ],
+  "graph:open-local": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "G"
+    }
+  ],
+  "workspace:goto-tab-8": [],
+  "workspace:goto-tab-7": [],
+  "workspace:goto-tab-6": [],
+  "workspace:goto-tab-5": [],
+  "workspace:goto-tab-4": [],
+  "workspace:goto-tab-3": [],
+  "workspace:goto-tab-2": [],
+  "workspace:goto-tab-1": [],
+  "markdown-prettifier:markdown-prettifier-run": [],
+  "nldates-obsidian:nlp-picker": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "D"
+    }
+  ],
+  "window:reset-zoom": [
+    {
+      "modifiers": [
+        "Alt",
+        "Mod"
+      ],
+      "key": "="
+    }
+  ],
+  "editor:context-menu": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "'"
+    }
+  ],
+  "various-complements:show-suggestions": [],
+  "editor:toggle-checklist-status": [],
+  "obsidian-languagetool-plugin:ltclear": [],
+  "app:open-help": [],
+  "nldates-obsidian:nlp-today": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "1"
+    }
+  ],
+  "nldates-obsidian:nlp-dates": [],
+  "nldates-obsidian:nlp-time": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "2"
+    }
+  ],
+  "switcher:open": [],
+  "table-editor-obsidian:table-control-bar": [],
+  "table-editor-obsidian:insert-column": [],
+  "obsidian-outliner:move-list-item-up": [],
+  "obsidian-outliner:move-list-item-down": [],
+  "table-editor-obsidian:move-column-right": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "ArrowRight"
+    }
+  ],
+  "table-editor-obsidian:move-column-left": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "ArrowLeft"
+    }
+  ],
+  "table-editor-obsidian:move-row-down": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "ArrowUp"
+    }
+  ],
+  "table-editor-obsidian:move-row-up": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "ArrowDown"
+    }
+  ],
+  "obsidian-languagetool-plugin:ltaccept-suggestion-1": [
+    {
+      "modifiers": [],
+      "key": "F1"
+    }
+  ],
+  "obsidian-languagetool-plugin:ltaccept-suggestion-2": [
+    {
+      "modifiers": [],
+      "key": "F2"
+    }
+  ],
+  "obsidian-languagetool-plugin:ltaccept-suggestion-3": [
+    {
+      "modifiers": [],
+      "key": "F3"
+    }
+  ],
+  "workspace:edit-file-title": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "F2"
+    }
+  ],
+  "obsidian-languagetool-plugin:ltcheck-text": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "T"
+    }
+  ],
+  "editor:focus-left": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "L"
+    }
+  ],
+  "obsidian-heading-shifter:increase-heading": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "."
+    }
+  ],
+  "workspace:next-tab": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "L"
+    }
+  ],
+  "workspace:previous-tab": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "J"
+    }
+  ],
+  "editor:focus-bottom": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "'"
+    }
+  ],
+  "editor:focus-right": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": ";"
+    }
+  ],
+  "obsidian-excalidraw-plugin:insert-link-to-element": [],
+  "obsidian-dictionary-plugin:dictionary-open-language-switcher": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "L"
+    }
+  ],
+  "obsidian-dictionary-plugin:dictionary-open-view": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "O"
+    }
+  ],
+  "obsidian-heading-shifter:decrease-heading": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": ","
+    }
+  ],
+  "editor:focus-top": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "P"
+    }
+  ],
+  "easy-toggle-sidebars:toggle-both-sidebars": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": " "
+    }
+  ]
 }

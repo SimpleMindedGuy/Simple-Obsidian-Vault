@@ -2,11 +2,22 @@
 
 :root{
     /* --file-line-width : 1200px !important; */
-    --Table-Row-Color-Even:rgb(58, 58, 58);
-    --Table-Row-Color-Odd:rgb(35, 35, 35);
-    --Table-Row-Color-Thread:rgb(34, 15, 77);
+    --Table-Row-Color-Even:#3a3a3a;
+    --Table-Row-Color-Odd:#232323;
+    --Color-1:rgb(60, 34, 119);
     --Border-Color : #cecece;
+
+
+    --Color-1: #6D67E4;
+    --Color-2: #21E1E1;
+    --Color-3: #03C988;
+    --Color-4: #FFD369;
+    --Color-5: #F39422;
+    --Color-6: #ED2B2A;
+    --Color-7: #272727;
+    --Color-8: #D6D5A8;
 }
+/* [{label:'😡 rage',value:'😡 rage',color:'#FF6969'},{label:'😒 bitter',value:'😒 bitter',color:'#FF6969'},{label:'😭 sad',value:'😭 sad',color:'#FF6969'},{label:'😫 frustrated',value:'😫 frustrated',color:'#FF6969'},{label:'😨 scared',value:'😨 scared',color:'#FF6969'},{label:'😶 lonely',value:'😶 lonely',color:'#E8AA42'},{label:'😖 Guilty',value:'😖 Guilty',color:'#E8AA42'},{label:'😞 disappointed',value:'😞 disappointed',color:'#E8AA42'},{label:'😓 hopeless',value:'😓 hopeless',color:'#E8AA42'},{label:'😟 worried',value:'😟 worried',color:'#3CCF4E'},{label:'😮‍💨 exhausted',value:'😮‍💨 exhausted',color:'#3CCF4E'},{label:'😖 anxious',value:'😖 anxious',color:'#3CCF4E'},{label:'🤢 sick',value:'🤢 sick',color:'#3CCF4E'},{label:'😄 happy',value:'😄 happy',color:'#6D67E4'},{label:'😆 satisfied',value:'😆 satisfied',color:'#6D67E4'},{label:'😲 surprised',value:'😲 surprised',color:'#6D67E4'},{label:'😂 joyful',value:'😂 joyful',color:'#6D67E4'},{label:'😐 ok',value:'😐 ok',color:'#6D67E4'},] */
 
 * {
     unicode-bidi: plaintext;
@@ -24,33 +35,45 @@ table.calendar, tbody.calendar
 }
 
 
-.markdown-preview-view img:not([width]), .markdown-rendered img:not([width])
-{
-    width:100%;
+
+body:is(:not(.css-settings-manager),.toggle-status-bar) .status-bar {
+    bottom: 0 !important;
+    width: 100%;
 }
 
-.markdown-source-view:not(.is-live-preview) .HyperMD-header-1 
+
+.app-container {
+
+    height: calc(100% - 30px) !important;
+
+}
+
+
+/* .markdown-source-view:not(.is-live-preview) .HyperMD-header-1 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-2 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-3 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-4 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-5 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-6 
+
 {
     text-indent : 0;
     display: flex;    
     flex-wrap: wrap;
-}
+} */
 
 
-h1, .markdown-rendered h1,
-h2, .markdown-rendered h2,
-h3, .markdown-rendered h3,
-h4, .markdown-rendered h4,
-h5, .markdown-rendered h5,
-h6, .markdown-rendered h6
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
 {
     display: flex;
-    
+    text-indent : 0;
+    display: flex;    
+    flex-wrap: wrap;
     justify-items: center;
     justify-self: center;
 }
@@ -63,6 +86,11 @@ span.internal-embed.media-embed.image-embed.is-loaded
     margin-right: 0.5rem ;
 }
 
+ul > li.task-list-item {
+    display: flex;
+    align-content: center;
+    align-items: center;
+}
 
 /* .search-result-file-matched-text
 {
@@ -141,7 +169,13 @@ span.internal-embed.media-embed.image-embed.is-loaded
     margin: 0;
     padding: 0;
     /* height: 100%; */
+
+    position: static;
+    /* top: auto; */
+    
+    /* padding-bottom: calc(var(--banner-height) + 20px); */
 }
+
 .obsidian-banner {
     position: relative;
     top: 0;
@@ -153,6 +187,10 @@ span.internal-embed.media-embed.image-embed.is-loaded
     width: 100%;
     overflow: hidden;
     user-select: none;
+}
+
+.obsidian-banner-spacer{
+    height:  0;
 }
 
 .markdown-preview-view.is-readable-line-width .markdown-preview-sizer
@@ -180,6 +218,7 @@ span.internal-embed.media-embed.image-embed.is-loaded
 /* ,.dataview .table-view-table */
 ,.markdown-preview-view .dataview 
 {
+    color : white!important;
     border: none !important;
 }
 .markdown-preview-view .dataview .table-view-tbody
@@ -201,7 +240,13 @@ span.internal-embed.media-embed.image-embed.is-loaded
     text-align: center !important;
 }
 
-
+.markdown-preview-view img:not([width]), .markdown-rendered img:not([width]) {
+    /* width: auto; */
+    max-width: 100%;
+    min-height: 24px !important;
+    padding: 0px !important;
+    margin: 0px 0.2em 0em 0px;
+}
 
 
 .markdown-preview-view tbody tr:nth-child(even)
@@ -218,12 +263,12 @@ span.internal-embed.media-embed.image-embed.is-loaded
 }
 
 .markdown-preview-view tbody tr:hover{
-    background-color: #505050 !important;
+    background-color: #000000 !important;
 }
 
 .markdown-preview-view thead tr {
 
-    background-color: var(--Table-Row-Color-Thread) !important;
+    background-color: var(--Color-1) !important;
 }
 
 .markdown-rendered td, .markdown-rendered th {
@@ -329,14 +374,6 @@ table
 
 
 
-.obsidian-banner-wrapper
-{
-    position: static;
-    /* top: auto; */
-    
-    padding-bottom: calc(var(--banner-height) + 20px);
-    
-}
 
 .obsidian-banner.cm5-banner.solid.loaded
 {
@@ -394,6 +431,9 @@ table
     height: 100%;
     justify-items: center;
     background-color: transparent !important;
+
+    padding: 0.5rem !important;
+
     grid-auto-columns: 1fr;
 }
 
@@ -404,24 +444,25 @@ table
     min-height: 30px;
     align-content: center;
     min-width: 50px !important;
-    padding: 2px 4px !important;
+    /* padding: 2px 4px !important; */
+    padding: 0px !important;
 }
 
 
 .dvTableCards .table-view-tbody > tr
 {
     display: grid;
+    padding: 0;
     
     grid-auto-columns: 1fr;
-    
 }
 
-.dvTableCards .table-view-tbody > tr > td  > span > .Column
+.dvTableCards .table-view-tbody > tr > td > span > .Column
 {
 
 
     display: grid;
-    grid-template-columns: 30px 1fr;
+    grid-template-columns: auto 1fr;
     
     
     justify-items: start;
@@ -434,24 +475,28 @@ table
 
     font-size: small;
     height: fit-content;
-    padding: 0;
+    padding: 0px 3px;
     
+    place-items: center;
 }
 
 
 .dvTableCards .table-view-tbody > tr>td > span > .Column::before
 {
-    content: attr(Icon);
+    content: attr(Icon)":";
     width: 100%;
     height: 100%;
     display: grid;
     place-items: center;
+
+    place-content: center;
+    place-items: center;
+    
 }
 
 .dvTableCards.progressCards .table-view-tbody > tr
 {
     grid-template-areas: 
-    "Link Link"
     "Title Title"
     "Category Status"
     "Progress Progress";
@@ -459,21 +504,18 @@ table
 
 .dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(1)
 {
-    grid-area: Link;
-}
-.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(2)
-{
     grid-area: Title;
 }
-.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(3)
+
+.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(2)
 {
     grid-area: Category;
 }
-.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(4)
+.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(3)
 {
     grid-area: Status;
 }
-.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(5)
+.dvTableCards.progressCards .table-view-tbody > tr>td:nth-of-type(4)
 {
     grid-area: Progress;
 }
@@ -608,7 +650,82 @@ table
     border-radius: 6px;
     background-color: rgb(86, 74, 98);
     padding: 2px 6px;
-    top: -18px;
-    
+    top: -1rem;
+}
 
+.workspace-split.mod-horizontal.mod-right-split .view-content
+{
+    padding : 0.25rem;
+}
+
+table.calendar, tbody.calendar {
+    margin: 0;
+    padding: 0;
+}
+
+
+h1, .markdown-rendered h1,
+.HyperMD-header.HyperMD-header-1.CodeMirror-line,
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-1
+{
+    color : var(--Color-1)
+}
+h2, .markdown-rendered h2,
+.HyperMD-header.HyperMD-header-2.CodeMirror-line ,
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-2
+
+{
+    color : var(--Color-2)
+
+}
+h3, .markdown-rendered h3,
+.HyperMD-header.HyperMD-header-3.CodeMirror-line ,
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-3
+{
+    color : var(--Color-3)
+}
+h4, .markdown-rendered h4,
+.HyperMD-header.HyperMD-header-4.CodeMirror-line ,
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-4
+{
+    color : var(--Color-4)
+}
+h5, .markdown-rendered h5,
+.HyperMD-header.HyperMD-header-5.CodeMirror-line,
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-5
+{
+    color : var(--Color-5)
+}
+h6, .markdown-rendered h6,
+.HyperMD-header.HyperMD-header-6.CodeMirror-line ,
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-6
+{
+    color : var(--Color-6)
+}
+
+
+
+.workspace-split.mod-horizontal.mod-right-split .workspace-leaf{
+    margin: 0 1rem;
+}
+.workspace-split.mod-horizontal.mod-right-split {
+    padding-bottom: 1rem;
+}
+
+.calendar table thead tr th{
+    display: grid !important;
+    place-self: center !important;
+    place-content: center!important;
+    text-align: center!important;
+}
+
+body:is(:not(.css-settings-manager),
+.toggle-explorer-indent) .nav-folder.mod-root .nav-folder > .nav-folder-children 
+{
+    padding-left: 0.6rem;
+}
+
+body:not(.is-mobile):is(:not(.css-settings-manager),.toggle-scrollbar) ::-webkit-scrollbar-thumb
+{
+    visibility: visible;
 }

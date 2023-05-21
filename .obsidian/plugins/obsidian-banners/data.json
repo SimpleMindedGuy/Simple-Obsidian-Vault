@@ -1,6 +1,6 @@
 {
   "height": 400,
-  "style": "solid",
+  "style": "gradient",
   "showInInternalEmbed": true,
   "internalEmbedHeight": null,
   "showInPreviewEmbed": true,
@@ -11,9 +11,9 @@
   "iconHorizontalTransform": null,
   "iconVerticalAlignment": "center",
   "iconVerticalTransform": null,
-  "useTwemoji": true,
+  "useTwemoji": false,
   "showPreviewInLocalModal": true,
   "localSuggestionsLimit": 20,
-  "bannersFolder": "Gallery/Banner",
+  "bannersFolder": "80-Gallery/Banner",
   "allowMobileDrag": false
 }

@@ -4,6 +4,11 @@
       "type": "file",
       "title": "DialyDB",
       "path": "Journal/Daily/DialyDB.md"
+    },
+    {
+      "type": "file",
+      "title": "DialyDB",
+      "path": "92-FolderDB/DialyDB.md"
     }
   ]
 }

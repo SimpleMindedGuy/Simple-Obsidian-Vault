@@ -1,0 +1,189 @@
+{
+  "strategy": "default",
+  "cedictPath": "./cedict_ts.u8",
+  "matchStrategy": "partial",
+  "fuzzyMatch": true,
+  "matchingWithoutEmoji": true,
+  "treatAccentDiacriticsAsAlphabeticCharacters": false,
+  "maxNumberOfSuggestions": 11,
+  "maxNumberOfWordsAsPhrase": 3,
+  "minNumberOfCharactersTriggered": 0,
+  "minNumberOfWordsTriggeredPhrase": 1,
+  "complementAutomatically": false,
+  "delayMilliSeconds": 0,
+  "disableSuggestionsDuringImeOn": false,
+  "insertAfterCompletion": true,
+  "firstCharactersDisableSuggestions": ":/^",
+  "useCommonPrefixCompletionOfSuggestion": false,
+  "patternsToSuppressTrigger": [
+    "^~~~.*",
+    "^```.*"
+  ],
+  "showMatchStrategy": true,
+  "showComplementAutomatically": true,
+  "showIndexingStatus": true,
+  "descriptionOnSuggestion": "Short",
+  "selectSuggestionKeys": "Enter",
+  "additionalCycleThroughSuggestionsKeys": "None",
+  "disableUpDownKeysForCycleThroughSuggestionsKeys": false,
+  "openSourceFileKey": "None",
+  "propagateEsc": false,
+  "enableCurrentFileComplement": true,
+  "currentFileMinNumberOfCharacters": 2,
+  "onlyComplementEnglishOnCurrentFileComplement": false,
+  "enableCurrentVaultComplement": false,
+  "currentVaultMinNumberOfCharacters": 0,
+  "includeCurrentVaultPathPrefixPatterns": "",
+  "excludeCurrentVaultPathPrefixPatterns": "",
+  "includeCurrentVaultOnlyFilesUnderCurrentDirectory": false,
+  "enableCustomDictionaryComplement": false,
+  "customDictionaryPaths": "https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt",
+  "columnDelimiter": "Tab",
+  "customDictionaryWordRegexPattern": "",
+  "delimiterToHideSuggestion": "",
+  "delimiterToDivideSuggestionsForDisplayFromInsertion": "",
+  "caretLocationSymbolAfterComplement": "",
+  "displayedTextSuffix": " => ...",
+  "enableInternalLinkComplement": true,
+  "suggestInternalLinkWithAlias": true,
+  "excludeInternalLinkPathPrefixPatterns": "",
+  "updateInternalLinksOnSave": true,
+  "insertAliasTransformedFromDisplayedInternalLink": {
+    "enabled": false,
+    "beforeRegExp": "",
+    "after": ""
+  },
+  "frontMatterKeyForExclusionInternalLink": "",
+  "enableFrontMatterComplement": true,
+  "frontMatterComplementMatchStrategy": "inherit",
+  "insertCommaAfterFrontMatterCompletion": false,
+  "intelligentSuggestionPrioritization": {
+    "historyFilePath": "",
+    "maxDaysToKeepHistory": 30,
+    "maxNumberOfHistoryToKeep": 0
+  },
+  "disableOnMobile": false,
+  "showLogAboutPerformanceInConsole": false,
+  "selectionHistoryTree": {
+    "journal": {
+      "journal": {
+        "currentFile": {
+          "count": 1,
+          "lastUpdated": 1680657229900
+        }
+      }
+    },
+    "MakeSubNote": {
+      "MakeSubNote": {
+        "internalLink": {
+          "count": 1,
+          "lastUpdated": 1680693279456
+        }
+      }
+    },
+    "MoveDocumentMedia": {
+      "MoveDocumentMedia": {
+        "internalLink": {
+          "count": 1,
+          "lastUpdated": 1680693614826
+        }
+      }
+    },
+    "SubNote": {
+      "SubNote": {
+        "frontMatter": {
+          "count": 59,
+          "lastUpdated": 1680702492095
+        }
+      }
+    },
+    "CS": {
+      "CS": {
+        "frontMatter": {
+          "count": 1,
+          "lastUpdated": 1680699500939
+        }
+      }
+    },
+    "<%+ tp.date.now(\"YYYY/MM/DD - hh:mm A\") %>": {
+      "<%+ tp.date.now(\"YYYY/MM/DD - hh:mm A\") %>": {
+        "frontMatter": {
+          "count": 15,
+          "lastUpdated": 1680947711166
+        }
+      }
+    },
+    "Subject": {
+      "Subject": {
+        "frontMatter": {
+          "count": 3,
+          "lastUpdated": 1680701947281
+        }
+      }
+    },
+    "![[Gallery/Banner/typewriter.jpg]]": {
+      "![[Gallery/Banner/typewriter.jpg]]": {
+        "frontMatter": {
+          "count": 1,
+          "lastUpdated": 1680869023482
+        }
+      }
+    },
+    "habbit": {
+      "habbit": {
+        "currentFile": {
+          "count": 1,
+          "lastUpdated": 1680871260415
+        }
+      }
+    },
+    "modules": {
+      "modules": {
+        "currentFile": {
+          "count": 1,
+          "lastUpdated": 1680949682623
+        }
+      }
+    },
+    "Machine Learning Tracking": {
+      "Machine Learning Tracking": {
+        "internalLink": {
+          "count": 1,
+          "lastUpdated": 1680951644175
+        }
+      }
+    },
+    "Activities/Video/Clips/0002 - Just doing noita stuff/Media/just doing noita stuff.mp4": {
+      "Activities/Video/Clips/0002 - Just doing noita stuff/Media/just doing noita stuff.mp4": {
+        "internalLink": {
+          "count": 1,
+          "lastUpdated": 1680951717269
+        }
+      }
+    },
+    "Recognition": {
+      "Recognition": {
+        "currentFile": {
+          "count": 1,
+          "lastUpdated": 1680952286347
+        }
+      }
+    },
+    "prediction": {
+      "prediction": {
+        "currentFile": {
+          "count": 1,
+          "lastUpdated": 1680952417426
+        }
+      }
+    },
+    "Systems Analysis and Design Progress": {
+      "Systems Analysis and Design Progress": {
+        "internalLink": {
+          "count": 1,
+          "lastUpdated": 1680952477287
+        }
+      }
+    }
+  }
+}

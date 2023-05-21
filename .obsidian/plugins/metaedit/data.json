@@ -29,7 +29,32 @@
   },
   "KanbanHelper": {
     "enabled": true,
-    "boards": []
+    "boards": [
+      {
+        "property": "📊",
+        "boardName": "University"
+      },
+      {
+        "property": "📊",
+        "boardName": "Project"
+      },
+      {
+        "property": "📊",
+        "boardName": "People"
+      },
+      {
+        "property": "📊",
+        "boardName": "Learning"
+      },
+      {
+        "property": "📊",
+        "boardName": "Book"
+      },
+      {
+        "property": "📊",
+        "boardName": "Video"
+      }
+    ]
   },
   "UIElements": {
     "enabled": true

@@ -1,7 +1,7 @@
 {
-  "baseFontSize": 17,
+  "baseFontSize": 14,
   "translucency": false,
-  "cssTheme": "Tokyo Night",
+  "cssTheme": "Mado 11",
   "theme": "obsidian",
   "baseFontSizeAction": true,
   "interfaceFontFamily": "",
@@ -10,7 +10,7 @@
   "enabledCssSnippets": [
     "MyStyle"
   ],
-  "accentColor": "#9372fd",
+  "accentColor": "#9580ff",
   "showViewHeader": true,
   "nativeMenus": false
 }

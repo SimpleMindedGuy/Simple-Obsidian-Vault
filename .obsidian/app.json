@@ -8,7 +8,7 @@
   "showLineNumber": true,
   "readableLineLength": false,
   "fileSortOrder": "alphabetical",
-  "attachmentFolderPath": "Gallery",
+  "attachmentFolderPath": "80-Gallery",
   "showUnsupportedFiles": true,
   "useMarkdownLinks": false,
   "mobileToolbarCommands": [
@@ -52,7 +52,7 @@
     "DIFS",
     "sense"
   ],
-  "livePreview": true,
+  "livePreview": false,
   "defaultViewMode": "preview",
   "showFrontmatter": true,
   "strictLineBreaks": false,

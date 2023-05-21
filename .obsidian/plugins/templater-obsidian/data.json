@@ -1,6 +1,6 @@
 {
   "command_timeout": 5,
-  "templates_folder": "Templates",
+  "templates_folder": "99-Templates",
   "templates_pairs": [
     [
       "",
@@ -11,7 +11,7 @@
   "auto_jump_to_cursor": true,
   "enable_system_commands": false,
   "shell_path": "",
-  "user_scripts_folder": "Templates/Scripts",
+  "user_scripts_folder": "99-Templates/Scripts",
   "enable_folder_templates": true,
   "folder_templates": [
     {

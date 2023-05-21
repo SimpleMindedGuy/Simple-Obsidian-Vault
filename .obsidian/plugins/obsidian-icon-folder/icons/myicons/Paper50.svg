@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 73 73"
+   version="1.1"
+   id="svg65"
+   sodipodi:docname="html-templates-svgrepo-com.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview67"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="0.59"
+     inkscape:cx="395.76271"
+     inkscape:cy="416.94915"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg65" />
+  <title
+     id="title2">web-components/html-templates</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <defs
+     id="defs6" />
+  <g
+     id="web-components/html-templates"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="matrix(1.4016675,0,0,1.4016675,-14.655999,-16.045558)">
+    <g
+       id="container"
+       transform="translate(2,2)"
+       fill-rule="nonzero">
+      <g
+         id="web-design"
+         transform="translate(11,12)">
+        <path
+           d="m 42.116157,44.545929 c 0,1.342057 -1.087715,2.429772 -2.429773,2.429772 H 7.2893163 c -1.3420578,0 -2.4297721,-1.087715 -2.4297721,-2.429772 V 2.4297721 C 4.8595442,1.0877143 5.9472585,0 7.2893163,0 H 39.686384 c 1.342058,0 2.429773,1.0877143 2.429773,2.4297721 z"
+           id="Shape"
+           fill="#87ced9" />
+        <path
+           d="M 39.686384,46.975781 H 2.4297721 C 1.0877143,46.975781 0,45.887986 0,44.545929 v -2.429772 h 37.256612 v 2.429772 c 0,1.342057 1.087714,2.429852 2.429772,2.429852 z"
+           id="path10"
+           fill="#4398d1" />
+        <rect
+           id="Rectangle-path"
+           fill="#fda72f"
+           x="0"
+           y="12.958811"
+           width="16.198534"
+           height="9.7190886" />
+        <path
+           d="M 4.2869116,19.456881 2.6670901,17.837059 c -0.3158911,-0.315891 -0.3158911,-0.829374 0,-1.145265 l 1.6198215,-1.619821 1.1452653,1.145265 -1.0472687,1.047269 1.0472687,1.047109 z"
+           id="path13"
+           fill="#ff8a3d" />
+        <path
+           d="m 11.911622,19.456881 -1.145265,-1.145265 1.047269,-1.047269 -1.047269,-1.047269 1.145265,-1.145265 1.619822,1.619821 c 0.315891,0.315891 0.315891,0.829374 0,1.145266 z"
+           id="path15"
+           fill="#ff8a3d" />
+        <rect
+           id="rect17"
+           fill="#ff8a3d"
+           transform="rotate(-71.55418,8.098304,17.264943)"
+           x="5.5370264"
+           y="16.455051"
+           width="5.1225548"
+           height="1.6197817" />
+        <rect
+           id="rect19"
+           fill="#4398d1"
+           x="19.438257"
+           y="4.8595443"
+           width="27.537523"
+           height="16.198534" />
+        <polygon
+           id="polygon21"
+           fill="#3269a1"
+           points="35.052008,17.818355 27.537524,12.958811 19.438257,17.818355 19.438257,21.058078 46.975781,21.058078 46.975781,17.818355 41.306286,14.578713 " />
+        <circle
+           id="Oval"
+           fill="#e34b87"
+           cx="37.661629"
+           cy="10.124104"
+           r="2.0248368" />
+        <rect
+           id="rect24"
+           fill="#e34b87"
+           x="8.099267"
+           y="25.917622"
+           width="20.248127"
+           height="9.7190886" />
+        <rect
+           id="rect26"
+           fill="#bf3d75"
+           x="10.529039"
+           y="28.347395"
+           width="3.2397227"
+           height="1.6198214" />
+        <rect
+           id="rect28"
+           fill="#bf3d75"
+           x="15.388583"
+           y="28.347395"
+           width="7.2893162"
+           height="1.6198214" />
+        <rect
+           id="rect30"
+           fill="#bf3d75"
+           x="24.2978"
+           y="28.347395"
+           width="1.6198214"
+           height="1.6198214" />
+        <rect
+           id="rect32"
+           fill="#bf3d75"
+           x="10.529039"
+           y="31.587118"
+           width="9.7190886"
+           height="1.6198214" />
+        <rect
+           id="rect34"
+           fill="#bf3d75"
+           x="21.868029"
+           y="31.587118"
+           width="4.0495934"
+           height="1.6198214" />
+        <rect
+           id="rect36"
+           fill="#5eb3d1"
+           x="7.2893162"
+           y="2.4297721"
+           width="1.6198214"
+           height="1.6198214" />
+        <rect
+           id="rect38"
+           fill="#5eb3d1"
+           x="10.529039"
+           y="2.4297721"
+           width="1.6198214"
+           height="1.6198214" />
+        <rect
+           id="rect40"
+           fill="#5eb3d1"
+           x="13.768762"
+           y="2.4297721"
+           width="1.6198214"
+           height="1.6198214" />
+        <rect
+           id="rect42"
+           fill="#5eb3d1"
+           x="7.2893162"
+           y="5.6694951"
+           width="9.7190886"
+           height="1.6198214" />
+        <rect
+           id="rect44"
+           fill="#e34b87"
+           x="31.587118"
+           y="29.157345"
+           width="15.388583"
+           height="9.7190886" />
+        <rect
+           id="rect46"
+           fill="#bf3d75"
+           x="34.016888"
+           y="31.587118"
+           width="1.6198214"
+           height="1.6198214" />
+        <rect
+           id="rect48"
+           fill="#bf3d75"
+           x="34.016888"
+           y="34.826839"
+           width="1.6198214"
+           height="1.6198214" />
+        <rect
+           id="rect50"
+           fill="#bf3d75"
+           x="37.256611"
+           y="31.587118"
+           width="7.2893162"
+           height="1.6198214" />
+        <rect
+           id="rect52"
+           fill="#bf3d75"
+           x="37.256611"
+           y="34.826839"
+           width="7.2893162"
+           height="1.6198214" />
+        <rect
+           id="rect54"
+           fill="#71c4d1"
+           x="21.058079"
+           y="21.058079"
+           width="21.058079"
+           height="1.6198214" />
+        <rect
+           id="rect56"
+           fill="#71c4d1"
+           x="33.20702"
+           y="38.876514"
+           width="8.9092178"
+           height="1.6198214" />
+        <polygon
+           id="polygon58"
+           fill="#71c4d1"
+           points="4.8595442,22.67798 4.8595442,24.297801 17.818355,24.297801 17.818355,14.578713 16.198534,14.578713 16.198534,22.67798 " />
+        <polygon
+           id="polygon60"
+           fill="#71c4d1"
+           points="9.7190884,35.636791 9.7190884,37.256612 29.967296,37.256612 29.967296,27.537524 28.347395,27.537524 28.347395,35.636791 " />
+      </g>
+    </g>
+  </g>
+  <metadata
+     id="metadata69">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>web-components/html-templates</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
