@@ -24,12 +24,6 @@ Added some script to read Daily, Weekly, And Monthly note's **MetaData** to disp
 
 But currently it only works for data that is collected from periodic notes, Read the [[99-Templates/Habit Tracking Documentation|documentation]] for more information, and understand how it works.
 
-{% note %}
-
-You need to make sure that the variables names exactly match the ones you're looking for, and those same variables have to also be included in the templates you're trying to set its value in 
-
-{% endnote %}
-
 >[!important] 
 > You need to make sure that the variables names exactly match the ones you're looking for, and those same variables have to also be included in the templates you're trying to set its value in 
 
