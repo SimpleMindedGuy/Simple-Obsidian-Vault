@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<style>.cls-1{fill:#4b6ea4;}.cls-2{fill:#445f96;}.cls-3{fill:#a09b8c;}.cls-4{fill:#f1f2f2;}.cls-5{fill:#4c5665;}</style>
+</defs>
+<title/>
+<g id="Book">
+<rect class="cls-1" height="48" rx="2" ry="2" width="34" x="8"/>
+<path class="cls-2" d="M10,0h2a0,0,0,0,1,0,0V48a0,0,0,0,1,0,0H10a2,2,0,0,1-2-2V2A2,2,0,0,1,10,0Z"/>
+<path class="cls-3" d="M40,44H10a2,2,0,0,0,0,4H40a2,2,0,0,0,2-2V42A2.006,2.006,0,0,1,40,44Z"/>
+<path class="cls-4" d="M40,44H10a2,2,0,0,0,0,4H40a2,2,0,0,0,2-2V42A2.006,2.006,0,0,1,40,44Z"/>
+<path class="cls-5" d="M42,44v2a2.006,2.006,0,0,1-2,2H10a2,2,0,0,1-1.73-3A2,2,0,0,0,10,46H40A2.006,2.006,0,0,0,42,44Z"/>
+<rect class="cls-2" height="10" rx="1" ry="1" width="19" x="17" y="6"/>
+</g>
+</svg>

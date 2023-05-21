@@ -4,23 +4,24 @@ tags:
   - Dashboard
 alias : 
   - Home
+banner_y: 0.615
 ---
+
 ```button
 name New Document
 type append template
 action Commands/NewDocument
 templater true
 ```
-[[Activity/Book/Book|Book]] [[Activity/Learning/Learning|Learning]] [[Activity/University/University|University]] [[Activity/Project/Project|Project]] [[Activity/Video/Video|Video]]
-# ![[Gallery/Icons/My-Icons/activitiesicon.svg]] Activities
+
+
+[[99-Templates/Project/Project|Project]] [[99-Templates/Learning/Learning|Learning]] [[12-Video/Video|Video]] [[14-Book/Book|Book]] [[15-University/University|University]]
+
 ```dataviewjs
-await dv.view("Templates/view/Activities")
+await dv.view("98-DataView/View/Activities","hello world")
 ```
-# ![[Gallery/Icons/My-Icons/DefultUser.svg]] Personal 
-```dataviewjs
-await dv.view("Templates/view/Personal")
-```
+
 # 📔Important Diaries
 ```dataviewjs
-await dv.view("Templates/view/important Diary")
+await dv.view("98-DataView/View/important Diary")
 ```

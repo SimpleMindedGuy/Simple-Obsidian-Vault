@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="_x35_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 512 512"  xml:space="preserve">
+<g>
+	<g>
+		<polygon style="fill:#728C9F;" points="195.038,137.409 195.038,212.812 0,156.057 92.234,106.372 		"/>
+		<polygon style="fill:#FFFFFF;" points="390.083,455.235 195.06,511.974 195.06,212.789 390.083,156.049 		"/>
+		<polygon style="fill:#5DAFD1;" points="390.083,455.235 195.06,511.974 195.06,364.084 390.083,307.345 		"/>
+		<polygon style="fill:#92D0E2;" points="287.249,49.666 92.226,106.405 195.06,212.789 390.083,156.049 		"/>
+		<polygon style="fill:#FFFFFF;" points="287.272,0 287.272,49.685 92.234,106.372 92.234,56.754 277.78,2.76 		"/>
+		<polygon style="fill:#F2F2F2;" points="195.038,212.812 195.038,512 25.987,462.787 0,455.246 0,156.057 		"/>
+		<polygon style="fill:#69B9CF;" points="195.038,364.089 195.038,512 25.987,462.787 0,455.246 0,307.335 		"/>
+	</g>
+	<g>
+		<g>
+			<path style="fill:#E88293;" d="M253.341,256.438l-13.465,31.912l-13.532-24.102l-10.031,2.828v51.974l10.166-2.962v-30.229
+				l9.964,16.764l6.867-1.953l9.897-22.554v30.229l10.166-2.894v-51.907L253.341,256.438z"/>
+			<path style="fill:#E88293;" d="M275.491,250.042v51.907l10.099-2.962v-51.906L275.491,250.042z"/>
+			<path style="fill:#E88293;" d="M307.806,283.502v-42.818l-10.099,2.895v51.907l33.662-9.694v-9.089L307.806,283.502z"/>
+			<path style="fill:#E88293;" d="M357.357,247.013l17.168-25.651l-12.32,3.568l-18.245,27.939v-22.62l-10.166,2.894v51.907
+				l10.166-2.895v-15.619l6.665-9.964l13.33,19.793l11.849-3.434L357.357,247.013z"/>
+		</g>
+	</g>
+</g>
+</svg>
