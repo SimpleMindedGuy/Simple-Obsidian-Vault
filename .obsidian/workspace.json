@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "1756b77314defa85",
+        "id": "7b8264793fd05c30",
         "type": "tabs",
         "children": [
           {
-            "id": "e76d9df2ad1885af",
+            "id": "d74132adfbcf3264",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -190,7 +190,7 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "e76d9df2ad1885af",
+  "active": "d74132adfbcf3264",
   "lastOpenFiles": [
     "02-Monthly/2023/2023-05.md",
     "00-Daily/2023/2023-05-20.md",
