@@ -371,8 +371,8 @@ config:
   show_metadata_tasks: false
   show_metadata_inlinks: false
   show_metadata_outlinks: false
-  source_data: tag
-  source_form_result: "#diary"
+  source_data: query_js
+  source_form_result: "\"00-Daily\""
   source_destination_path: 92-FolderDB
   row_templates_folder: Journal/Daily
   current_row_template: 

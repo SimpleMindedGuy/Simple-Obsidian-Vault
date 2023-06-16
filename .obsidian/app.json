@@ -50,7 +50,8 @@
     "TDMA",
     "WARC",
     "DIFS",
-    "sense"
+    "sense",
+    "precisiona"
   ],
   "livePreview": false,
   "defaultViewMode": "preview",

@@ -242,7 +242,7 @@ async function GetInstructions(Text)
 async function RemoveInstructions(file)
 {
     // (\w+)\ *\:\ *(\=\>\ *.*\n*|\[.*\]\ *\=\>\ *.*\n*|(?:\{(\n.*)+?)\n\}\n*)
-    let CommandExp= new RegExp(`(\\w+)\\ *\\:\\ *(.+)?(\\=\\>\\ *.*|\\[.*\\]\\ *\\=\\>\\ *.*|(?:\\{(\\n.*)+?)(?<=\\n\\}))`,`gmi`)
+    let CommandExp= new RegExp(`(\\w+)\\ *\\:\\ *(.+)?(\\=\\>\\ *.*|\\[.*\\]\\ *\\=\\>\\ *.*|(?:\\{(\\n.*)+?)(?<=\\n\\}))\n*`,`gmi`)
     let text = await app.vault.read(file) 
 
     text = text.replace(CommandExp,"")
@@ -630,7 +630,6 @@ async function getLayers(Layers,rootPath)
     let Path = rootPath
     let num = 2
     
-    
     let Folder = await app.vault.getAbstractFileByPath(Path)
 
     for (const Layer of Layers)
@@ -660,9 +659,10 @@ async function getLayers(Layers,rootPath)
         {
             let documentNumber = await GetDocumentNumber(Folder,num)
             
-            Path += `${documentNumber}-${Layer}`
+            Path += `\/${documentNumber}-${Layer}`
 
             Path = Path.replace(/^\//mg,"")
+            Path = Path.replace(/\/{2,}/mg,"/")
             
 
             console.log(`Path ${Path}`)
@@ -678,6 +678,7 @@ async function getLayers(Layers,rootPath)
         num+=2
 
         console.log(`Folder : `)
+        
         console.log(Folder)
         Path = `${Folder.path}` 
         console.log(`New path  ${Path}`)
@@ -704,6 +705,9 @@ async function BuildDocument(tp)
 
     let Path = Paths[0]
 
+    console.log(`Path : `)
+    console.log( Path)
+
 
     console.log(`Getting templates`)
     const OptionalTemplates= await GetOptionalTemplates(TemplateExp,Paths)
@@ -713,9 +717,10 @@ async function BuildDocument(tp)
     
     console.log( OverView.Layer)
     console.log(`Overview Templates`)
-    console.log( Path)
     console.log( Path.match(OverviewFolder))
     let OverviewTemplate = await GetOverviewTemplate(OverviewExp,await Path.match(OverviewFolder)[0])
+
+
 
 
     console.log(`User options`)
@@ -1248,8 +1253,10 @@ async function MoveMedia(instruction,File)
     }
 
     let Folder = await app.vault.getAbstractFileByPath(Path)
+// (?<=\!\[\[)(\w[^(Banner|Media|icon|Daily|Files|Media|Attachments)]([\w \/|\ |\(|\)|\_|\-|\d|\.])*)+\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf)(?=\]\])
+    const pattern       = RegExp(/(?<=\!\[\[)((\d{1,}\-)?\w+[^(Banner|Media|icon|Daily|Files|Media|Attachments)][\/|\ |\(|\)|\_|\-|\d|\.]*\/?)+\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf)(?=\]\])/igm);
 
-    const pattern       = RegExp(/(?<=\!\[\[)(\w[^(Banner|Media|icon|Daily|Files|Media|Attachments)]([\w \/|\ |\(|\)|\_|\-|\d|\.])*)+\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf)(?=\]\])/igm);
+    // (?<=\!\[\[)((\d{1,}\-)?\w+[^(Banner|Media|icon|Daily|Files|Media|Attachments)][\/|\ |\(|\)|\_|\-|\d|\.]*\/?)+\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf)(?=\]\])
 
 
     let data = await app.vault.read(File);

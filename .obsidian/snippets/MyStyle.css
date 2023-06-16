@@ -729,3 +729,13 @@ body:not(.is-mobile):is(:not(.css-settings-manager),.toggle-scrollbar) ::-webkit
 {
     visibility: visible;
 }
+
+.workspace-split.mod-vertical.mod-root .markdown-preview-view{
+    padding: 0rem 0rem !important;
+}
+
+.markdown-preview-sizer.markdown-preview-section {
+    padding:0rem  1rem;
+    max-width: 1000px;
+    margin: auto;
+}

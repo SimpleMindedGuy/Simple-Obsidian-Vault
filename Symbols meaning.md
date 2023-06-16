@@ -41,9 +41,3 @@ tags:  > Tags generally used to group documents with similar nature
 banner: > Image for document
 
 
-## Numbers Association
-00 - 09 Journal Related
-10  - 29 Work,School and project Related
-30 - 39 Personal and relationship Related
-40 - 80 Not reserved 
-80 - 99 Habit Tracking, data visualization, Attachment storage and archiving 

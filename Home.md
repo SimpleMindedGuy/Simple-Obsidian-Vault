@@ -4,7 +4,7 @@ tags:
   - Dashboard
 alias : 
   - Home
-banner_y: 0.615
+banner_y: 0.6125
 ---
 
 ```button
@@ -13,6 +13,18 @@ type append template
 action Commands/NewDocument
 templater true
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 [[99-Templates/Project/Project|Project]] [[99-Templates/Learning/Learning|Learning]] [[12-Video/Video|Video]] [[14-Book/Book|Book]] [[15-University/University|University]]

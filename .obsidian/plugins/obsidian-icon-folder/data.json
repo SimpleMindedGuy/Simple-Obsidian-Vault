@@ -49,11 +49,6 @@
         "for": "everything"
       },
       {
-        "rule": "^Journal Files$",
-        "icon": "MyArchive",
-        "for": "everything"
-      },
-      {
         "rule": "^Journal$",
         "icon": "MyBook32",
         "for": "everything"
@@ -114,7 +109,7 @@
         "for": "everything"
       },
       {
-        "rule": "Daily",
+        "rule": "Daily$",
         "icon": "MyBook32",
         "for": "everything"
       },
@@ -164,7 +159,7 @@
         "for": "everything"
       },
       {
-        "rule": "Monthly",
+        "rule": "Monthly$",
         "icon": "MyBook25",
         "for": "everything"
       },
@@ -229,7 +224,7 @@
         "for": "everything"
       },
       {
-        "rule": "Weekly",
+        "rule": "Weekly$",
         "icon": "MyBook21",
         "for": "everything"
       },
@@ -239,13 +234,8 @@
         "for": "everything"
       },
       {
-        "rule": "Yearly",
+        "rule": "Yearly$",
         "icon": "MyBook18",
-        "for": "everything"
-      },
-      {
-        "rule": "Daily",
-        "icon": "MyBook32",
         "for": "everything"
       }
     ],
