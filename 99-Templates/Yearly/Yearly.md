@@ -69,9 +69,13 @@ customJS.DvMonthlyCharts.renderYear({
 			stacked : true,
 			target	: false,
 		},
-		"table" : {
+		"bar" : {
 			stacked : false,
 			target	: false,
+		},
+		"table" : {
+			stacked : false,
+			target	: true,
 		},
 	},
 })

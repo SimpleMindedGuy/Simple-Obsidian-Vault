@@ -4,60 +4,23 @@
     "type": "split",
     "children": [
       {
-        "id": "7146193faaec8475",
+        "id": "89c861b80fa3544d",
         "type": "tabs",
         "children": [
           {
-            "id": "72e0701d1df63ea7",
-            "type": "leaf",
-            "state": {
-              "type": "database-plugin",
-              "state": {
-                "file": "92-FolderDB/DialyDB.md"
-              }
-            }
-          },
-          {
-            "id": "169cd332ffbf1d2b",
+            "id": "46bd0ad4c0a103cc",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "99-Templates/Daily/Daily.md",
-                "mode": "source",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "7d00ecbcf2069467",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "99-Templates/Video/Video.md",
-                "mode": "preview",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "30a630f0a9f18cb1",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "99-Templates/Problem/Problem.md",
+                "file": "Home.md",
                 "mode": "preview",
                 "backlinks": true,
                 "source": true
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -69,7 +32,7 @@
       {
         "id": "cc9aaa7762441c95",
         "type": "tabs",
-        "dimension": 67.1892497200448,
+        "dimension": 71.25,
         "children": [
           {
             "id": "ccfa9f300fd13d9c",
@@ -101,7 +64,7 @@
       {
         "id": "434ddfbb5353f396",
         "type": "tabs",
-        "dimension": 32.81075027995521,
+        "dimension": 28.749999999999996,
         "children": [
           {
             "id": "a9064e1b1ef5af44",
@@ -115,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 307
+    "width": 297
   },
   "right": {
     "id": "cf0c977f7f90dfd4",
@@ -124,7 +87,7 @@
       {
         "id": "5cc77365d0d8e474",
         "type": "tabs",
-        "dimension": 42.523364485981304,
+        "dimension": 49.18032786885246,
         "children": [
           {
             "id": "d0d83656605c5435",
@@ -159,7 +122,7 @@
       {
         "id": "6aa5e20b69b42b13",
         "type": "tabs",
-        "dimension": 57.476635514018696,
+        "dimension": 50.81967213114754,
         "children": [
           {
             "id": "6311cc4f6775fc4d",
@@ -167,7 +130,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "99-Templates/Daily/Daily.md"
+                "file": "Home.md"
               }
             }
           },
@@ -177,7 +140,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "99-Templates/Daily/Daily.md",
+                "file": "Home.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -189,14 +152,14 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "99-Templates/Daily/Daily.md",
+                "file": "Home.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
                 "searchQuery": "",
-                "backlinkCollapsed": true,
-                "unlinkedCollapsed": false
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
               }
             }
           }
@@ -209,6 +172,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
       "homepage:Open homepage": false,
       "graph:Open graph view": false,
       "obsidian-gallery:Gallery": false,
@@ -224,58 +188,56 @@
       "dbfolder:Create a new database table": false,
       "obsidian-excalidraw-plugin:Create new drawing": false,
       "templater-obsidian:Templater": false,
-      "table-editor-obsidian:Advanced Tables Toolbar": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "169cd332ffbf1d2b",
+  "active": "ccfa9f300fd13d9c",
   "lastOpenFiles": [
-    "99-Templates/Problem/Problem.md",
-    "99-Templates/Video/Video.md",
-    "99-Templates/Daily/Daily.md",
     "92-FolderDB/DialyDB.md",
-    "00-Daily/2023/2023-06-16.md",
-    "01-Weekly/2023/2023-W24.md",
     "Home.md",
-    "12-Video/0000-Simple Talk/00 - filterring throuhg people/filterring throuhg people Tracking.md",
-    "12-Video/0000-Simple Talk/00 - filterring throuhg people/filterring throuhg people Progress.md",
-    "12-Video/0000-Simple Talk/00 - filterring throuhg people/filterring throuhg people Description.md",
-    "12-Video/0000-Simple Talk/00 - filterring throuhg people",
-    "12-Video/0000-Simple Talk",
-    "12-Video0000-Simple Talk/00 - Filtering Through People/Filtering Through People Tracking.md",
-    "12-Video0000-Simple Talk/00 - Filtering Through People/Filtering Through People Progress.md",
-    "12-Video0000-Simple Talk/00 - Filtering Through People/Filtering Through People Description.md",
-    "12-Video0000-Simple Talk/00 - Filtering Through People",
-    "12-Video0000-Simple Talk",
-    "99-Templates/Video/Progress Template.md",
-    "99-Templates/Video/Overview Template.md",
-    "00-Daily/2023/2023-06-17.md",
-    "00-Daily/2023/2023-06-15.md",
-    "00-Daily/2023/2023-05-31.md",
-    "00-Daily/2023/2023-06-01.md",
-    "00-Daily/2023/2023-06-02.md",
-    "00-Daily/2023/2023-06-03.md",
-    "00-Daily/2023/2023-06-04.md",
-    "00-Daily/2023/2023-06-05.md",
-    "00-Daily/2023/2023-06-06.md",
-    "00-Daily/2023/2023-06-08.md",
-    "00-Daily/2023/2023-06-09.md",
-    "15-University/0002 - Algorithm/introduction-to-algorithms-3rd-edition.pdf",
-    "80-Gallery/Banner/Writing-beginners.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01",
-    "81-DailyFiles/Year-2023/Month-06",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230531_234853.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230531_234901.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230531_234906.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230518_182236.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230518_193016.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230518_212746.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230531_150708.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230530_224131.png",
-    "81-DailyFiles/Year-2023/Month-06/Day-01/Screenshot_20230530_223803.png",
-    "10-Project/02 - example/SubNotes",
-    "10-Project/02 - example",
-    "10-Project/00 - Simple Obsidian Vault/Media",
+    "04-Project/Project.md",
+    "04-Project/00 - test/test Tracking.md",
+    "04-Project/00 - test/test Progress.md",
+    "04-Project/00 - test/test Description.md",
+    "04-Project/00 - test",
+    "04-Project",
+    "04-Project/00 - title/title Tracking.md",
+    "04-Project/00 - title/title Progress.md",
+    "04-Project/00 - title/title Description.md",
+    "04-Project/00 - title",
+    "02-Monthly/2023/2023-05.md",
+    "00-Daily/2023/2023-05-20.md",
+    "03-Yearly/2022.md",
+    "03-Yearly/2023.md",
+    "02-Monthly/2023/2023-01.md",
+    "02-Monthly/2023/2023-04.md",
+    "02-Monthly/2023/2023-02.md",
+    "01-Weekly/2023/2023-W19.md",
+    "01-Weekly/2023/2023-W20.md",
+    "99-Templates/01-Weekly/Weekly.md",
+    "00-Daily/2023/2023-05-14.md",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-17_01-53-07.332_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-17_01-52-23.259_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-17_01-52-27.537_1920x1080.png",
+    "15-University/0009 - test subject/test subject Description.md",
+    "15-University/0009 - test subject",
+    "00-Daily/2023/2023-05-12.md",
+    "00-Daily/2023/2023-05-13.md",
+    "00-Daily/2023/2023-05-15.md",
+    "00-Daily/2023/2023-05-16.md",
+    "15-University/0008 - Numerical Analysis/Numerical Analysis.pdf",
+    "15-University/0008 - Numerical Analysis/Media",
+    "12-Video/0003-Clips/0005 - mhw - when the cool move work",
+    "12-Video/0007-03-Clips",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile56588-1.pdf",
+    "15-University/0007 - Machine Learning/toPdfViaTempFile56588-0.html",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_23-36-28.337_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_23-36-25.954_1920x1080.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_22-24-49.761_7680x4320.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/VRChat_2023-01-16_22-23-31.315_2560x1440.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/Screenshot_20230117_020055.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/Screenshot_20230117_012150.png",
+    "81-DailyFiles/Year-2023/Month-01/Day-22/Screenshot_20230117_011519.png",
     "Templates/Activity/Canvas Subnote.canvas"
   ]
 }

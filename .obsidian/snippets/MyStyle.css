@@ -739,3 +739,17 @@ body:not(.is-mobile):is(:not(.css-settings-manager),.toggle-scrollbar) ::-webkit
     max-width: 1000px;
     margin: auto;
 }
+
+
+.tree-item-self{
+    padding: 2px 6px;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+}
+
+.tree-item-icon{
+    position: inherit !important;
+}

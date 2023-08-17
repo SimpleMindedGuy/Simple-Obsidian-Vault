@@ -98,21 +98,6 @@ how much tea did you drink today (cups)
 input :=> 🍵
 
 Dialog : {
-Money Gained today?
-}
-input :=> 💰
-
-Dialog : {
-Money Spent
-}
-input :=> 💵
-
-Dialog : {
-Items bought
-}
-input :=> 💳
-
-Dialog : {
 Enter Today's Title
 }
 Input :=> 🏷️
@@ -126,8 +111,6 @@ Dialog : {
 Aliases
 }
 List :=> alias
-
-Select: ['😡 rage','😒 bitter','😭 sad','😫 frustrated','😨 scared','😶 lonely','😖 Guilty','😞 disappointed','😓 hopeless','😟 worried','😮‍💨 exhausted','😖 anxious','🤢 sick','😄 happy','😆 satisfied','😲 surprised','😂 joyful','😐 ok'] => 😶
 
 BuildInFile :=>
 

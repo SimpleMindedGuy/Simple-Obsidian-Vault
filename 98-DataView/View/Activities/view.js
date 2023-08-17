@@ -7,16 +7,14 @@ for (let group of Groups)
 	
 	dv.container.className = "block-language-dataviewjs node-insert-event dvTableCards progressCards"
 
-	const rows = group.rows.groupBy(k => k["🎟️"])
-
-	for (const SubGroup of rows)
+	for (const SubGroup of group.rows.groupBy(k => k["🎟️"]))
 	{
 		dv.header(3, `${SubGroup.key}`)
-		dv.table([],
+		dv.table(["Name","🏷️Title","📊Category","📊Status","Progress"],
 
 		SubGroup.rows
-		.sort(k => k["🏹"] > 0 ? Math.round((k["🏹"]/k["🎯"])*100) : k["🏹"], "asc")
-
+		.sort(k => `${Math.round((k["🏹"]/k["🎯"])*100)}`, 'desc')
+		
 		.map(k => 
 		[
 			
@@ -26,16 +24,9 @@ for (let group of Groups)
 			dv.el("div", `[[${k.file.path}|${k["🏷️"]}]]`, {  attr: { Icon:"🏷️",class:"Column"},style:"grid-area:Title" }),
 			dv.el("div", `${k["🎟️"] ?? "❌"}`, {  attr: { Icon:"🎟️",class:"Column"},style:"grid-area:Category" }),
 			dv.el("div", `${k["📊"] ?? "❌"}`, {  attr: { Icon:"📊",class:"Column"},style:"grid-area:Status" }),
-			dv.el("progress", "", {  attr: {
-				max: k["🎯"] , value:k["🏹"],
-				percent: `${k["🏹"] > 0 ? Math.round((k["🏹"]/k["🎯"])*100) : 0}`},
-				style:"grid-area:Progress" }
-			)
+			dv.el("progress", "", {  attr: { max: k["🎯"] , value:k["🏹"], percent: `${Math.round((k["🏹"]/k["🎯"])*100)}`}, style:"grid-area:Progress" })
 
 		])
-
-
-
 	)
 	}
 

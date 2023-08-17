@@ -72,9 +72,13 @@ customJS.DvDailyCharts.renderWeek({
 			stacked : true,
 			target	: true,
 		},
-		"table" : {
+		"bar" : {
 			stacked : false,
 			target	: false,
+		},
+		"table" : {
+			stacked : false,
+			target	: true,
 		},
 	},
 })
