@@ -4,7 +4,7 @@ This documentation should cover all the important variables and terminology so t
 
 IF something is not explained here, please make an issue, and I'll Work on it as soon as possible 
 
->[!note]
+> [!note]
 > All files mentioned here are Javascript files
 > You don't have to have a total understanding of JavavSciprt  but it will make ur life much easier working with this document
 
@@ -47,32 +47,33 @@ It keeps looping through the list of colors until it apply colors to all the dat
 ### Yaxies 
 Specifies how many stacks/layers Y  of axes will  be displayed  and what type they will be 
 
->[!example] 
->to display 3 stacks of Y axes 
->Yaxises = {
+> [!example] 
+> to display 3 stacks of Y axes 
+> Yaxises = {
 > y                 : "check",
->y2				: "check",
->y3				: "Value",
->y4			    :  "Value",
->}
+> y2				: "check",
+> y3				: "Value",
+> y4			    :  "Value",
+> }
 > ![[80-Gallery/Screenshot_20230520_193622.png]]
 
 
 ### Properties
 A list/Array of objects that contain important information about what values to look for, and how to display them.
 
->[!note] Order Matters
->The order of how objects are places, is the order of how the data is going to be displayed, layered or stack on top of each other. 
+> [!note]
+> Order Matters
+> The order of how objects are places, is the order of how the data is going to be displayed, layered or stack on top of each other. 
 
 Each object in the List/ Array have to specify what the variable to look for, whether to store the values as a sum of all values or as the average of the values, what Y/X axes it should be displayed on, what stack it is displayed on, and what is the Target value to measure the actual value against. 
 
 
->[!iimportant] 
->[[99-Templates/Habit Tracking Documentation#Yaxies|Yaxises object]] values and [[99-Templates/Habit Tracking Documentation#Properties|Propeties]] values have to be edited per file in the current state.
->current files are 
->[[90-CustomJS/01-DialyCharts.js|01-DialyCharts]]
->[[90-CustomJS/02-WeeklyCharts.js|02-WeeklyCharts]]
->[[90-CustomJS/03-MonthlyCharts.js|03-MonthlyCharts]]
+> [!note] 
+> [[99-Templates/Habit Tracking Documentation#Yaxies|Yaxises object]] values and [[99-Templates/Habit Tracking Documentation#Properties|Propeties]] values have to be edited per file in the current state.
+> current files are 
+> [[90-CustomJS/01-DialyCharts.js|01-DialyCharts]]
+> [[90-CustomJS/02-WeeklyCharts.js|02-WeeklyCharts]]
+> [[90-CustomJS/03-MonthlyCharts.js|03-MonthlyCharts]]
 
 
 
@@ -85,18 +86,19 @@ this is used so that the graph display data in a more understandable form, and t
 
 The data displayed in the graph, is going to be the percentage of the real value compared to the target value. 
 
->[!example] Set a target of how many hours of read I expect to do, and my weight for the week.
->properties=[
->{
+> [!note]
+> Set a target of how many hours of read I expect to do, and my weight for the week.
+> properties=[
+> {
 >	label           : 'reading',
 >	Target			: 5,
->},
->{
+> },
+> {
 >	label           : 'weight',
 >	Target			: 60,
->}
->]
->lets imagine that we have those values 
+> }
+> ]
+> lets imagine that we have those values 
 > weight : 94 , 95 , 95 , 94 , 94
 > reading : 2 , 2 , 4 , 3 , 1
 > ![[80-Gallery/Screenshot_20230521_224028.png]]
@@ -139,16 +141,17 @@ the reason I made it this way ; is to provide different options, but also to avo
 
 And Just to stay safe I'll include a setup example for all those cases with comments in the setup code to explain what  needs to be explained 
 
->[!important] Things might change in the future.
->the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
+> [!important] Things might change in the future.
+> the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
 
 
 
 ### Displaying Week data
->[!example] List/Display data for the week by days
+> [!note]
+> List/Display data for the week by days
 >
 >```dataviewjs
->customJS.DvDailyCharts.renderWeek({	
+> customJS.DvDailyCharts.renderWeek({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
 >	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
@@ -173,14 +176,15 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >			target	: true,
 >		},
 >	},
->})
->```
+> })
+> ```
 
 ### Displaying Months data
->[!example] List/Display data for the Month by days
+> [!note]
+> List/Display data for the Month by days
 >
->```dataviewjs
->customJS.DvDailyCharts.renderMonth({	
+> ```dataviewjs
+> customJS.DvDailyCharts.renderMonth({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
 >	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
@@ -209,7 +213,8 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >```	
 
 
->[!example] List/Display data for the Month by weeks
+> [!note]
+> List/Display data for the Month by weeks
 >
 >```dataviewjs
 >customJS.DvWeeklyCharts.renderMonth({	
@@ -243,7 +248,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 
 ### Displaying Years Data
 
->[!example] List/Display data for the Year by days
+> [!note] List/Display data for the Year by days
 >
 >```dataviewjs
 >customJS.DvDailyCharts.renderYear({	
@@ -275,7 +280,8 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >```	
 
 
->[!example] List/Display data for the Year by weeks
+> [!note]
+> List/Display data for the Year by weeks
 >
 >```dataviewjs
 >customJS.DvWeeklyCharts.renderYear({	
@@ -307,7 +313,8 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >```	
 
 
->[!example] List/Display data for the Year by Month
+> [!note]
+> List/Display data for the Year by Month
 >
 >```dataviewjs
 >customJS.DvMonthlyCharts.renderYear({	
