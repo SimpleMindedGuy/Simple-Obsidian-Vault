@@ -322,7 +322,8 @@ if path is left empty then the script will create a folder inside the Document's
 ## Stop :=> 
 Stops marks the end of execution and removes the commands from  the current file. 
 
->[!important]  Always end with the stop command
+> [!important]
+> Always end with the stop command
 >It is very important to always end the commands with the stop command failing to do so will cause the script to infinately loop over the commands, and may result in un-predicted behaviour.
 >The only exception fo this rule is 
 >not needed when using the `BuildDocument/BuildSubDocument/BuildSubNote` command
