@@ -35,7 +35,7 @@ But currently it only works for data that is collected from periodic notes, Read
 > You need to make sure that the variables names exactly match the ones you're looking for, and those same variables have to also be included in the templates you're trying to set its value in 
 
 
-> [!note]exmaple
+> [!note](exmaple)
 > This is an example for data in my daily notes for a week. 
 > For most of those values I set the totals of those values in the YAML that weekly note's file. 
 > the data is all measured against a target so that so that we don't end up with hard to understand graphs where we have very high, and very low values in the graph, instead we have percentages, that are measured against a specific target.
