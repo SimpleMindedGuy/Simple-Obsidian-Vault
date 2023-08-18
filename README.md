@@ -23,15 +23,15 @@ This is a Utility that reads a file, and looks for specific commands within it, 
 
 It is meant to simplify scripts that do useful things, like where to create files, what kind of Data is expected for those files and how to group them together based on Options that are provided for the user.
 
-Look up the [99-Templates/Utility documentation|Utility documentation](99-Templates/Utility%20documentation.md) for the Utility for more information on what commands do, If you have any suggestions for commands, please create an issue ticket for it, preferably with an `enhancement` label.
+Look up the [99-Templates/Utility documentation](99-Templates/Utility%20documentation.md) for the Utility for more information on what commands do, If you have any suggestions for commands, please create an issue ticket for it, preferably with an `enhancement` label.
 
 ### Habit tracking
 
 Added some script to read Daily, Weekly, And Monthly note's **MetaData** to display them using graphs and tables, the variables themselves are customizable, all you have to do is edit the 3 files, the editing process is a little lengthy currently, and I'm trying to work out a way to make that process shorter.
 
-But currently it only works for data that is collected from periodic notes, Read the [99-Templates/Habit Tracking Documentation|documentation](99-Templates/Habit%20Tracking%20Documentation.md) for more information, and understand how it works.
+But currently it only works for data that is collected from periodic notes, Read the [99-Templates/Habit Tracking Documentation](99-Templates/Habit%20Tracking%20Documentation.md) for more information, and understand how it works.
 
-> [!important] 
+> [!note] 
 > You need to make sure that the variables names exactly match the ones you're looking for, and those same variables have to also be included in the templates you're trying to set its value in 
 
 
