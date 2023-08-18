@@ -13,7 +13,8 @@ The main file of specific document, any document that is made will look for temp
 ## Key
 Is a value that will end up being added to the metadata of the Description file.
 
-> [!Example] Example 
+> [!note]
+> Example 
 > Select : [one,two,three] => number
 > will result in a value called `number` with the chosen value
 > it should look like this 
@@ -61,7 +62,8 @@ A metadata value that holds all text values that can refer/link to the document
 ### CreateDateKey : => `key` , LastUpdatedKey : => `key` , TitleKey :=> `key`,ParentDocumentKey:=>`key`
 Changes the Key for or the MetaData variable name for the document's Created date/Modified Date/ Title
 
->[!eexample] Example
+>[!note]
+> Example
 > CreateDateKey : => 🗓️
 > stead of storing the created date in a 
 > `Created: 21/1/2020` 
@@ -78,7 +80,7 @@ those can be later used in data views and other related things.
 ## Set : `value`or `[value1,value2,value3]`=> `key`
 Sets a value or a  list of values to a key
 
->[!example] 
+>[!note] 
 >Set: hello world => sayHello
 >Stores "hello world" in the variable `sayHello`
 >Set: [1,2,3,4] => Numbers
@@ -92,7 +94,7 @@ Reads the value of `key1` from the current file's metadata, and store it in `key
 Adds the ability to put a value of a variable into the document instead of just as MetaData. 
 
 for example 
->[!example]
+>[!note]
 >using the commands 
 >Date :=> Day
 >\$(Day)
@@ -143,7 +145,8 @@ Shows an input dialog for the user  with options for True/False values.
 ## NextFile :=> `key` OR `templatefolder name`
 Tells the script to look for the next file of instructions , looks for folders first, and The search is based on the value of the given key (`key`).
 
->[!example] Example
+>[!note]
+>Example
 >Using the ` NextFile :=>`   command
 >Will look into the `Layers` variable, then read the first index if used for the first time, or read the next index.
 >when using the 
@@ -202,7 +205,7 @@ tells the Script at which layer to make the Overview folder, you can only make o
 Takes either a number, or name a folder name. 
 
 
->[!Example]
+>[!note]
 >If the values (OverviewKey) and (OverviewLayer) are assigned
 >- the script will first look for an "Overview Template" file, at the chosen `layer`
 >- if we made a document with the layers 
@@ -248,14 +251,14 @@ The way templates will work :
 	- Each value in the `Layers` represent a folder.
 	- Each `Layer` should contain the `Layer` after it. 
 
->[!example]
+>[!note]
 >if the `Layers` array contain the values [Activity , Project , Program], the script will look inside the Templates folder.
 >And it will look for the `Activity` folder, then will look inside the `Activity` folder for the `Project` folder, then will look inside the `Project` folder for `Program` folder.
 
 - When the last `Layer` is reached the script will look for `Template files`.
 	script will look for any file with the suffix Template in their name in the current layer. 
 
->[!example]
+>[!note]
 >if we want to make template files for the `layer` `Activity/Project/Program`.
 >then the utility will look for
 >
