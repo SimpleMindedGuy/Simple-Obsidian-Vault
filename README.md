@@ -36,7 +36,7 @@ But currently it only works for data that is collected from periodic notes, Read
 
 
 > [!note]
->  This is an example for data in my daily notes for a week. 
+> This is an example for data in my daily notes for a week. 
 > For most of those values I set the totals of those values in the YAML that weekly note's file. 
 > the data is all measured against a target so that so that we don't end up with hard to understand graphs where we have very high, and very low values in the graph, instead we have percentages, that are measured against a specific target.
 > ![](80-Gallery/Screenshot%2020230520%20164944.png)
