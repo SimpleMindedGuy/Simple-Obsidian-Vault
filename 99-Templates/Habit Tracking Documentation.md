@@ -48,14 +48,17 @@ It keeps looping through the list of colors until it apply colors to all the dat
 ### Yaxies 
 Specifies how many stacks/layers Y  of axes will  be displayed  and what type they will be 
 
-> [!note] 
-> to display 3 stacks of Y axes 
+> [!note]
+> 
+> to display 3 stacks of Y axes
+> ```js
 > Yaxises = {
 > y                 : "check",
 > y2				: "check",
 > y3				: "Value",
 > y4			    :  "Value",
 > }
+> ```
 > ![](../80-Gallery/Screenshot%2020230520%20193622.png)
 
 
@@ -69,12 +72,13 @@ A list/Array of objects that contain important information about what values to 
 Each object in the List/ Array have to specify what the variable to look for, whether to store the values as a sum of all values or as the average of the values, what Y/X axes it should be displayed on, what stack it is displayed on, and what is the Target value to measure the actual value against. 
 
 
-> [!note] 
+> [!note]
+> 
 > [Yaxises object](#Yaxies) values and [Propeties](#Properties) values have to be edited per file in the current state.
-> current files are 
-> [90-CustomJS/01-DialyCharts.js](../90-CustomJS/01-DialyCharts.js)
-> [90-CustomJS/02-WeeklyCharts.js](../90-CustomJS/02-WeeklyCharts.js)
-> [90-CustomJS/03-MonthlyCharts.js](90-CustomJS/03-MonthlyCharts.js)
+> current files are :
+> - [90-CustomJS/01-DialyCharts.js](../90-CustomJS/01-DialyCharts.js)
+> - [90-CustomJS/02-WeeklyCharts.js](../90-CustomJS/02-WeeklyCharts.js)
+> - [90-CustomJS/03-MonthlyCharts.js](90-CustomJS/03-MonthlyCharts.js)
 
 
 
