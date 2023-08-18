@@ -7,7 +7,7 @@ IF something is not explained here, please make an issue, and I'll Work on it as
 
  	
 
->? TIP: **Click me to read more.**
+> TIP: **Click me to read more.**
 >
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla.
 >
