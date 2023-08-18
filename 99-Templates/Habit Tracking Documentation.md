@@ -4,7 +4,8 @@ This documentation should cover all the important variables and terminology so t
 
 IF something is not explained here, please make an issue, and I'll Work on it as soon as possible 
 
-> [!example]
+> [!note] TITLe
+> 
 > All files mentioned here are Javascript files
 > You don't have to have a total understanding of JavavSciprt  but it will make ur life much easier working with this document
 
