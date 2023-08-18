@@ -89,6 +89,7 @@ The data displayed in the graph, is going to be the percentage of the real value
 
 > [!note]
 > Set a target of how many hours of read I expect to do, and my weight for the week.
+> ```JS
 > properties=[
 > {
 >	label           : 'reading',
@@ -99,23 +100,24 @@ The data displayed in the graph, is going to be the percentage of the real value
 >	Target			: 60,
 > }
 > ]
+> ```
 > lets imagine that we have those values 
 > weight : 94 , 95 , 95 , 94 , 94
 > reading : 2 , 2 , 4 , 3 , 1
-> ![[80-Gallery/Screenshot_20230521_224028.png]]
+> ![](../80-Gallery/Screenshot&2020230521%20224028.png)
 > this makes it harder to understand the graph, so instead we compare those values to the target and display them in the same Y-axies
 > it is much easier to understand the graph
-> ![[80-Gallery/Screenshot_20230521_224053.png]]
+> ![](../80-Gallery/Screenshot%2020230521%20224053.png)
 
 #### Scatter
 specifies the style it will display data in for more information check [ChartJS](https://www.chartjs.org/).
 
 #### chart
 What type of value to expect from the variable weather its a Numerical or Categorical 
-take the values that are found in [[99-Templates/Habit Tracking Documentation#Chart|The Charts]] object. 
+take the values that are found in [|The Charts](#Chart) object. 
 
 #### yAxisID
-specifies the Y axes layer it will be displayed in those values should match the the values in the [[99-Templates/Habit Tracking Documentation#Yaxies|Yaxises object]] 
+specifies the Y axes layer it will be displayed in those values should match the the values in the [|Yaxises object](#Yaxies)
 
 current setups
 
@@ -142,7 +144,8 @@ the reason I made it this way ; is to provide different options, but also to avo
 
 And Just to stay safe I'll include a setup example for all those cases with comments in the setup code to explain what  needs to be explained 
 
-> [!important] Things might change in the future.
+> [!warning]
+> Things might change in the future.
 > the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
 
 
@@ -155,7 +158,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > customJS.DvDailyCharts.renderWeek({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
+>	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
 >	
 >	Date: "2020-W15", // Date want to track, this can be a week, or month. ( in this case the week )
 >	DateFormat: "YYYY-[W]ww", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
@@ -188,7 +191,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > customJS.DvDailyCharts.renderMonth({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
+>	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
 >	
 >	Date: "2020-01", // Date want to track, this can be a week, or month. ( in this case the month )
 >	DateFormat: "YYYY-MM", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
@@ -221,7 +224,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >customJS.DvWeeklyCharts.renderMonth({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
+>	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
 >	
 >	Date: "2020-01", // Date want to track, this can be a week, or month. ( in this case the month )
 >	DateFormat: "YYYY-MM", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
@@ -255,7 +258,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >customJS.DvDailyCharts.renderYear({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
+>	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
 >	
 >	Date: "2020", // Date want to track, this can be a week, or month. ( in this case the Year )
 >	DateFormat: "YYYY", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
@@ -288,7 +291,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >customJS.DvWeeklyCharts.renderYear({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
+>	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
 >	
 >	Date: "2020", // Date want to track, this can be a week, or month. ( in this case the month )
 >	DateFormat: "YYYY", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
@@ -321,7 +324,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 >customJS.DvMonthlyCharts.renderYear({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the [[99-Templates/Habit Tracking Documentation#Properties|Properties]] of those files)
+>	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
 >	
 >	Date: "2020-01", // Date want to track, this can be a week, or month. ( in this case the month )
 >	DateFormat: "YYYY-MM", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
