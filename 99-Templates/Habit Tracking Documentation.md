@@ -47,7 +47,7 @@ It keeps looping through the list of colors until it apply colors to all the dat
 ### Yaxies 
 Specifies how many stacks/layers Y  of axes will  be displayed  and what type they will be 
 
-> [!example] 
+> [!note] 
 > to display 3 stacks of Y axes 
 > Yaxises = {
 > y                 : "check",
