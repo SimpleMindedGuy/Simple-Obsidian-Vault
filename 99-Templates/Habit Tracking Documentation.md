@@ -1,3 +1,7 @@
+> [!warning]
+> Things might change in the future.
+> the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
+
 # Introduction
 
 This documentation should cover all the important variables and terminology so that you can easily customize your habit tracking visualizationn. 
@@ -53,10 +57,10 @@ Specifies how many stacks/layers Y  of axes will  be displayed  and what type th
 > to display 3 stacks of Y axes
 > ```js
 > Yaxises = {
-> y                 : "check",
-> y2				: "check",
-> y3				: "Value",
-> y4			    :  "Value",
+> y 			: "check",
+> y2			: "check",
+> y3			: "Value",
+> y4			:  "Value",
 > }
 > ```
 > ![](../80-Gallery/Screenshot%2020230520%20193622.png)
@@ -99,12 +103,12 @@ The data displayed in the graph, is going to be the percentage of the real value
 > ```JS
 > properties=[
 > {
->	label           : 'reading',
->	Target			: 5,
+>	label		: 'reading',
+>	Target		: 5,
 > },
 > {
->	label           : 'weight',
->	Target			: 60,
+>	label		: 'weight',
+>	Target		: 60,
 > }
 > ]
 > ```
@@ -151,9 +155,7 @@ the reason I made it this way ; is to provide different options, but also to avo
 
 And Just to stay safe I'll include a setup example for all those cases with comments in the setup code to explain what  needs to be explained 
 
-> [!warning]
-> Things might change in the future.
-> the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
+
 
 
 
@@ -259,7 +261,8 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 
 ### Displaying Years Data
 
-> [!note] List/Display data for the Year by days
+> [!note]
+> List/Display data for the Year by days
 >
 >```dataviewjs
 >customJS.DvDailyCharts.renderYear({	
