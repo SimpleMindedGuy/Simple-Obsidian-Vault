@@ -1,9 +1,10 @@
-# Important 
-To be able to use the commands, you need to have a templater command 
-- `<%* tp.user.NewDocument(tp,true) %>` 
-	if you are trying to read the commands in the current file 
-- `<%* tp.user.NewDocument(tp,false) %>`
-	if you are trying to read the commands in the 'NewDocument' File
+> [!Important]
+> To be able to use the commands, you need to have a templater command 
+> 
+> - `<%* tp.user.NewDocument(tp,true) %>` 
+> 	if you are trying to read the commands in the current file 
+> - `<%* tp.user.NewDocument(tp,false) %>`
+> 	if you are trying to read the commands in the 'NewDocument' File
 
 # Keywords
 
@@ -111,7 +112,8 @@ can contain any amount of text, The text is later used to be displayed in the in
 ## Layer : [`value`,`value`...] (=> `Key`) optional
 Shows an input dialog, for the user, the user can only chose one of them, then the value is stored in an array called `Layers`, each `Layer` represent a fold, the folders then are created in ascending order ( first layer is created first), each containing the folder after it.
 
-Note that too many layers will negatively affect the performance of your vault.
+>[!warning]
+>Too many layers will negatively affect the performance of your vault.
 
 storing that value in a `key` is optional.
 
@@ -122,7 +124,8 @@ shows input dialog for the user with multiple values that are stored inside the 
 
 User can only pic only one value, and the value is then stored in a key (`key`), the key can be any string( Text ) value. the key can be later used to write the value in the document, or in meta data.
 
-its important to note that Keys can only be assigned once, to avoid overwriting values.
+>[!important]
+>that Keys can only be assigned once, to avoid overwriting values.
 
 
 ## Options : [ `value`,`value`] => `key`
@@ -228,7 +231,8 @@ the path can include `key` to use values in current file's metadata values, from
 when using a "fixed" path 
 just type the path as normal : path/to/folder
 when using variables  use the current format :  /\$(`key`)/\$(`key`)/\$(`key`)
-note : using the character \$ might end up rendering the as latex, but that wont affect how the script functions. 
+> [!important]
+> using the character \$ might end up rendering the as latex, but that wont affect how the script functions. 
 
 It can also be left empty and use the `Layers` values instead, and will move the files based on the layer values.
 
@@ -301,11 +305,13 @@ the `parent` key can be changed using the `ParentKey => newKey` command
 
 just like `MoveMedia` the path value can be a fixed value or can be made of data from the metadata or some input values 
 
-note : In this command the `Layers` values will be used for both
-- Looking for the templates if `Template path` is left empty
-- Decide where to build the project if `build path` is left empty
+>[!note]
+> In this command the `Layers` values will be used for both
+> - Looking for the templates if `Template path` is left empty
+> - Decide where to build the project if `build path` is left empty
 
-note : when looking for Templates (`Template path`) the script will assume that the path is inside the Templates folder, whereas The build path have different rules
+>[!important]
+> when looking for Templates (`Template path`) the script will assume that the path is inside the Templates folder, whereas The build path have different rules
 
 If the build path is empty, and Layers is empty, the script will create folder inside the current document folder, and build the sub document inside it. 
 
