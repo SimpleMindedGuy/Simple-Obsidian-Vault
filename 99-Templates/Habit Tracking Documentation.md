@@ -56,7 +56,7 @@ Specifies how many stacks/layers Y  of axes will  be displayed  and what type th
 > y3				: "Value",
 > y4			    :  "Value",
 > }
-> ![[80-Gallery/Screenshot_20230520_193622.png]]
+> ![](../80-Gallery/Screenshot%2020230520%20193622.png)
 
 
 ### Properties
@@ -70,11 +70,11 @@ Each object in the List/ Array have to specify what the variable to look for, wh
 
 
 > [!note] 
-> [[99-Templates/Habit Tracking Documentation#Yaxies|Yaxises object]] values and [[99-Templates/Habit Tracking Documentation#Properties|Propeties]] values have to be edited per file in the current state.
+> [Yaxises object](#Yaxies) values and [Propeties](#Properties) values have to be edited per file in the current state.
 > current files are 
-> [[90-CustomJS/01-DialyCharts.js|01-DialyCharts]]
-> [[90-CustomJS/02-WeeklyCharts.js|02-WeeklyCharts]]
-> [[90-CustomJS/03-MonthlyCharts.js|03-MonthlyCharts]]
+> [90-CustomJS/01-DialyCharts.js](../90-CustomJS/01-DialyCharts.js)
+> [90-CustomJS/02-WeeklyCharts.js](../90-CustomJS/02-WeeklyCharts.js)
+> [90-CustomJS/03-MonthlyCharts.js](90-CustomJS/03-MonthlyCharts.js)
 
 
 
