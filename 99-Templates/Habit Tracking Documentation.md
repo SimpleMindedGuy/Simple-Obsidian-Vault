@@ -76,8 +76,11 @@ Each object in the List/ Array have to specify what the variable to look for, wh
 > 
 > [Yaxises object](#Yaxies) values and [Propeties](#Properties) values have to be edited per file in the current state.
 > current files are :
+> 
 > - [90-CustomJS/01-DialyCharts.js](../90-CustomJS/01-DialyCharts.js)
+>   
 > - [90-CustomJS/02-WeeklyCharts.js](../90-CustomJS/02-WeeklyCharts.js)
+>   
 > - [90-CustomJS/03-MonthlyCharts.js](90-CustomJS/03-MonthlyCharts.js)
 
 
