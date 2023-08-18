@@ -10,7 +10,7 @@ IF something is not explained here, please make an issue, and I'll Work on it as
 > You don't have to have a total understanding of JavavSciprt  but it will make ur life much easier working with this document
 
 ## Graph Display
-This can be found in the [[90-CustomJS/00-Defaults.js|Defaults]] file. 
+This can be found in the [/90-CustomJS/00-Defaults.js](../90-CustomJS/00-Defaults.js) file. 
 
 To understand how to customize these data you have to check [ChartJS](https://www.chartjs.org/) documentation, if you want to add more custom values.
 
