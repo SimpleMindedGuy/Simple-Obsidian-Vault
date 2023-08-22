@@ -81,7 +81,7 @@ those can be later used in data views and other related things.
 
 # Command Block `{{{:::  <commands>  :::}}}`
 All Commands have to be inside the command block, the utility will only for the commands inside only one block in the file that is written in the following form.
-```
+```markdown
 {{{:::
 <command> 
 <command>

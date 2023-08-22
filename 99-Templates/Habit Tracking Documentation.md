@@ -133,10 +133,10 @@ specifies the style it will display data in for more information check [ChartJS]
 
 #### chart
 What type of value to expect from the variable weather its a Numerical or Categorical 
-take the values that are found in [|The Charts](#Chart) object. 
+take the values that are found in [The Charts](#Chart) object. 
 
 #### yAxisID
-specifies the Y axes layer it will be displayed in those values should match the the values in the [|Yaxises object](#Yaxies)
+specifies the Y axes layer it will be displayed in those values should match the the values in the [Yaxises object](#Yaxies)
 
 current setups
 
