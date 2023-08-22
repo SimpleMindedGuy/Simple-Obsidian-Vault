@@ -63,7 +63,8 @@ Specifies how many stacks/layers Y  of axes will  be displayed  and what type th
 > y4			:  "Value",
 > }
 > ```
-> ![](../80-Gallery/Screenshot_20230520_193622.png)
+
+![](../80-Gallery/Screenshot_20230520_193622.png)
 
 
 ### Properties
@@ -112,13 +113,20 @@ The data displayed in the graph, is going to be the percentage of the real value
 > }
 > ]
 > ```
-> lets imagine that we have those values 
+> let's imagine that we have those values 
+> ```js
 > weight : 94 , 95 , 95 , 94 , 94
 > reading : 2 , 2 , 4 , 3 , 1
-> ![](../80-Gallery/Screenshot_20230521_224028.png)
+>```
+
+![](../80-Gallery/Screenshot_20230521_224028.png) 
+
+>[!note]
 > this makes it harder to understand the graph, so instead we compare those values to the target and display them in the same Y-axies
 > it is much easier to understand the graph
-> ![](../80-Gallery/Screenshot_20230521_224053.png)
+
+![](../80-Gallery/Screenshot_20230521_224053.png)
+
 
 #### Scatter
 specifies the style it will display data in for more information check [ChartJS](https://www.chartjs.org/).

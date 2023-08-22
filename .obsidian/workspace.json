@@ -14,7 +14,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "99-Templates/Habit Tracking Documentation.md",
                 "mode": "source",
                 "backlinks": true,
                 "source": true
@@ -35,7 +35,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "99-Templates/Habit Tracking Documentation.md",
                 "mode": "preview",
                 "backlinks": true,
                 "source": true
@@ -153,7 +153,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "99-Templates/Utility documentation.md"
+                "file": "99-Templates/Habit Tracking Documentation.md"
               }
             }
           },
@@ -163,7 +163,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "99-Templates/Habit Tracking Documentation.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -175,7 +175,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "99-Templates/Habit Tracking Documentation.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -216,8 +216,8 @@
   },
   "active": "15990dd33194e1cf",
   "lastOpenFiles": [
-    "99-Templates/Habit Tracking Documentation.md",
     "99-Templates/Utility documentation.md",
+    "99-Templates/Habit Tracking Documentation.md",
     "99-Templates/NewDocument.md",
     "99-Templates/Topic SubNote.md",
     "README.md",
