@@ -63,7 +63,7 @@ Specifies how many stacks/layers Y  of axes will  be displayed  and what type th
 > y4			:  "Value",
 > }
 > ```
-> ![](../80-Gallery/Screenshot%2020230520%20193622.png)
+> ![](../80-Gallery/Screenshot_20230520_193622.png)
 
 
 ### Properties
@@ -115,10 +115,10 @@ The data displayed in the graph, is going to be the percentage of the real value
 > lets imagine that we have those values 
 > weight : 94 , 95 , 95 , 94 , 94
 > reading : 2 , 2 , 4 , 3 , 1
-> ![](../80-Gallery/Screenshot&2020230521%20224028.png)
+> ![](../80-Gallery/Screenshot_20230521_224028.png)
 > this makes it harder to understand the graph, so instead we compare those values to the target and display them in the same Y-axies
 > it is much easier to understand the graph
-> ![](../80-Gallery/Screenshot%2020230521%20224053.png)
+> ![](../80-Gallery/Screenshot_20230521_224053.png)
 
 #### Scatter
 specifies the style it will display data in for more information check [ChartJS](https://www.chartjs.org/).
@@ -163,28 +163,33 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > [!note]
 > List/Display data for the week by days
 >
->```dataviewjs
+>```JS
+>/// script should be a dataview block
 > customJS.DvDailyCharts.renderWeek({	
 >	dv, // important to include the dataview plugin so it can gather data
 >	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
+>	setValues: true, // Option to write the values into the current file 
 >	
->	Date: "2020-W15", // Date want to track, this can be a week, or month. ( in this case the week )
->	DateFormat: "YYYY-[W]ww", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
->	DocumentFormat: "YYYY-MM-DD", // the date format  for the names of the files you want to get its data (in this case Daily notes Naming format)
->	labelFormat:"dddd", // the date format for the labels of the files you want to display (in this case this changes the name of the file to the name of the corresponding day)
+>	Date: "2020-W15", // Date we want to track
+>	DateFormat: "YYYY-[W]ww", // Date Format 
+>	DocumentFormat: "YYYY-MM-DD", // the date format  
+>	labelFormat:"dddd", // date labels 
 >	
->	group: "#diary",  // Specifies where to look for data, or what types of files to look for to get the data from,  could be a path, or could be a tag
->	types: { // this includes objects that tells the script what kind of charts to display, and how to display the data in those charts, there are only 3, line, bar, table.
->		"line" : {// display a line chart
->			stacked : true, // if the chart is going to stacked or not ( this will overwrite the stack property for every chart data).
->			target	: false, // if the data is going to measured against a target.
+>	group: "#diary",  // Files to look read, could be path or tag
+>	types: { 
+>	// Types of charts to display
+>		"line" :  // display a line chart
+>		{ 
+>			stacked : true, // display stacked chart
+>			target	: false, // measure data against target.
 >		},
->		"bar" : { // display a bar chart
+>		"bar" :  // display a bar chart
+>		{ 
 >			stacked : false,
 >			target	: false,
 >		},
->		"table" : { // display a table 
+>		"table" : // display a table 
+>		{ 
 >			stacked : false,
 >			target	: true,
 >		},
@@ -196,28 +201,29 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > [!note]
 > List/Display data for the Month by days
 >
-> ```dataviewjs
+>```JS
+>/// script should be a dataview block
 > customJS.DvDailyCharts.renderMonth({	
->	dv, // important to include the dataview plugin so it can gather data
->	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
+>	dv, 
+>	block: this, 
+>	setValues: true, 
 >	
->	Date: "2020-01", // Date want to track, this can be a week, or month. ( in this case the month )
->	DateFormat: "YYYY-MM", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
->	DocumentFormat: "YYYY-MM-DD", // the date format  for the names of the files you want to get its data (in this case Daily notes Naming format)
->	labelFormat:"DD", // the date format for the labels of the files you want to display (in this case this changes the name of the file to the number of the corresponding day of the month)
+>	Date: "2020-01", 
+>	DateFormat: "YYYY-MM", 
+>	DocumentFormat: "YYYY-MM-DD",
+>	labelFormat:"DD", 
 >	
->	group: "#diary",  // Specifies where to look for data, or what types of files to look for to get the data from,  could be a path, or could be a tag
->	types: { // this includes objects that tells the script what kind of charts to display, and how to display the data in those charts, there are only 3, line, bar, table.
->		"line" : {// display a line chart
->			stacked : true, // if the chart is going to stacked or not ( this will overwrite the stack property for every chart data).
->			target	: false, // if the data is going to measured against a target.
+>	group: "#diary",  
+>	types: { 
+>		"line" : {
+>			stacked : true,
+>			target	: false, 
 >		},
->		"bar" : { // display a bar chart
+>		"bar" : { 
 >			stacked : false,
 >			target	: false,
 >		},
->		"table" : { // display a table 
+>		"table" : { 
 >			stacked : false,
 >			target	: true,
 >		},
@@ -229,28 +235,29 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > [!note]
 > List/Display data for the Month by weeks
 >
->```dataviewjs
+>```JS
+>/// script should be a dataview block
 >customJS.DvWeeklyCharts.renderMonth({	
->	dv, // important to include the dataview plugin so it can gather data
->	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
+>	dv, 
+>	block: this,
+>	setValues: true, 
 >	
->	Date: "2020-01", // Date want to track, this can be a week, or month. ( in this case the month )
->	DateFormat: "YYYY-MM", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
->	DocumentFormat: "YYYY-[W]ww", // the date format  for the names of the files you want to get its data (in this case Weekly notes Naming format)
->	labelFormat:"YYYY-[W]ww", // the date format for the labels of the files you want to display (in this case this changes the name of the file to the number of the corresponding week of the month)
+>	Date: "2020-01",
+>	DateFormat: "YYYY-MM", 
+>	DocumentFormat: "YYYY-[W]ww", 
+>	labelFormat:"YYYY-[W]ww", 
 >	
->	group: "#Weekly",  // Specifies where to look for data, or what types of files to look for to get the data from,  could be a path, or could be a tag
->	types: { // this includes objects that tells the script what kind of charts to display, and how to display the data in those charts, there are only 3, line, bar, table.
->		"line" : {// display a line chart
->			stacked : true, // if the chart is going to stacked or not ( this will overwrite the stack property for every chart data).
->			target	: false, // if the data is going to measured against a target.
+>	group: "#Weekly", 
+>	types: { 
+>		"line" : {
+>			stacked : true, 
+>			target	: false, 
 >		},
->		"bar" : { // display a bar chart
+>		"bar" : { 
 >			stacked : false,
 >			target	: false,
 >		},
->		"table" : { // display a table 
+>		"table" : {
 >			stacked : false,
 >			target	: true,
 >		},
@@ -264,28 +271,29 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > [!note]
 > List/Display data for the Year by days
 >
->```dataviewjs
+>```JS
+>/// script should be a dataview block
 >customJS.DvDailyCharts.renderYear({	
->	dv, // important to include the dataview plugin so it can gather data
->	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
+>	dv, 
+>	block: this,
+>	setValues: true, 
 >	
->	Date: "2020", // Date want to track, this can be a week, or month. ( in this case the Year )
->	DateFormat: "YYYY", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
->	DocumentFormat: "YYYY-MM-DD", // the date format  for the names of the files you want to get its data (in this case Daily notes Naming format)
->	labelFormat:"MM-DD", // the date format for the labels of the files you want to display (in this case this changes the name of the file to the number of the corresponding month and day of the year)
+>	Date: "2020", 
+>	DateFormat: "YYYY", 
+>	DocumentFormat: "YYYY-MM-DD", 
+>	labelFormat:"MM-DD", 
 >	
->	group: "#diary",  // Specifies where to look for data, or what types of files to look for to get the data from,  could be a path, or could be a tag
->	types: { // this includes objects that tells the script what kind of charts to display, and how to display the data in those charts, there are only 3, line, bar, table.
->		"line" : {// display a line chart
->			stacked : true, // if the chart is going to stacked or not ( this will overwrite the stack property for every chart data).
->			target	: false, // if the data is going to measured against a target.
+>	group: "#diary", 
+>	types: { 
+>		"line" : {
+>			stacked : true, 
+>			target	: false,
 >		},
->		"bar" : { // display a bar chart
+>		"bar" : { 
 >			stacked : false,
 >			target	: false,
 >		},
->		"table" : { // display a table 
+>		"table" : { 
 >			stacked : false,
 >			target	: true,
 >		},
@@ -297,28 +305,29 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 > [!note]
 > List/Display data for the Year by weeks
 >
->```dataviewjs
+>```JS
+>/// script should be a dataview block
 >customJS.DvWeeklyCharts.renderYear({	
->	dv, // important to include the dataview plugin so it can gather data
->	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
+>	dv, 
+>	block: this, 
+>	setValues: true, 
 >	
->	Date: "2020", // Date want to track, this can be a week, or month. ( in this case the month )
->	DateFormat: "YYYY", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
->	DocumentFormat: "YYYY-[W]ww", // the date format  for the names of the files you want to get its data ( in this case Weekly notes Naming format )
->	labelFormat:"[W]ww", // the date format for the labels of the files you want to display ( in this case this changes the name of the file to the number of the corresponding week of the year )
+>	Date: "2020", 
+>	DateFormat: "YYYY",
+>	DocumentFormat: "YYYY-[W]ww",
+>	labelFormat:"[W]ww",
 >	
->	group: "#Weekly",  // Specifies where to look for data, or what types of files to look for to get the data from,  could be a path, or could be a tag
->	types: { // this includes objects that tells the script what kind of charts to display, and how to display the data in those charts, there are only 3, line, bar, table.
->		"line" : {// display a line chart
->			stacked : true, // if the chart is going to stacked or not ( this will overwrite the stack property for every chart data).
->			target	: false, // if the data is going to measured against a target.
+>	group: "#Weekly",
+>	types: { 
+>		"line" : {
+>			stacked : true, 
+>			target	: false, 
 >		},
->		"bar" : { // display a bar chart
+>		"bar" : { 
 >			stacked : false,
 >			target	: false,
 >		},
->		"table" : { // display a table 
+>		"table" : {
 >			stacked : false,
 >			target	: true,
 >		},
@@ -329,29 +338,29 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 
 > [!note]
 > List/Display data for the Year by Month
->
->```dataviewjs
+>```JS
+>/// script should be a dataview block
 >customJS.DvMonthlyCharts.renderYear({	
->	dv, // important to include the dataview plugin so it can gather data
->	block: this, // important to tell the script to draw the charts in the current code block
->	setValues: true, // Option to write the values into the current file or not. (this writes the totals values or the average values according to how you specifies that in the Properties of those files)
+>	dv, 
+>	block: this,
+>	setValues: true,
 >	
->	Date: "2020-01", // Date want to track, this can be a week, or month. ( in this case the month )
->	DateFormat: "YYYY-MM", // Date Format (this is according [momentjs](https://momentjs.com/docs/))
->	DocumentFormat: "YYYY-MM", // the date format  for the names of the files you want to get its data (in this case Monthly notes Naming format)
->	labelFormat:"MMMM", // the date format for the labels of the files you want to display (in this case this changes the name of the file to the name of the corresponding month of the year)
+>	Date: "2020-01",
+>	DateFormat: "YYYY-MM",
+>	DocumentFormat: "YYYY-MM",
+>	labelFormat:"MMMM",
 >	
->	group: "#Monthly",  // Specifies where to look for data, or what types of files to look for to get the data from, could be a path, or could be a tag.
->	types: { // this includes objects that tells the script what kind of charts to display, and how to display the data in those charts, there are only 3, line, bar, table.
->		"line" : {// display a line chart
->			stacked : true, // if the chart is going to stacked or not ( this will overwrite the stack property for every chart data).
->			target	: false, // if the data is going to measured against a target.
+>	group: "#Monthly",
+>	types: { 
+>		"line" : {
+>			stacked : true,
+>			target	: false, 
 >		},
->		"bar" : { // display a bar chart
+>		"bar" : {
 >			stacked : false,
 >			target	: false,
 >		},
->		"table" : { // display a table 
+>		"table" : {
 >			stacked : false,
 >			target	: true,
 >		},

@@ -36,6 +36,8 @@ banner_icon: 📆
 # Title
 {{date: dddd - [W]ww}} - {{date: MM - MMMM}} - {{date: DD/MM/YYYY - hh:mm a}}
 
+
+{{{:::
 <%* tp.user.NewDocument(tp,true) %>
 
 CreateDateKey : => 🗓️
@@ -98,6 +100,21 @@ how much tea did you drink today (cups)
 input :=> 🍵
 
 Dialog : {
+Money Gained today?
+}
+input :=> 💰
+
+Dialog : {
+Money Spent
+}
+input :=> 💵
+
+Dialog : {
+Items bought
+}
+input :=> 💳
+
+Dialog : {
 Enter Today's Title
 }
 Input :=> 🏷️
@@ -112,9 +129,13 @@ Aliases
 }
 List :=> alias
 
+Select: ['😡 rage','😒 bitter','😭 sad','😫 frustrated','😨 scared','😶 lonely','😖 Guilty','😞 disappointed','😓 hopeless','😟 worried','😮‍💨 exhausted','😖 anxious','🤢 sick','😄 happy','😆 satisfied','😲 surprised','😂 joyful','😐 ok'] => 😶
+
 BuildInFile :=>
 
 Stop : =>
+:::}}}
+
 talk about your day and thoughts in the moment
 
 ## What happened today 

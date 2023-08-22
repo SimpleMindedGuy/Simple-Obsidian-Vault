@@ -7,7 +7,9 @@ let Meta={
     LayerIndex=0,
     folder,
     file,
-    Text,
+    Text,   
+    CommandBlock,
+    CommandBlockRegEx = new RegExp(/(?:\{{3}\:{3}\n)(.*\n)*(?:\:{3}\}{3})/),
     Created="Created",
     Modified="Modified",
     Title = "Title",
@@ -16,6 +18,7 @@ let Meta={
     Thumb=false,
     TimeFormat = "YYYY/MM/DD - hh:mm a",
     Dialog="";
+    
 
     
     let TemplateRoot = `99-Templates`;
@@ -27,6 +30,7 @@ async function NewDocuemnt(tp,Active){
 
     folder = await app.vault.getAbstractFileByPath(`${TemplateRoot}`)
     file = await app.vault.getAbstractFileByPath(`${TemplateRoot}/NewDocument.md`)
+
     
     if(Active)
     {
@@ -34,18 +38,20 @@ async function NewDocuemnt(tp,Active){
         
     }
     Text = await app.vault.read(file)
-
+    
+    CommandBlock = await Text.match(CommandBlockRegEx) ? await Text.match(CommandBlockRegEx)[0] : null
+    console.log(CommandBlock)
 
     instructions: while(file != null)
     {
 
-        let Instructions = await GetInstructions(Text)
+        let Instructions = await GetInstructions(CommandBlock)
         for await (let instruction of Instructions)
         {
             instruction = await AddValues(instruction)
             let Command = await GetCommand(instruction)
             
-            Text = await ReplaceVariables(Text)
+            CommandBlock = await ReplaceVariables(CommandBlock)
 
             switch (Command) {
                 case Command.match(/^Dialog$/i)?.input:
@@ -201,6 +207,7 @@ async function NewDocuemnt(tp,Active){
 
                 default: 
                     console.log("Unknonw command")
+                    console.log(Command)
                     return null
                 // break instructions;
             }
@@ -227,12 +234,12 @@ async function ReadDialog(Text)
 
 
 
-async function GetInstructions(Text)
+async function GetInstructions(CB)
 {
     // (\w+)\ *\:\ *(.+)?(\=\>\ *.*|\[.*\]\ *\=\>\ *.*|(?:\{(\n.*)+?)(?<=\n\}))
     let CommandExp= new RegExp(`(\\w+)\\ *\\:\\ *(.+)?(\\=\\>\\ *.*|\\[.*\\]\\ *\\=\\>\\ *.*|(?:\\{(\\n.*)+?)(?<=\\n\\}))`,`gmi`)
 
-    let Commands = Text.match(CommandExp)
+    let Commands = CB.match(CommandExp)
 
 
     return Commands
@@ -241,11 +248,10 @@ async function GetInstructions(Text)
 
 async function RemoveInstructions(file)
 {
-    // (\w+)\ *\:\ *(\=\>\ *.*\n*|\[.*\]\ *\=\>\ *.*\n*|(?:\{(\n.*)+?)\n\}\n*)
-    let CommandExp= new RegExp(`(\\w+)\\ *\\:\\ *(.+)?(\\=\\>\\ *.*|\\[.*\\]\\ *\\=\\>\\ *.*|(?:\\{(\\n.*)+?)(?<=\\n\\}))`,`gmi`)
+
     let text = await app.vault.read(file) 
 
-    text = text.replace(CommandExp,"")
+    text = text.replace(CommandBlockRegEx,"")
 
     
     await app.vault.modify(
@@ -620,7 +626,8 @@ async function NextFile()
     }
 
 
-    Text = await app.vault.read(file)
+    Text = await app.vault.read(file);
+    CommandBlock = await Text.match(CommandBlockRegEx) ? await Text.match(CommandBlockRegEx)[0] : null
     LayerIndex++
 }
 
@@ -629,7 +636,6 @@ async function getLayers(Layers,rootPath)
     let Paths = []
     let Path = rootPath
     let num = 2
-    
     
     let Folder = await app.vault.getAbstractFileByPath(Path)
 
@@ -660,9 +666,10 @@ async function getLayers(Layers,rootPath)
         {
             let documentNumber = await GetDocumentNumber(Folder,num)
             
-            Path += `${documentNumber}-${Layer}`
+            Path += `\/${documentNumber}-${Layer}`
 
             Path = Path.replace(/^\//mg,"")
+            Path = Path.replace(/\/{2,}/mg,"/")
             
 
             console.log(`Path ${Path}`)
@@ -678,6 +685,7 @@ async function getLayers(Layers,rootPath)
         num+=2
 
         console.log(`Folder : `)
+        
         console.log(Folder)
         Path = `${Folder.path}` 
         console.log(`New path  ${Path}`)
@@ -704,6 +712,9 @@ async function BuildDocument(tp)
 
     let Path = Paths[0]
 
+    console.log(`Path : `)
+    console.log( Path)
+
 
     console.log(`Getting templates`)
     const OptionalTemplates= await GetOptionalTemplates(TemplateExp,Paths)
@@ -713,9 +724,10 @@ async function BuildDocument(tp)
     
     console.log( OverView.Layer)
     console.log(`Overview Templates`)
-    console.log( Path)
     console.log( Path.match(OverviewFolder))
     let OverviewTemplate = await GetOverviewTemplate(OverviewExp,await Path.match(OverviewFolder)[0])
+
+
 
 
     console.log(`User options`)
@@ -956,7 +968,7 @@ function compare( a, b ) {
 
 
 async function GetDocumentNumber (Folder,padding){
-    let DocumentNumber = 0;
+    let DocumentNumber = 1;
 
     let folders = Folder.children.sort(compare)
 
@@ -1033,7 +1045,7 @@ async function CreateDescriptionFile(DocumentFolder,DefaultTemplate,Templates,tp
         Data = await Data.replace(HeaderPatter,`# ${Meta[Title]}\n${links}`)
 
         const AliasExp = new RegExp(`(?=alias\\ *:)((\\ *.+)+|.+)`,`gm`)
-        Data = await Data.replace(AliasExp,`alias:\n - ${Meta[Title]}`)
+        Data = await Data.replace(AliasExp,`alias:\n - "${Meta[Title]}"`)
 
         await app.vault.modify(
             File,
@@ -1248,13 +1260,18 @@ async function MoveMedia(instruction,File)
     }
 
     let Folder = await app.vault.getAbstractFileByPath(Path)
+// (?<=\!\[\[)(\w[^(Banner|Media|icon|Daily|Files|Media|Attachments)]([\w \/|\ |\(|\)|\_|\-|\d|\.])*)+\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf)(?=\]\])
+    const pattern       = RegExp(/(?<=\!\[\[)(?!.*(Banner|Media|icon|Daily|Files|Media|Attachments)).*(?!\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf))(?=\]\])/igm);
 
-    const pattern       = RegExp(/(?<=\!\[\[)(\w[^(Banner|Media|icon|Daily|Files|Media|Attachments)]([\w \/|\ |\(|\)|\_|\-|\d|\.])*)+\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf)(?=\]\])/igm);
+    // (?<=\!\[\[)((\d{1,}\-)?\w+[^(Banner|Media|icon|Daily|Files|Media|Attachments)]{0,}[\/|\ |\(|\)|\_|\-|\d|\.]{0,})+(?:\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|aac|flac|kmv|pdf))
 
 
     let data = await app.vault.read(File);
-    let matches = data.match(pattern);
-       
+    // console.log(`data`)
+    // console.log(data)
+    let matches = await data.match(pattern);
+    // console.log(`Matches`)
+    // console.log(matches)
 
 //  check if the media folder already exists 
 
@@ -1397,7 +1414,7 @@ async function BuildSubDoc(instruction,File,tp){
     console.log("Alias")
     console.log(`${File.parent.name}`)
     console.log(`${File.parent.name.replace(NameExp,"")}`)
-    Data = await Data.replace(AliasExp,`alias:\n - ${await File.parent.name.replace(NameExp,"")} : ${Meta[Title]}`)
+    Data = await Data.replace(AliasExp,`alias:\n - "${await File.parent.name.replace(NameExp,"")} - ${Meta[Title]}"`)
     await app.vault.modify(
         DocFile,
         Data
@@ -1480,7 +1497,7 @@ async function CreateSubNote(instruction,File,tp){
     let   Data = await app.vault.read(DocFile);
     const AliasExp = new RegExp(`(?=alias\\ *:)((\\ *.+)+|.+)`,`gm`)
     const NameExp = new RegExp(/\d{2,4} - /ig)
-    Data = await Data.replace(AliasExp,`alias:\n - ${await File.parent.name.replace(NameExp,"")} : ${Meta[Title]}`)
+    Data = await Data.replace(AliasExp,`alias:\n - "${await File.parent.name.replace(NameExp,"")} - ${Meta[Title]}"`)
     await app.vault.modify(
         DocFile,
         Data

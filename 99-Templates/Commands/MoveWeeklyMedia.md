@@ -1,5 +1,7 @@
 <%* tp.user.NewDocument(tp,true) %>
 
+{{{:::
+
 Get :=> 🗓️
 
 
@@ -15,3 +17,4 @@ SetDate : $(🗓️) => Year
 MoveMedia :=> 82-WeeklyFiles/Year-$(Year)/Month-$(Month)/Week-$(Week)
 
 Stop : =>
+:::}}}

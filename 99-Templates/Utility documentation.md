@@ -60,7 +60,11 @@ A metadata value that holds all text values that can refer/link to the document
 ```
 
 
-### CreateDateKey : => `key` , LastUpdatedKey : => `key` , TitleKey :=> `key`,ParentDocumentKey:=>`key`
+### CreateDateKey : => `key`, <br> LastUpdatedKey : => `key`, <br> TitleKey :=> `key`, <br>ParentDocumentKey:=>`key`
+
+
+### CreateDateKey : => `key`,  LastUpdatedKey : => `key`,  TitleKey :=> `key`, ParentDocumentKey:=>`key`
+
 Changes the Key for or the MetaData variable name for the document's Created date/Modified Date/ Title
 
 >[!note]
@@ -73,6 +77,20 @@ Changes the Key for or the MetaData variable name for the document's Created dat
 
 
 those can be later used in data views and other related things.
+
+
+# Command Block `{{{:::  <commands>  :::}}}`
+All Commands have to be inside the command block, the utility will only for the commands inside only one block in the file that is written in the following form.
+```
+{{{:::
+<command> 
+<command>
+<command>
+<command>
+:::}}}
+```
+
+This is made this way to avoid overwriting text that may look like the commands inside the file, and once the utility is done with the commands, it will remove the block from the file.
 
 
 

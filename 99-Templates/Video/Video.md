@@ -1,8 +1,9 @@
+{{{:::
 Dialog : { 
 chose type 
 }
 
-Layer: [Simple Rant,The Simple Podcast,Clips,Memory,General] => 🎟️
+Layer: [Simple Rant,Simple Talk,The Simple Podcast,Clips,Memory,General] => 🎟️
 
 
 OverviewKey: => 📊
@@ -26,3 +27,4 @@ Tags
 List :=> tags
 
 Build :=>
+:::}}}

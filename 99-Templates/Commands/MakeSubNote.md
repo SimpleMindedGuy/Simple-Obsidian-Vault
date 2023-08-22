@@ -2,6 +2,7 @@
 
 <%* tp.user.NewDocument(tp,true) %>
 
+{{{:::
 Get : 🎫 => 🎫
 Get : 🎟️ => 🎟️
 Get : 🏷️ => 🔖
@@ -12,10 +13,10 @@ TitleKey :=> 🏷️
 ParentDocumentKey :=> ⬅️
 
 Dialog : {
-Enter Document Title 
+Enter Document Title
 }
 Input :=> 🏷️
-
-BuildSubNote :=>  Project
+BuildSubNote :=> Project
 
 Stop : =>
+:::}}}

@@ -1,5 +1,6 @@
 <%* tp.user.NewDocument(tp,true) %>
 
+{{{:::
 Get : 🗓️ => 🗓️
 
 SetDateFormat :=> DD
@@ -14,3 +15,4 @@ SetDate : $(🗓️) => Year
 MoveMedia :=> 81-DailyFiles/Year-$(Year)/Month-$(Month)/Day-$(Day)
 
 Stop : =>
+:::}}}

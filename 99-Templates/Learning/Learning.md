@@ -1,9 +1,10 @@
+{{{:::
 Dialog : {
 
 Chose $(🎫) type 
 }
 
-Select: [Math,Physics,Philosophy,Theology,Carpentry,Engineering,Computer science] => 🎟️
+Select: [Math,Physics,Philosophy,Theology,Carpentry,Engineering,Computer science,Programming,Art] => 🎟️
 
 
 OverviewKey: => 📊
@@ -31,3 +32,4 @@ Tags
 List :=> tags
 
 Build :=>
+:::}}}

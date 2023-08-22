@@ -48,8 +48,8 @@ body:is(:not(.css-settings-manager),.toggle-status-bar) .status-bar {
 
 }
 
-
-/* .markdown-source-view:not(.is-live-preview) .HyperMD-header-1 
+/* 
+.markdown-source-view:not(.is-live-preview) .HyperMD-header-1 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-2 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-3 
 ,.markdown-source-view:not(.is-live-preview) .HyperMD-header-4 
@@ -58,9 +58,11 @@ body:is(:not(.css-settings-manager),.toggle-status-bar) .status-bar {
 
 {
     text-indent : 0;
-    display: flex;    
+    display: block !important;
+    
     flex-wrap: wrap;
-} */
+} 
+*/
 
 
 h1,
@@ -70,10 +72,8 @@ h4,
 h5,
 h6
 {
-    display: flex;
     text-indent : 0;
-    display: flex;    
-    flex-wrap: wrap;
+    display: block !important;
     justify-items: center;
     justify-self: center;
 }
@@ -740,16 +740,11 @@ body:not(.is-mobile):is(:not(.css-settings-manager),.toggle-scrollbar) ::-webkit
     margin: auto;
 }
 
-
-.tree-item-self{
-    padding: 2px 6px;
-    margin-bottom: 2px;
+.tree-item-inner{
     display: flex;
-    align-items: center;
-    position: relative;
-
+    place-self: center;
 }
-
-.tree-item-icon{
-    position: inherit !important;
+.tree-item-self .tree-item-icon{
+    position: relative;
+    margin: 0;
 }

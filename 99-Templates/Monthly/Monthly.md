@@ -74,16 +74,12 @@ customJS.DvWeeklyCharts.renderMonth({
 			stacked : true,
 			target	: false,
 		},
-		"bar" : {
+		"table" : {
 			stacked : false,
 			target	: false,
 		},
-		"table" : {
-			stacked : false,
-			target	: true,
-		},
 	},
-	Yaxises,
+
 })
 ```
 

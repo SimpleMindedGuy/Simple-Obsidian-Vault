@@ -12,7 +12,7 @@ async function UpdateTarget(tp) {
     if(!TrackingFile)
     {
         return
-    }
+    } 
     const TrackingData = await app.vault.read(TrackingFile)
 
     const lists = TrackingData.match(Listpattern)
