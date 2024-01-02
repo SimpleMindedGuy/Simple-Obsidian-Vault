@@ -1,0 +1,31 @@
+{
+  "types": {
+    "aliases": "aliases",
+    "cssclasses": "multitext",
+    "tags": "tags",
+    "🍱": "number",
+    "🍵": "number",
+    "😶": "multitext",
+    "day": "number",
+    "month": "number",
+    "🏋️‍♂️": "number",
+    "📖": "number",
+    "🖋️": "datetime",
+    "🗓️": "datetime",
+    "year": "number",
+    "week": "number",
+    "monthNumber": "number",
+    "⛔": "number",
+    "⚖️": "number",
+    "🥞": "number",
+    "💸": "number",
+    "🏦": "number",
+    "🍴": "number",
+    "dayNumber": "number",
+    "📚": "multitext",
+    "monthName": "text",
+    "⬅️": "text",
+    "📊": "text",
+    "🧾": "multitext"
+  }
+}

@@ -68,6 +68,211 @@ function ensureSettings(loaded) {
   return settings;
 }
 
+// src/envmodal.ts
+var import_obsidian = __toModule(require("obsidian"));
+
+// src/environmentNames.ts
+var DISPLAY_EQUATIONS = [
+  "equation",
+  "equation*",
+  "gather",
+  "gather*",
+  "multline",
+  "multline*",
+  "split",
+  "align",
+  "align*",
+  "flalign",
+  "flalign*",
+  "alignat",
+  "alignat*"
+];
+var MATRICES = [
+  "matrix",
+  "pmatrix",
+  "bmatrix",
+  "Bmatrix",
+  "vmatrix",
+  "Vmatrix",
+  "smallmatrix"
+];
+var SUB_ENVIRONMENTS = ["multlined", "gathered", "aligned", "cases"];
+var DEFAULT_ENVIRONMENTS = [
+  ...DISPLAY_EQUATIONS,
+  ...MATRICES,
+  ...SUB_ENVIRONMENTS
+];
+
+// src/envmodal.ts
+var EnvModal = class extends import_obsidian.FuzzySuggestModal {
+  constructor(app, settings, name, callback) {
+    super(app);
+    this.settings = settings;
+    this.name = name;
+    this.callback = callback;
+    this.matched = false;
+    this.setInstructions([
+      { command: "\u2191\u2193", purpose: "to navigate" },
+      { command: "\u21B5", purpose: "to select" },
+      { command: "esc", purpose: "to dismiss" }
+    ]);
+    this.setPlaceholder("environment name");
+  }
+  getItems() {
+    return Array.from(new Set([this.settings.defaultEnvironment].concat(this.settings.customEnvironments, DEFAULT_ENVIRONMENTS)));
+  }
+  getItemText(item) {
+    this.matched = true;
+    return item;
+  }
+  onNoSuggestion() {
+    this.matched = false;
+  }
+  onChooseItem(item, _evt) {
+    if (this.matched) {
+      this.callback(item);
+    } else {
+      this.callback(this.inputEl.value);
+    }
+  }
+  static callback(app, settings, defaultName, call) {
+    new EnvModal(app, settings, defaultName, call).open();
+  }
+};
+
+// src/latexEnvironmentsSettingsTab.ts
+var import_obsidian2 = __toModule(require("obsidian"));
+var LatexEnvironmentsSettingTab = class extends import_obsidian2.PluginSettingTab {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+  display() {
+    const { containerEl } = this;
+    containerEl.empty();
+    containerEl.createEl("h2", { text: "Settings for latex environments" });
+    new import_obsidian2.Setting(containerEl).setName("Default environment").setDesc("The default environment to insert").addText((text) => text.setPlaceholder("environment").setValue(this.plugin.settings.defaultEnvironment).onChange((value) => __async(this, null, function* () {
+      this.plugin.settings.defaultEnvironment = value;
+      yield this.plugin.saveData(this.plugin.settings);
+    })));
+    new import_obsidian2.Setting(containerEl).setName("Extra environments").setDesc("Environment names to be suggested for completion (one per line)").addTextArea((area) => {
+      area.setValue(this.plugin.settings.customEnvironments.join("\n")).onChange((value) => __async(this, null, function* () {
+        this.plugin.settings.customEnvironments = value.split("\n").map((x) => x.trim()).filter((x) => x.length > 0);
+        yield this.plugin.saveData(this.plugin.settings);
+      }));
+    });
+  }
+};
+
+// src/actions/action.ts
+var Action = class {
+  constructor(doc) {
+    this.doc = doc;
+  }
+  suggestName() {
+    return void 0;
+  }
+  get needsName() {
+    return true;
+  }
+};
+
+// src/environment.ts
+function newEnvironment(name, cursor, contents = "") {
+  return {
+    replaceSelection: `\\begin{${name}}${padContents(contents, true)}\\end{${name}}`,
+    selection: {
+      from: {
+        ch: 0,
+        line: cursor.line + 1
+      }
+    }
+  };
+}
+function wrapSelection(name, cursor, contents = "") {
+  return {
+    replaceSelection: `\\begin{${name}}${padContents(contents)}\\end{${name}}`,
+    selection: {
+      from: {
+        ch: 0,
+        line: cursor.line + 1
+      }
+    }
+  };
+}
+function wrapBlock(name, doc, block) {
+  const blockText = block.text.slice(block.startPosition, block.endPosition);
+  let cursor = doc.getCursor();
+  const start = doc.offsetToPos(block.startPosition);
+  if (cursor.line === start.line) {
+    cursor = {
+      line: cursor.line + 1,
+      ch: 0
+    };
+  }
+  return {
+    changes: [
+      {
+        from: doc.offsetToPos(block.startPosition),
+        to: doc.offsetToPos(block.endPosition),
+        text: `\\begin{${name}}${padContents(blockText)}\\end{${name}}`
+      }
+    ],
+    selection: { from: cursor }
+  };
+}
+function unwrapEnvironment(environment, doc) {
+  let cursor = doc.getCursor();
+  if (justWhitespace(environment.contents.split("\n", 1)[0])) {
+    cursor = {
+      line: cursor.line - 1,
+      ch: cursor.ch + doc.offsetToPos(environment.begin.from).ch
+    };
+  }
+  return {
+    changes: [
+      {
+        text: trim(environment.contents),
+        from: doc.offsetToPos(environment.begin.from),
+        to: doc.offsetToPos(environment.end.to)
+      }
+    ],
+    selection: { from: cursor }
+  };
+}
+function changeEnvironment(environment, doc, name) {
+  const change = {
+    text: `\\begin{${name}}${environment.contents}\\end{${name}}`,
+    from: doc.offsetToPos(environment.begin.from),
+    to: doc.offsetToPos(environment.end.to)
+  };
+  return {
+    changes: [change],
+    selection: { from: doc.getCursor() }
+  };
+}
+function padContents(contents, padEmpty = false) {
+  const lines = contents.split("\n");
+  return `${getPad(lines[0], padEmpty)}${contents}${getPad(lines[lines.length - 1], padEmpty)}`;
+}
+function justWhitespace(text) {
+  return text.match(/^[ \t]*$/) != null;
+}
+function getPad(text, padEmpty = false) {
+  if (text.length === 0 && padEmpty)
+    return "\n";
+  if (text.length === 0 || justWhitespace(text))
+    return "";
+  return "\n";
+}
+function trim(text) {
+  if (text.length === 0)
+    return text;
+  const start = text.startsWith("\n") ? 1 : 0;
+  const end = text.endsWith("\n") ? text.length - 1 : text.length;
+  return text.slice(start, end);
+}
+
 // src/search.ts
 var SearchCursor = class {
   constructor(text, regex, _originalCaret) {
@@ -97,7 +302,7 @@ var SearchCursor = class {
     return match;
   }
   findPrevious() {
-    const reverseRegex = new RegExp(`(?<full>${this.regex.source})(?!.*[\\r\\n]*.*\\k<full>)`, this.regex.flags);
+    const reverseRegex = new RegExp(`(?<full>${this.regex.source})(?![\\s\\S]*\\k<full>)`, this.regex.flags);
     const text = this.text.slice(0, this._caret);
     const lastMatch = text.match(reverseRegex);
     if ((lastMatch == null ? void 0 : lastMatch.index) == null || (lastMatch == null ? void 0 : lastMatch.groups) == null) {
@@ -230,176 +435,17 @@ var BeginEnds = class {
   }
 };
 
-// src/envmodal.ts
-var import_obsidian = __toModule(require("obsidian"));
-
-// src/environmentNames.ts
-var DISPLAY_EQUATIONS = [
-  "equation",
-  "equation*",
-  "gather",
-  "gather*",
-  "multline",
-  "multline*",
-  "split",
-  "align",
-  "align*",
-  "flalign",
-  "flalign*",
-  "alignat",
-  "alignat*"
-];
-var MATRICES = [
-  "matrix",
-  "pmatrix",
-  "bmatrix",
-  "Bmatrix",
-  "vmatrix",
-  "Vmatrix",
-  "smallmatrix"
-];
-var SUB_ENVIRONMENTS = ["multlined", "gathered", "aligned", "cases"];
-var DEFAULT_ENVIRONMENTS = [
-  ...DISPLAY_EQUATIONS,
-  ...MATRICES,
-  ...SUB_ENVIRONMENTS
-];
-
-// src/envmodal.ts
-var EnvModal = class extends import_obsidian.FuzzySuggestModal {
-  constructor(app, settings, name, callback) {
-    super(app);
-    this.settings = settings;
-    this.name = name;
-    this.callback = callback;
-    this.matched = false;
-    this.setInstructions([
-      { command: "\u2191\u2193", purpose: "to navigate" },
-      { command: "\u21B5", purpose: "to select" },
-      { command: "esc", purpose: "to dismiss" }
-    ]);
-    this.setPlaceholder("environment name");
-  }
-  getItems() {
-    return Array.from(new Set([this.settings.defaultEnvironment].concat(this.settings.customEnvironments, DEFAULT_ENVIRONMENTS)));
-  }
-  getItemText(item) {
-    this.matched = true;
-    return item;
-  }
-  onNoSuggestion() {
-    this.matched = false;
-  }
-  onChooseItem(item, _evt) {
-    if (this.matched) {
-      this.callback(item);
-    } else {
-      this.callback(this.inputEl.value);
-    }
-  }
-  static callback(app, settings, defaultName, call) {
-    new EnvModal(app, settings, defaultName, call).open();
-  }
-};
-
-// src/latexEnvironmentsSettingsTab.ts
-var import_obsidian2 = __toModule(require("obsidian"));
-var LatexEnvironmentsSettingTab = class extends import_obsidian2.PluginSettingTab {
-  constructor(app, plugin) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-  display() {
-    const { containerEl } = this;
-    containerEl.empty();
-    containerEl.createEl("h2", { text: "Settings for latex environments" });
-    new import_obsidian2.Setting(containerEl).setName("Default environment").setDesc("The default environment to insert").addText((text) => text.setPlaceholder("environment").setValue(this.plugin.settings.defaultEnvironment).onChange((value) => __async(this, null, function* () {
-      this.plugin.settings.defaultEnvironment = value;
-      yield this.plugin.saveData(this.plugin.settings);
-    })));
-    new import_obsidian2.Setting(containerEl).setName("Extra environments").setDesc("Environment names to be suggested for completion (one per line)").addTextArea((area) => {
-      area.setValue(this.plugin.settings.customEnvironments.join("\n")).onChange((value) => __async(this, null, function* () {
-        this.plugin.settings.customEnvironments = value.split("\n").map((x) => x.trim()).filter((x) => x.length > 0);
-        yield this.plugin.saveData(this.plugin.settings);
-      }));
-    });
-  }
-};
-
-// src/actions/action.ts
-var Action = class {
-  constructor(doc) {
-    this.doc = doc;
-  }
-  suggestName() {
-    return void 0;
-  }
-  get needsName() {
-    return true;
-  }
-};
-
-// src/environment.ts
-function newEnvironment(name, cursor, contents = "") {
-  const pad = getPad(contents);
-  return {
-    replaceSelection: `\\begin{${name}}${pad}${contents}${pad}\\end{${name}}`,
-    selection: {
-      from: {
-        ch: 0,
-        line: cursor.line + 1
-      }
-    }
-  };
-}
-function unwrapEnvironment(environment, doc) {
-  return {
-    changes: [
-      {
-        text: trim(environment.contents),
-        from: doc.offsetToPos(environment.begin.from),
-        to: doc.offsetToPos(environment.end.to)
-      }
-    ],
-    selection: { from: doc.getCursor() }
-  };
-}
-function changeEnvironment(environment, doc, name) {
-  const change = {
-    text: `\\begin{${name}}${environment.contents}\\end{${name}}`,
-    from: doc.offsetToPos(environment.begin.from),
-    to: doc.offsetToPos(environment.end.to)
-  };
-  return {
-    changes: [change],
-    selection: { from: doc.getCursor() }
-  };
-}
-function getPad(text) {
-  if (text.length > 0 && text.match(/^[ \t]*$/) != null) {
-    return "";
-  }
-  return "\n";
-}
-function trim(text) {
-  if (text.length === 0)
-    return text;
-  const start = text.startsWith("\n") ? 1 : 0;
-  const end = text.endsWith("\n") ? text.length - 1 : text.length;
-  return text.slice(start, end);
-}
-
 // src/actions/wrapAction.ts
 var WrapAction = class extends Action {
-  constructor(doc, addWhitespace = true) {
-    super(doc);
-    this.addWhitespace = addWhitespace;
-  }
   prepare() {
     return this;
   }
   transaction(envName) {
-    return newEnvironment(envName, this.doc.getCursor(), this.doc.getSelection());
+    if (this.doc.somethingSelected()) {
+      return wrapSelection(envName, this.doc.getCursor(), this.doc.getSelection());
+    }
+    const block = new MathBlock(this.doc.getValue(), this.doc.posToOffset(this.doc.getCursor()));
+    return wrapBlock(envName, this.doc, block);
   }
 };
 
@@ -425,8 +471,8 @@ var ChangeAction = class extends Action {
     const cursor = this.doc.posToOffset(this.doc.getCursor());
     const block = new MathBlock(this.doc.getValue(), cursor);
     this.current = block.getEnclosingEnvironment(cursor);
-    if (this.current === void 0) {
-      return new WrapAction(this.doc, block.startPosition === block.endPosition);
+    if (this.current === void 0 || this.doc.somethingSelected()) {
+      return new WrapAction(this.doc);
     }
     this.name = this.current.name;
     return this;
@@ -473,41 +519,29 @@ var LatexEnvironments = class extends import_obsidian3.Plugin {
       this.addCommand({
         id: "insert-latex-env",
         name: "Insert LaTeX environment",
-        checkCallback: this.mathModeCallback(InsertAction)
+        editorCallback: this.mathModeCallback(InsertAction)
       });
       this.addCommand({
         id: "change-latex-env",
         name: "Change LaTeX environment",
-        checkCallback: this.mathModeCallback(ChangeAction)
+        editorCallback: this.mathModeCallback(ChangeAction)
       });
       this.addCommand({
         id: "delete-latex-env",
         name: "Delete LaTeX environment",
-        checkCallback: this.mathModeCallback(DeleteAction)
+        editorCallback: this.mathModeCallback(DeleteAction)
       });
       this.addSettingTab(new LatexEnvironmentsSettingTab(this.app, this));
     });
   }
   mathModeCallback(ActionType) {
-    return (checking) => {
-      const leaf = this.app.workspace.activeLeaf;
-      if (leaf.view instanceof import_obsidian3.MarkdownView) {
-        const editor = leaf.view.editor;
-        const cursor = editor.posToOffset(editor.getCursor());
-        if (!MathBlock.isMathMode(cursor, editor)) {
-          return false;
-        }
-        if (!checking) {
-          try {
-            const action = new ActionType(editor.getDoc()).prepare();
-            this.withPromptName(editor, action);
-          } catch (e) {
-            new import_obsidian3.Notice(e.message);
-          }
-        }
-        return true;
+    return (editor, _view) => {
+      try {
+        const action = new ActionType(editor).prepare();
+        this.withPromptName(editor, action);
+      } catch (e) {
+        new import_obsidian3.Notice(e.message);
       }
-      return false;
     };
   }
   withPromptName(editor, action) {

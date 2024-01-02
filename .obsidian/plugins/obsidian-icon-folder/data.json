@@ -1,6 +1,6 @@
 {
   "settings": {
-    "migrated": true,
+    "migrated": 3,
     "iconPacksPath": "80-Gallery/Icons",
     "fontSize": 24,
     "emojiStyle": "native",
@@ -11,232 +11,278 @@
       {
         "rule": ".*(.gif|.GIF)$",
         "icon": "MyPicture2",
-        "for": "everything"
+        "for": "everything",
+        "order": 0
       },
       {
         "rule": ".*(.jpe?g|.JPE?G|PNG|png|webm|WEBM)$",
         "icon": "MyPicture6",
-        "for": "everything"
+        "for": "everything",
+        "order": 1
       },
       {
         "rule": ".*(.MP4|.mp4|.mov|.MOV|.webm|.WEBM|.mkv|.MKV)$",
         "icon": "MyVideo",
-        "for": "everything"
+        "for": "everything",
+        "order": 2
       },
       {
         "rule": ".*(.svg|.SVG)",
         "icon": "MyMath3",
-        "for": "everything"
+        "for": "everything",
+        "order": 3
       },
       {
         "rule": ".*DB",
         "icon": "MyDevice17",
-        "for": "everything"
+        "for": "everything",
+        "order": 4
       },
       {
         "rule": "(Day|Week)\\-\\d{2}",
         "icon": "MyFolder7",
-        "for": "everything"
+        "for": "everything",
+        "order": 5
       },
       {
         "rule": "(Excalidraw)|(draw)|(Thumbnail)",
         "icon": "🖌",
-        "for": "everything"
+        "for": "everything",
+        "order": 6
       },
       {
         "rule": "\\d{2}\\-.*Files$",
         "icon": "MyArchive",
-        "for": "everything"
+        "for": "everything",
+        "order": 7
       },
       {
         "rule": "^Journal$",
         "icon": "MyBook32",
-        "for": "everything"
+        "for": "everything",
+        "order": 8
       },
       {
         "rule": "^Personal$",
         "icon": "MyDefultuser",
-        "for": "everything"
+        "for": "everything",
+        "order": 9
       },
       {
         "rule": "Activity",
         "icon": "MyClipboard5",
-        "for": "everything"
+        "for": "everything",
+        "order": 10
       },
       {
         "rule": "Addiction",
         "icon": "🌀",
-        "for": "everything"
+        "for": "everything",
+        "order": 11
       },
       {
         "rule": "Banner",
         "icon": "MyBanner",
-        "for": "everything"
+        "for": "everything",
+        "order": 12
       },
       {
         "rule": "Blog",
         "icon": "MyPaper6",
-        "for": "everything"
+        "for": "everything",
+        "order": 13
       },
       {
         "rule": "Book",
         "icon": "MyLybrary4",
-        "for": "everything"
+        "for": "everything",
+        "order": 14
       },
       {
         "rule": "Calendar",
         "icon": "📅",
-        "for": "everything"
+        "for": "everything",
+        "order": 15
       },
       {
         "rule": "Clips",
         "icon": "MyClip2",
-        "for": "everything"
+        "for": "everything",
+        "order": 16
       },
       {
         "rule": "Computer science",
         "icon": "MyDevice30",
-        "for": "everything"
+        "for": "everything",
+        "order": 17
       },
       {
         "rule": "Cover Letter",
         "icon": "MyPaper10",
-        "for": "everything"
+        "for": "everything",
+        "order": 18
       },
       {
         "rule": "CustomJS|Scripts?",
         "icon": "MyScreen10",
-        "for": "everything"
+        "for": "everything",
+        "order": 19
       },
       {
         "rule": "Daily$",
         "icon": "MyBook32",
-        "for": "everything"
+        "for": "everything",
+        "order": 20
       },
       {
         "rule": "Data(V|view)|(View)s?",
         "icon": "MyScreen4",
-        "for": "everything"
+        "for": "everything",
+        "order": 21
       },
       {
         "rule": "DB.md",
         "icon": "MyDevice37",
-        "for": "everything"
+        "for": "everything",
+        "order": 22
       },
       {
         "rule": "Dictionary",
         "icon": "MyBook9",
-        "for": "everything"
+        "for": "everything",
+        "order": 23
       },
       {
         "rule": "Gallery",
         "icon": "MyAlbum",
-        "for": "everything"
+        "for": "everything",
+        "order": 24
       },
       {
         "rule": "Home",
         "icon": "MyHome2",
-        "for": "everything"
+        "for": "everything",
+        "order": 25
       },
       {
         "rule": "Learning",
         "icon": "MyHat2",
-        "for": "everything"
+        "for": "everything",
+        "order": 26
       },
       {
         "rule": "Math",
         "icon": "MyMath1",
-        "for": "everything"
+        "for": "everything",
+        "order": 27
       },
       {
         "rule": "Memories",
         "icon": "MyMemory",
-        "for": "everything"
+        "for": "everything",
+        "order": 28
       },
       {
         "rule": "Month\\-\\d{2}",
         "icon": "MyFolder8",
-        "for": "everything"
+        "for": "everything",
+        "order": 29
       },
       {
         "rule": "Monthly$",
         "icon": "MyBook25",
-        "for": "everything"
+        "for": "everything",
+        "order": 30
       },
       {
         "rule": "People",
         "icon": "MyCard2",
-        "for": "everything"
+        "for": "everything",
+        "order": 31
       },
       {
         "rule": "Problem",
         "icon": "MyMazesvgrepocom",
-        "for": "everything"
+        "for": "everything",
+        "order": 32
       },
       {
         "rule": "Program",
         "icon": "MyScreen5",
-        "for": "everything"
+        "for": "everything",
+        "order": 33
       },
       {
         "rule": "Project",
         "icon": "MyBlueprint",
-        "for": "everything"
+        "for": "everything",
+        "order": 34
       },
       {
         "rule": "Quotes",
         "icon": "MyAudio5",
-        "for": "everything"
+        "for": "everything",
+        "order": 35
       },
       {
         "rule": "Simple Rant",
         "icon": "💢",
-        "for": "everything"
+        "for": "everything",
+        "order": 36
       },
       {
         "rule": "Subject",
         "icon": "MyBook28",
-        "for": "everything"
+        "for": "everything",
+        "order": 37
       },
       {
         "rule": "Templates?",
         "icon": "MyTemplate4",
-        "for": "everything"
+        "for": "everything",
+        "order": 38
       },
       {
         "rule": "The Simple Podcast",
         "icon": "MyMic4",
-        "for": "everything"
+        "for": "everything",
+        "order": 39
       },
       {
         "rule": "Trackers?",
         "icon": "MyStatistics3",
-        "for": "everything"
+        "for": "everything",
+        "order": 40
       },
       {
         "rule": "University",
         "icon": "MyBuilding3",
-        "for": "everything"
+        "for": "everything",
+        "order": 41
       },
       {
         "rule": "Video",
         "icon": "📼",
-        "for": "everything"
+        "for": "everything",
+        "order": 42
       },
       {
         "rule": "Weekly$",
         "icon": "MyBook21",
-        "for": "everything"
+        "for": "everything",
+        "order": 43
       },
       {
         "rule": "Year\\-\\d{4}",
         "icon": "MyArchive13",
-        "for": "everything"
+        "for": "everything",
+        "order": 44
       },
       {
         "rule": "Yearly$",
         "icon": "MyBook18",
-        "for": "everything"
+        "for": "everything",
+        "order": 45
       }
     ],
     "extraMargin": {
@@ -245,6 +291,10 @@
       "bottom": 0,
       "left": 0
     },
-    "iconInTabsEnabled": true
+    "iconInTabsEnabled": true,
+    "iconsBackgroundCheckEnabled": false,
+    "iconInTitleEnabled": false,
+    "iconInFrontmatterEnabled": false,
+    "iconsInNotesEnabled": true
   }
 }

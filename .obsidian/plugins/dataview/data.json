@@ -7,7 +7,7 @@
   "recursiveSubTaskCompletion": false,
   "warnOnEmptyResult": true,
   "refreshEnabled": true,
-  "refreshInterval": 50000,
+  "refreshInterval": 3000,
   "defaultDateFormat": "yyyy MM DD",
   "defaultDateTimeFormat": "h:mm a - MMMM dd, yyyy",
   "maxRecursiveRenderDepth": 4,

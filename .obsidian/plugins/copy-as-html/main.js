@@ -3680,7 +3680,7 @@ var MarkdownToHTML = class extends import_obsidian.Plugin {
     text = text.replace(/==/g, "");
     text = text.replace(/\^\w+/g, "");
     if (this.settings.removeBrackets) {
-      text = text.replace(/\[\[(?:.*\/)?(?:[^\]]+\|)?([^\]]+)\]\]/g, "$1");
+      text = text.replace(/\[\[(.*?)\]\]/g, "$1");
     }
     if (this.settings.removeEmphasis) {
       text = text.replace(/[*~]+(\w+)[*~]+/g, "$1");

@@ -3,6 +3,7 @@
   "cedictPath": "./cedict_ts.u8",
   "matchStrategy": "partial",
   "fuzzyMatch": true,
+  "minFuzzyMatchScore": 0.5,
   "matchingWithoutEmoji": true,
   "treatAccentDiacriticsAsAlphabeticCharacters": false,
   "maxNumberOfSuggestions": 11,
@@ -14,19 +15,48 @@
   "disableSuggestionsDuringImeOn": false,
   "insertAfterCompletion": true,
   "firstCharactersDisableSuggestions": ":/^",
-  "useCommonPrefixCompletionOfSuggestion": false,
   "patternsToSuppressTrigger": [
     "^~~~.*",
     "^```.*"
   ],
+  "phrasePatternsToSuppressTrigger": [],
+  "noAutoFocusUntilCycle": false,
   "showMatchStrategy": true,
   "showComplementAutomatically": true,
   "showIndexingStatus": true,
   "descriptionOnSuggestion": "Short",
-  "selectSuggestionKeys": "Enter",
-  "additionalCycleThroughSuggestionsKeys": "None",
-  "disableUpDownKeysForCycleThroughSuggestionsKeys": false,
-  "openSourceFileKey": "None",
+  "hotkeys": {
+    "select": [
+      {
+        "modifiers": [],
+        "key": "Enter"
+      }
+    ],
+    "up": [
+      {
+        "modifiers": [],
+        "key": "ArrowUp"
+      }
+    ],
+    "down": [
+      {
+        "modifiers": [],
+        "key": "ArrowDown"
+      }
+    ],
+    "select 1st": [],
+    "select 2nd": [],
+    "select 3rd": [],
+    "select 4th": [],
+    "select 5th": [],
+    "select 6th": [],
+    "select 7th": [],
+    "select 8th": [],
+    "select 9th": [],
+    "open": [],
+    "completion": [],
+    "insert as text": []
+  },
   "propagateEsc": false,
   "enableCurrentFileComplement": true,
   "currentFileMinNumberOfCharacters": 2,
@@ -58,132 +88,17 @@
   "frontMatterComplementMatchStrategy": "inherit",
   "insertCommaAfterFrontMatterCompletion": false,
   "intelligentSuggestionPrioritization": {
+    "enabled": true,
     "historyFilePath": "",
     "maxDaysToKeepHistory": 30,
     "maxNumberOfHistoryToKeep": 0
   },
-  "disableOnMobile": false,
+  "disableOnMobile": true,
   "showLogAboutPerformanceInConsole": false,
-  "selectionHistoryTree": {
-    "journal": {
-      "journal": {
-        "currentFile": {
-          "count": 1,
-          "lastUpdated": 1680657229900
-        }
-      }
-    },
-    "MakeSubNote": {
-      "MakeSubNote": {
-        "internalLink": {
-          "count": 1,
-          "lastUpdated": 1680693279456
-        }
-      }
-    },
-    "MoveDocumentMedia": {
-      "MoveDocumentMedia": {
-        "internalLink": {
-          "count": 1,
-          "lastUpdated": 1680693614826
-        }
-      }
-    },
-    "SubNote": {
-      "SubNote": {
-        "frontMatter": {
-          "count": 59,
-          "lastUpdated": 1680702492095
-        }
-      }
-    },
-    "CS": {
-      "CS": {
-        "frontMatter": {
-          "count": 1,
-          "lastUpdated": 1680699500939
-        }
-      }
-    },
-    "<%+ tp.date.now(\"YYYY/MM/DD - hh:mm A\") %>": {
-      "<%+ tp.date.now(\"YYYY/MM/DD - hh:mm A\") %>": {
-        "frontMatter": {
-          "count": 15,
-          "lastUpdated": 1680947711166
-        }
-      }
-    },
-    "Subject": {
-      "Subject": {
-        "frontMatter": {
-          "count": 3,
-          "lastUpdated": 1680701947281
-        }
-      }
-    },
-    "![[Gallery/Banner/typewriter.jpg]]": {
-      "![[Gallery/Banner/typewriter.jpg]]": {
-        "frontMatter": {
-          "count": 1,
-          "lastUpdated": 1680869023482
-        }
-      }
-    },
-    "habbit": {
-      "habbit": {
-        "currentFile": {
-          "count": 1,
-          "lastUpdated": 1680871260415
-        }
-      }
-    },
-    "modules": {
-      "modules": {
-        "currentFile": {
-          "count": 1,
-          "lastUpdated": 1680949682623
-        }
-      }
-    },
-    "Machine Learning Tracking": {
-      "Machine Learning Tracking": {
-        "internalLink": {
-          "count": 1,
-          "lastUpdated": 1680951644175
-        }
-      }
-    },
-    "Activities/Video/Clips/0002 - Just doing noita stuff/Media/just doing noita stuff.mp4": {
-      "Activities/Video/Clips/0002 - Just doing noita stuff/Media/just doing noita stuff.mp4": {
-        "internalLink": {
-          "count": 1,
-          "lastUpdated": 1680951717269
-        }
-      }
-    },
-    "Recognition": {
-      "Recognition": {
-        "currentFile": {
-          "count": 1,
-          "lastUpdated": 1680952286347
-        }
-      }
-    },
-    "prediction": {
-      "prediction": {
-        "currentFile": {
-          "count": 1,
-          "lastUpdated": 1680952417426
-        }
-      }
-    },
-    "Systems Analysis and Design Progress": {
-      "Systems Analysis and Design Progress": {
-        "internalLink": {
-          "count": 1,
-          "lastUpdated": 1680952477287
-        }
-      }
-    }
-  }
+  "selectionHistoryTree": {},
+  "useCommonPrefixCompletionOfSuggestion": false,
+  "selectSuggestionKeys": "Enter",
+  "additionalCycleThroughSuggestionsKeys": "None",
+  "disableUpDownKeysForCycleThroughSuggestionsKeys": false,
+  "openSourceFileKey": "None"
 }

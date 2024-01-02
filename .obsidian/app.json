@@ -51,7 +51,9 @@
     "WARC",
     "DIFS",
     "sense",
-    "precisiona"
+    "precisiona",
+    "hh",
+    "TextDate"
   ],
   "livePreview": false,
   "defaultViewMode": "preview",
@@ -65,5 +67,12 @@
   "useTab": true,
   "tabSize": 4,
   "autoConvertHtml": false,
-  "showInlineTitle": true
+  "showInlineTitle": true,
+  "pdfExportSettings": {
+    "includeName": false,
+    "pageSize": "Tabloid",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  }
 }

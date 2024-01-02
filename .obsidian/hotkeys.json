@@ -1,13 +1,4 @@
 {
-  "obsidian-admonition:insert-admonition": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "A"
-    }
-  ],
   "table-editor-obsidian:next-cell": [
     {
       "modifiers": [
@@ -122,32 +113,8 @@
     }
   ],
   "obsidian-excalidraw-plugin:save": [],
-  "app:open-settings": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "S"
-    }
-  ],
+  "app:open-settings": [],
   "editor:open-link-in-new-leaf": [],
-  "editor:swap-line-down": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "ArrowDown"
-    }
-  ],
-  "editor:swap-line-up": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "ArrowUp"
-    }
-  ],
   "auto-card-link:auto-card-link-enhance-selected-url": [
     {
       "modifiers": [
@@ -179,15 +146,6 @@
         "Mod"
       ],
       "key": "C"
-    }
-  ],
-  "graph:open-local": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "G"
     }
   ],
   "workspace:goto-tab-8": [],
@@ -228,14 +186,7 @@
   "editor:toggle-checklist-status": [],
   "obsidian-languagetool-plugin:ltclear": [],
   "app:open-help": [],
-  "nldates-obsidian:nlp-today": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "1"
-    }
-  ],
+  "nldates-obsidian:nlp-today": [],
   "nldates-obsidian:nlp-dates": [],
   "nldates-obsidian:nlp-time": [
     {
@@ -264,22 +215,6 @@
         "Mod"
       ],
       "key": "ArrowLeft"
-    }
-  ],
-  "table-editor-obsidian:move-row-down": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "ArrowUp"
-    }
-  ],
-  "table-editor-obsidian:move-row-up": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "ArrowDown"
     }
   ],
   "obsidian-languagetool-plugin:ltaccept-suggestion-1": [
@@ -407,6 +342,152 @@
         "Mod"
       ],
       "key": " "
+    }
+  ],
+  "obsidian-heading-shifter:insert-heading-deeper": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowRight"
+    }
+  ],
+  "obsidian-heading-shifter:insert-heading-higher": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowLeft"
+    }
+  ],
+  "editor:toggle-numbered-list": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "1"
+    }
+  ],
+  "editor:toggle-strikethrough": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "S"
+    }
+  ],
+  "editor:toggle-bullet-list": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "B"
+    }
+  ],
+  "workspace:toggle-stacked-tabs": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "S"
+    }
+  ],
+  "app:toggle-left-sidebar": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "["
+    }
+  ],
+  "app:toggle-right-sidebar": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "]"
+    }
+  ],
+  "editor:toggle-blockquote": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "."
+    }
+  ],
+  "editor:toggle-code": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": ","
+    }
+  ],
+  "editor:insert-callout": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "C"
+    }
+  ],
+  "markdown:add-metadata-property": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": ";"
+    }
+  ],
+  "obsidian-heading-shifter:insert-heading-current": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "ArrowUp"
+    },
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "ArrowDown"
+    }
+  ],
+  "editor:swap-line-down": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowDown"
+    }
+  ],
+  "editor:swap-line-up": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowUp"
+    }
+  ],
+  "graph:open": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "G"
+    }
+  ],
+  "graph:open-local": [
+    {
+      "modifiers": [
+        "Alt",
+        "Mod"
+      ],
+      "key": "G"
     }
   ]
 }

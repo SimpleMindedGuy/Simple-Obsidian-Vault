@@ -1,0 +1,9 @@
+{
+  "fieldOptions": [
+    {
+      "name": "🖋️",
+      "actionType": "update",
+      "valueType": "datetimeUpdate"
+    }
+  ]
+}

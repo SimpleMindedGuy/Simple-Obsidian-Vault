@@ -1,0 +1,28 @@
+/* Checkbox suggestions */
+.blockier-checkbox-suggestion.markdown-preview-view {
+	padding: 0;
+	overflow: hidden;
+	padding-right: calc((var(--list-indent) - var(--checkbox-size)) / 2);
+}
+
+.blockier-checkbox-suggestion ul {
+	margin-block: -1.5em;
+	display: block;
+}
+
+/* Callout suggestions */
+
+.blockier-callout-suggestion.markdown-preview-view {
+	padding: 0;
+	overflow: hidden;
+	width: 300px;
+}
+
+.is-mobile .blockier-callout-suggestion.markdown-preview-view {
+	width: 100%;
+}
+
+.blockier-callout-suggestion .callout {
+	margin: 0;
+	display: block;
+}

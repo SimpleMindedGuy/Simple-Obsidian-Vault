@@ -3,7 +3,11 @@
   "urlMode": "standard",
   "glassBg": true,
   "shouldAutoCheck": true,
+  "autoCheckDelay": 3000,
   "pickyMode": true,
   "staticLanguage": "auto",
-  "englishVeriety": "en-GB"
+  "englishVeriety": "en-GB",
+  "germanVeriety": "de-DE",
+  "portugueseVeriety": "pt-PT",
+  "catalanVeriety": "ca-ES"
 }

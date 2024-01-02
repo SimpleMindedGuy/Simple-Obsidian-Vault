@@ -1,13 +1,16 @@
 {{{:::
-CreateDateKey : => 🗓️
-LastUpdatedKey :=> 🖋️
-TitleKey :=> 🏷️
-ParentDocumentKey :=> ⬅️
-Dialog : {
-What type of document do you want to make
+
+Dialog :=>{
+Chose Document type
 }
+Menu :=> [Test,Project,Learning,Video,Blog,Book,University,People,Problem]
 
-Layer: [Project,Learning,Video,Blog,Book,University,People,Problem] => 🎫
+SelectLayer :=> 🎫
 
-NextFile : =>
+NextFile :=>
+
 :::}}}
+
+
+
+

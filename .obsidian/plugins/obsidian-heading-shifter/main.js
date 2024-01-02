@@ -79,7 +79,8 @@ var HEADINGS = [0, 1, 2, 3, 4, 5, 6];
 // src/settings.ts
 var DEFAULT_SETTINGS = {
   limitHeadingFrom: 1,
-  overrideTab: false
+  overrideTab: false,
+  styleToRemove: { ul: true, ol: true }
 };
 var HeadingShifterSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
@@ -101,6 +102,16 @@ var HeadingShifterSettingTab = class extends import_obsidian.PluginSettingTab {
     });
     new import_obsidian.Setting(containerEl).setName("Enable override tab behavior").setDesc('Tab execute "Increase Headings" and Shift-Tab execute "Decrease Headings"').addToggle((toggle) => toggle.setValue(this.plugin.settings.overrideTab).onChange((value) => __async(this, null, function* () {
       this.plugin.settings.overrideTab = value;
+      yield this.plugin.saveSettings();
+    })));
+    containerEl.createEl("h3", { text: "Style to remove" });
+    containerEl.createEl("p", { text: "If this style is at the beginning of a line, replace it by a Heading:" });
+    new import_obsidian.Setting(containerEl).setName("Unordered list").setDesc("-").addToggle((toggle) => toggle.setValue(this.plugin.settings.styleToRemove.ul).onChange((value) => __async(this, null, function* () {
+      this.plugin.settings.styleToRemove.ul = value;
+      yield this.plugin.saveSettings();
+    })));
+    new import_obsidian.Setting(containerEl).setName("Ordered list").setDesc("1., 2. ,3. ,...").addToggle((toggle) => toggle.setValue(this.plugin.settings.styleToRemove.ol).onChange((value) => __async(this, null, function* () {
+      this.plugin.settings.styleToRemove.ol = value;
       yield this.plugin.saveSettings();
     })));
   }
@@ -207,21 +218,14 @@ var InterfaceService = class {
   }
 };
 
-// src/features/applyHeading/module.ts
-var applyHeading = (chunk, headingSize) => {
-  const remove = chunk.replace(/^(\-|\*|\d+\.) /, "").replace(/^#+ /, "");
-  if (headingSize <= 0)
-    return remove;
-  return new Array(headingSize).fill("#").reduce((prev, cur) => {
-    return cur + prev;
-  }, " ") + remove;
-};
+// src/features/shiftHeading/operation.ts
+var import_obsidian4 = require("obsidian");
 
 // src/utils/editorChange.ts
-var composeLineChanges = (editor, lineNumbers, changeCallback) => {
+var composeLineChanges = (editor, lineNumbers, changeCallback, settings) => {
   const editorChange = [];
   for (const line of lineNumbers) {
-    const shifted = changeCallback(editor.getLine(line));
+    const shifted = changeCallback(editor.getLine(line), settings);
     editorChange.push({
       text: shifted,
       from: { line, ch: 0 },
@@ -248,31 +252,6 @@ var setMax = (prev, cur) => {
   return prev;
 };
 var createRange = (start, num) => Array.from(Array(num), (v, k) => k + start);
-
-// src/features/applyHeading/operation.ts
-var createApplyHeadingCommand = (setting, headingSize) => {
-  const createEditorCallback = (heading) => {
-    return (editor) => {
-      const lines = createRange(editor.getCursor("from").line, editor.getCursor("to").line - editor.getCursor("from").line + 1);
-      const isOneline = editor.getCursor("from").line === editor.getCursor("to").line;
-      editor.transaction({
-        changes: composeLineChanges(editor, lines, (chunk) => applyHeading(chunk, heading))
-      });
-      if (isOneline) {
-        editor.setCursor(editor.getCursor("anchor").line);
-      }
-    };
-  };
-  return {
-    id: `apply-heading${headingSize}`,
-    name: `Apply Heading ${headingSize}`,
-    icon: `headingShifter_heading${headingSize}`,
-    editorCallback: createEditorCallback(headingSize)
-  };
-};
-
-// src/features/shiftHeading/operation.ts
-var import_obsidian4 = require("obsidian");
 
 // src/utils/markdown.ts
 var checkHeading = (content) => {
@@ -332,16 +311,64 @@ var getPreviousHeading = (editor, from) => {
   return void 0;
 };
 
+// src/features/applyHeading/module.ts
+var regExp = { ol: new RegExp("\\d+\\."), ul: new RegExp("\\-|\\*") };
+var applyHeading = (chunk, headingSize, settings) => {
+  var _a;
+  const replacer = Object.entries((_a = settings == null ? void 0 : settings.styleToRemove) != null ? _a : {}).flatMap(([k, v]) => {
+    return v ? regExp[k].source : [];
+  });
+  const replaceStyleRegExp = new RegExp(`^(${replacer.join("|")}) `, "");
+  const remove = chunk.replace(replaceStyleRegExp, "").replace(/^#+ /, "");
+  if (headingSize <= 0)
+    return remove;
+  return new Array(headingSize).fill("#").reduce((prev, cur) => {
+    return cur + prev;
+  }, " ") + remove;
+};
+
+// src/features/applyHeading/operation.ts
+var ApplyHeading = class {
+  constructor(settings, headingSize) {
+    __publicField(this, "settings");
+    __publicField(this, "headingSize");
+    __publicField(this, "editorCallback", (editor) => {
+      const lines = createRange(editor.getCursor("from").line, editor.getCursor("to").line - editor.getCursor("from").line + 1);
+      const isOneline = editor.getCursor("from").line === editor.getCursor("to").line;
+      editor.transaction({
+        changes: composeLineChanges(editor, lines, (chunk) => applyHeading(chunk, this.headingSize, this.settings))
+      });
+      if (isOneline) {
+        editor.setCursor(editor.getCursor("anchor").line);
+      }
+      return true;
+    });
+    __publicField(this, "createCommand", () => {
+      return {
+        id: `apply-heading${this.headingSize}`,
+        name: `Apply Heading ${this.headingSize}`,
+        icon: `headingShifter_heading${this.headingSize}`,
+        editorCallback: this.editorCallback
+      };
+    });
+    __publicField(this, "check", () => {
+      return this.settings.overrideTab;
+    });
+    this.settings = settings;
+    this.headingSize = headingSize;
+  }
+};
+
 // src/features/shiftHeading/module.ts
-var shiftHeading = (chunk, dir) => {
+var shiftHeading = (chunk, dir, settings) => {
   const heading = checkHeading(chunk);
-  return applyHeading(chunk, heading + dir);
+  return applyHeading(chunk, heading + dir, settings);
 };
-var increaseHeading = (chunk) => {
-  return shiftHeading(chunk, 1);
+var increaseHeading = (chunk, settings) => {
+  return shiftHeading(chunk, 1, settings);
 };
-var decreaseHeading = (chunk) => {
-  return shiftHeading(chunk, -1);
+var decreaseHeading = (chunk, settings) => {
+  return shiftHeading(chunk, -1, settings);
 };
 
 // src/features/shiftHeading/operation.ts
@@ -354,7 +381,7 @@ var IncreaseHeading = class {
         new import_obsidian4.Notice("Cannot Increase (contains more than Heading 6)");
         return true;
       }
-      const editorChange = composeLineChanges(editor, headingLines, increaseHeading);
+      const editorChange = composeLineChanges(editor, headingLines, increaseHeading, this.settings);
       editor.transaction({
         changes: editorChange
       });
@@ -383,7 +410,7 @@ var DecreaseHeading = class {
         new import_obsidian4.Notice(`Cannot Decrease (contains less than Heading${Number(this.settings.limitHeadingFrom)})`);
         return true;
       }
-      const editorChange = composeLineChanges(editor, headingLines, decreaseHeading);
+      const editorChange = composeLineChanges(editor, headingLines, decreaseHeading, this.settings);
       editor.transaction({
         changes: editorChange
       });
@@ -406,9 +433,10 @@ var DecreaseHeading = class {
 
 // src/features/insertHeading/operation.ts
 var import_obsidian5 = require("obsidian");
-var createInsertHeadingAtCurrentLevelCommand = () => {
-  const createEditorCallback = () => {
-    return (editor) => {
+var InsertHeadingAtCurrentLevel = class {
+  constructor(settings) {
+    __publicField(this, "settings");
+    __publicField(this, "editorCallback", (editor) => {
       const cursorLine = editor.getCursor("from").line;
       const lastHeadingLine = getPreviousHeading(editor, cursorLine);
       const headingLevel = lastHeadingLine != void 0 ? checkHeading(editor.getLine(lastHeadingLine)) : 0;
@@ -416,19 +444,23 @@ var createInsertHeadingAtCurrentLevelCommand = () => {
         changes: composeLineChanges(editor, [cursorLine], (chunk) => applyHeading(chunk, headingLevel))
       });
       editor.setCursor(editor.getCursor().line);
-      return;
-    };
-  };
-  return {
-    id: `insert-heading-current`,
-    name: `Insert Heading at current level`,
-    icon: `headingShifter_heading`,
-    editorCallback: createEditorCallback()
-  };
+      return true;
+    });
+    __publicField(this, "createCommand", () => {
+      return {
+        id: `insert-heading-current`,
+        name: `Insert Heading at current level`,
+        icon: `headingShifter_heading`,
+        editorCallback: this.editorCallback
+      };
+    });
+    this.settings = settings;
+  }
 };
-var createInsertHeadingAtDeeperLevelCommand = () => {
-  const createEditorCallback = () => {
-    return (editor) => {
+var InsertHeadingAtDeeperLevel = class {
+  constructor(settings) {
+    __publicField(this, "settings");
+    __publicField(this, "editorCallback", (editor) => {
       const cursorLine = editor.getCursor("from").line;
       const lastHeadingLine = getPreviousHeading(editor, cursorLine);
       const headingLevel = lastHeadingLine ? checkHeading(editor.getLine(lastHeadingLine)) : 0;
@@ -440,35 +472,42 @@ var createInsertHeadingAtDeeperLevelCommand = () => {
         changes: composeLineChanges(editor, [cursorLine], (chunk) => applyHeading(chunk, headingLevel + 1))
       });
       editor.setCursor(editor.getCursor().line);
-      return;
-    };
-  };
-  return {
-    id: `insert-heading-deeper`,
-    name: `Insert Heading at one level deeper`,
-    icon: `headingShifter_heading`,
-    editorCallback: createEditorCallback()
-  };
+      return true;
+    });
+    __publicField(this, "createCommand", () => {
+      return {
+        id: `insert-heading-deeper`,
+        name: `Insert Heading at one level deeper`,
+        icon: `headingShifter_heading`,
+        editorCallback: this.editorCallback
+      };
+    });
+    this.settings = settings;
+  }
 };
-var createInsertHeadingAtHigherLevelCommand = () => {
-  const createEditorCallback = () => {
-    return (editor) => {
+var InsertHeadingAtHigherLevel = class {
+  constructor(settings) {
+    __publicField(this, "settings");
+    __publicField(this, "editorCallback", (editor) => {
       const cursorLine = editor.getCursor("from").line;
       const lastHeadingLine = getPreviousHeading(editor, cursorLine);
       const headingLevel = lastHeadingLine ? checkHeading(editor.getLine(lastHeadingLine)) : 0;
       editor.transaction({
-        changes: composeLineChanges(editor, [cursorLine], (chunk) => applyHeading(chunk, headingLevel - 1))
+        changes: composeLineChanges(editor, [cursorLine], (chunk) => applyHeading(chunk, headingLevel - 1, this.settings))
       });
       editor.setCursor(editor.getCursor().line);
-      return;
-    };
-  };
-  return {
-    id: `insert-heading-higher`,
-    name: `Insert Heading at one level higher`,
-    icon: `headingShifter_heading`,
-    editorCallback: createEditorCallback()
-  };
+      return true;
+    });
+    __publicField(this, "createCommand", () => {
+      return {
+        id: `insert-heading-higher`,
+        name: `Insert Heading at one level higher`,
+        icon: `headingShifter_heading`,
+        editorCallback: this.editorCallback
+      };
+    });
+    this.settings = settings;
+  }
 };
 
 // src/services/registerService.ts
@@ -485,12 +524,18 @@ var RegisterService = class {
   addCommands() {
     const increaseHeading2 = new IncreaseHeading(this.plugin.settings);
     const decreaseHeading2 = new DecreaseHeading(this.plugin.settings);
-    HEADINGS.forEach((heading) => this.plugin.addCommand(createApplyHeadingCommand(this.plugin.settings, heading)));
+    const insertHeadingAtCurrentLebel = new InsertHeadingAtCurrentLevel(this.plugin.settings);
+    const insertHeadingAtDeeperLevel = new InsertHeadingAtDeeperLevel(this.plugin.settings);
+    const insertHeadingAtHigherLevel = new InsertHeadingAtHigherLevel(this.plugin.settings);
+    HEADINGS.forEach((heading) => {
+      const applyHeading2 = new ApplyHeading(this.plugin.settings, heading);
+      this.plugin.addCommand(applyHeading2.createCommand());
+    });
     this.plugin.addCommand(increaseHeading2.createCommand());
     this.plugin.addCommand(decreaseHeading2.createCommand());
-    this.plugin.addCommand(createInsertHeadingAtCurrentLevelCommand());
-    this.plugin.addCommand(createInsertHeadingAtDeeperLevelCommand());
-    this.plugin.addCommand(createInsertHeadingAtHigherLevelCommand());
+    this.plugin.addCommand(insertHeadingAtCurrentLebel.createCommand());
+    this.plugin.addCommand(insertHeadingAtDeeperLevel.createCommand());
+    this.plugin.addCommand(insertHeadingAtHigherLevel.createCommand());
     this.plugin.registerEditorExtension(import_state.Prec.highest(import_view.keymap.of([
       {
         key: "Tab",

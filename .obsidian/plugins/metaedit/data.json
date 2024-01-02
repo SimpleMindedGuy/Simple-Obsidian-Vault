@@ -3,7 +3,7 @@
     "enabled": false,
     "properties": [
       {
-        "name": "",
+        "name": "📊",
         "type": "Total Tasks"
       }
     ]
@@ -14,18 +14,13 @@
   },
   "AutoProperties": {
     "enabled": true,
-    "properties": [
-      {
-        "name": "",
-        "choices": [
-          ""
-        ]
-      }
-    ]
+    "properties": []
   },
   "EditMode": {
     "mode": "Some Multi",
-    "properties": []
+    "properties": [
+      "📊"
+    ]
   },
   "KanbanHelper": {
     "enabled": true,
@@ -53,10 +48,14 @@
       {
         "property": "📊",
         "boardName": "Video"
+      },
+      {
+        "property": "📊",
+        "boardName": "Test"
       }
     ]
   },
   "UIElements": {
-    "enabled": true
+    "enabled": false
   }
 }

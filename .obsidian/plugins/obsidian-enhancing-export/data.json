@@ -44,14 +44,18 @@
     },
     {
       "name": "OPML"
+    },
+    {
+      "name": "Bibliography"
     }
   ],
   "defaultExportDirectoryMode": "Auto",
   "openExportedFile": true,
+  "env": {},
   "lastEditName": "Html",
   "showOverwriteConfirmation": true,
   "lastExportDirectory": {
     "linux": "/home/simple/Documents"
   },
-  "lastExportType": "Html"
+  "lastExportType": "Word (.docx)"
 }

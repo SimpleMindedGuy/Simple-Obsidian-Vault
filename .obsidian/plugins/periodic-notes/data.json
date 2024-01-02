@@ -5,18 +5,18 @@
   "daily": {
     "format": "YYYY/YYYY-MM-DD",
     "folder": "00-Daily",
-    "template": "99-Templates/Daily/Daily.md",
+    "template": "99-Templates/00-Daily/Daily.md",
     "enabled": true
   },
   "weekly": {
     "format": "YYYY/YYYY-[W]ww",
     "folder": "01-Weekly",
-    "template": "99-Templates/Weekly/Weekly.md",
+    "template": "99-Templates/02-Weekly/Weekly.md",
     "enabled": true
   },
   "monthly": {
     "format": "YYYY/YYYY-MM",
-    "template": "99-Templates/Monthly/Monthly.md",
+    "template": "99-Templates/01-Monthly/Monthly.md",
     "folder": "02-Monthly",
     "enabled": true
   },
@@ -28,7 +28,7 @@
   },
   "yearly": {
     "format": "YYYY",
-    "template": "99-Templates/Yearly/Yearly.md",
+    "template": "99-Templates/03-Yearly/Yearly.md",
     "folder": "03-Yearly",
     "enabled": true
   }
