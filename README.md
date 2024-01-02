@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is my obsidian vault self up with all my scripts, and utilities. 
+This is my obsidian vault setup with all my scripts, and utilities. 
 
 The goal of this setup is to make Making documents and Organizing them much easier, as well as Habit tracking and data visualization.
 It is still under development, and the script could still needs a lot of documentation, but this version works almost perfectly, If you find any bugs please report that in the issues section.
