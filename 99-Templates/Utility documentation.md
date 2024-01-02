@@ -274,7 +274,7 @@ Tells the Script at which layer to make the Overview folder, you can only make o
 
 Moves attachments from where ever they are, to the specified path.
 
-> [!example] 
+> [!Note] 
 > when using a "fixed" path 
 > just type the path as normal : path/to/folder
 > when using variables  use the current format :  !(`key`)/!(`key`)/!(`key`)
@@ -317,7 +317,7 @@ By default the parent document key is called `parent`, but in the current config
 
 And it only starts building document folders using the `layers` list, starting for the current document's file.
 
-> [!example] 
+> [!Note] 
 > the default command for making subnote, uses the command 
 > `AddLayer :=> SubNote`
 > so that the utility looks for SubNote Templates. 
