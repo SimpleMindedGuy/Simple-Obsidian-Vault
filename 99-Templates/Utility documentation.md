@@ -135,7 +135,8 @@ Changes the `Key` for or the `Meta` variable name for the document's Created dat
 
 Those are mostly set in the [config](./Config) file, which will be read and “executed” before running anything else.
 
->[!note] Example
+>[!note]
+> Example
 > SetCreatedKey : => 🗓️
 > stead of storing the created date in a 
 > `Created: 21/1/2020` 
