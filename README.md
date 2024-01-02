@@ -23,7 +23,7 @@ Look up the [Utility documentation](./99-Templates/Utility%20documentation.md) f
 
 Added some script to read Daily, Weekly, And Monthly note's **MetaData** to display them using graphs and tables, the variables themselves are customizable, all you have to do is edit the 3 files, the editing process is a little lengthy currently, and I'm trying to work out a way to make that process shorter.
 
-But currently it only works for data that is collected from periodic notes, Read the [Habit Tracking Documentation](./99-Templates/Habit%20Tracking%22Documentation.md) for more information, and understand how it works.
+But currently it only works for data that is collected from periodic notes, Read the [Habit Tracking Documentation](./99-Templates/Habit%20Tracking%20Documentation.md) for more information, and understand how it works.
 
 >[!important] 
 > You need to make sure that the variables names exactly match the ones you're looking for, and those same variables have to also be included in the templates you're trying to set its value in 
