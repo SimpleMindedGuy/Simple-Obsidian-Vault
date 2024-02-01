@@ -46,13 +46,15 @@ moving a link from one list to another will change a `key` value in the metadata
 ## Meta
 Is a variable the script will store all input data, as long as there is a `key`  provided after a command that would take value from (user input /current file/command block).
 
-> [!note] Example 1
+> [!note]
+> Example 1
 > Input :=> number
 > will result in a value/variable called `number` with the chosen value
 > it should look like this 
 > `number:one`
 
-> [!note] Example 2
+> [!note]
+> Example 2
 > GetValue :=> 🗓️ // gets a property in the current file with the name 🗓️, and stores is in a specific variable called `currenValue`.
 > StoreValue :=> createdDate // Stores the current value of the `currentValue` variable, and stores it in a `Key` inside the `Meta` variable.
 
@@ -100,7 +102,8 @@ the Script is going to look for at least 2 default files.
 Sets a value or a list of values in a global variable called `value`, that value can then be stored in another variable using the [[99-Templates/Utility documentation#StoreValue value or value1 value2|StoreValue command]].
 
 
->[!note] Example
+>[!note]
+>Example
 >SetValue:  => hello world
 >sets the value of `value` to 'hello world'
 >StoreValue : => hello   
@@ -132,7 +135,8 @@ Changes the `Key` for or the `Meta` variable name for the document's Created dat
 
 Those are mostly set in the [config](./Config) file, which will be read and “executed” before running anything else.
 
->[!note] Example
+>[!note]
+> Example
 > SetCreatedKey : => 🗓️
 > stead of storing the created date in a 
 > `Created: 21/1/2020` 
@@ -225,7 +229,8 @@ Tells the script to move to the next file in the `layers` list.
 
 the script will look for the next file, in the template folder 
 
-> [!note] Example
+> [!note]
+> Example
 > if layers have the values [project,type]
 > when reading the `NextFile:=>` command, it then looks in the Template file (`99-Template`, in the default configuration.)
 > for a folder called `porject`, then it looks for a note with the name `project`.
@@ -270,7 +275,7 @@ Tells the Script at which layer to make the Overview folder, you can only make o
 
 Moves attachments from where ever they are, to the specified path.
 
-> [!example] 
+> [!Note] 
 > when using a "fixed" path 
 > just type the path as normal : path/to/folder
 > when using variables  use the current format :  !(`key`)/!(`key`)/!(`key`)
@@ -313,7 +318,7 @@ By default the parent document key is called `parent`, but in the current config
 
 And it only starts building document folders using the `layers` list, starting for the current document's file.
 
-> [!example] 
+> [!Note] 
 > the default command for making subnote, uses the command 
 > `AddLayer :=> SubNote`
 > so that the utility looks for SubNote Templates. 
