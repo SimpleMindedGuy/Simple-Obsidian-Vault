@@ -1,35 +1,42 @@
 {{{:::
-Dialog : {
+Menu :=> {
 
 Chose $(🎫) type 
 }
 
-Select: [Math,Physics,Philosophy,Theology,Carpentry,Engineering,Computer science,Programming,Art] => 🎟️
+Menu :=>  [Math,Physics,Philosophy,Theology,Carpentry,Engineering,Computer science,Programming,Art] 
+
+SelectLayer :=> 🎟️
+
+SetOverviewLayer :=> !(🎫)
 
 
-OverviewKey: => 📊
-OverviewLayer: => 🎫
-
-Dialog : {
+Dialog  :=> {
 Enter Document Title 
 }
+
 Input :=> 🏷️
 
-Dialog : {
+Dialog :=> {
 Books to refer to if any
 }
+
 List :=> 📚
 
-Dialog : {
-Alias : 
+Dialog :=> {
 Names to refer to the document
+Alias :
 }
-List :=> alias
 
-Dialog : {
-Tags 
+List :=> aliases
+
+Dialog :=> {
+Tags :
 }
+
 List :=> tags
 
-Build :=>
+BuildDocument :=>
+
+
 :::}}}

@@ -21,7 +21,7 @@
 tags:
  - "diary"
 aliases:
-  - "{{date: YYYY-MM-DD}}"
+ - "{{date: YYYY-MM-DD}}"
 
 dayName: "{{date: dddd}}"
 day: {{ date: DD }}
@@ -149,7 +149,6 @@ Select :=> 😶
 BuildInFile :=>
 
 :::}}}
-
 talk about your day and thoughts in the moment
 
 ## What happened today 
@@ -171,6 +170,19 @@ talk about your day and thoughts in the moment
 ### Things I want to change
 
 ### Talk about future
+
+## Today's Taks
+- [ ] tidy up the room. 
+- [ ] Pray Fajhr
+- [ ] Eat breakfast
+- [ ] 20 Pages of the Qur'an
+- [ ] Pray Duhr
+- [ ] 1 Hour Math
+- [ ] 1 Hour Reading
+- [ ] Pray Asr
+- [ ] 2-4 Hours Project
+- [ ] Pray Maghrib
+- [ ] Pray Isha
 
 
 ```button

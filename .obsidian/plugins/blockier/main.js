@@ -42,9 +42,7 @@ var ANY_BLOCK = new RegExp(
   `${BLOCKS.CHECKBOX}|${BLOCKS.BULLET}|${BLOCKS.NUMBER}|${BLOCKS.HEADING}|${BLOCKS.QUOTE}`
 );
 var LINE_START_BLOCK = new RegExp(`^\\s*(?:${ANY_BLOCK.source}) `);
-var OVERRIDABLE_BLOCK = new RegExp(
-  `${BLOCKS.CHECKBOX}|${BLOCKS.BULLET}|${BLOCKS.NUMBER}`
-);
+var OVERRIDABLE_BLOCK = new RegExp(`${BLOCKS.CHECKBOX}|${BLOCKS.BULLET}|${BLOCKS.NUMBER}`);
 var OVERRIDING_BLOCK = new RegExp(`${BLOCKS.BULLET}|${BLOCKS.NUMBER}`);
 var IS_OVERRIDING = new RegExp(
   `^(?<whitespace>\\s*)(?<existing>${OVERRIDABLE_BLOCK.source}) (?<new>${OVERRIDING_BLOCK.source})`
@@ -75,9 +73,7 @@ function tryReplace(editor) {
 // src/select.ts
 function runSelectBlock(editor, avoidPrefixes) {
   const selections = editor.listSelections();
-  const newSelections = selections.map(
-    (sel) => selectLine(editor, sel, avoidPrefixes)
-  );
+  const newSelections = selections.map((sel) => selectLine(editor, sel, avoidPrefixes));
   editor.setSelections(newSelections);
 }
 function selectLine(editor, selection, avoidPrefixes) {
@@ -160,18 +156,8 @@ var BracketSuggest = class extends import_obsidian.EditorSuggest {
   }
   renderSuggestion(value, el) {
     const div = el.createDiv();
-    div.classList.add(
-      "markdown-rendered",
-      "markdown-preview-view",
-      this.opts.suggestionClass
-    );
-    import_obsidian.MarkdownRenderer.render(
-      this.app,
-      this.opts.renderMarkdown(value),
-      div,
-      "",
-      this.plugin
-    );
+    div.classList.add("markdown-rendered", "markdown-preview-view", this.opts.suggestionClass);
+    import_obsidian.MarkdownRenderer.render(this.app, this.opts.renderMarkdown(value), div, "", this.plugin);
   }
   selectSuggestion(value) {
     if (!this.context)
@@ -182,10 +168,7 @@ var BracketSuggest = class extends import_obsidian.EditorSuggest {
     const offsetAmount = context.editor.getLine(cursor.line).indexOf("]") + 2 - cursor.ch;
     const newCursor = offsetCh(cursor, offsetAmount);
     context.editor.setCursor(newCursor);
-    const next2Char = context.editor.getRange(
-      newCursor,
-      offsetCh(newCursor, 2)
-    );
+    const next2Char = context.editor.getRange(newCursor, offsetCh(newCursor, 2));
     if (next2Char === "] ") {
       context.editor.replaceRange("", newCursor, offsetCh(newCursor, 2));
     } else if (next2Char[0] === "]") {
@@ -207,7 +190,8 @@ var CalloutSuggest = class extends BracketSuggest {
   constructor(app, plugin, csv) {
     super(app, plugin, {
       suggestions: csv.split(",").map((str) => str.trim()),
-      triggerRegex: /^\s*> \[!(\w*)$/,
+      // allow 0/1 space before the `[!` - https://github.com/blorbb/obsidian-blockier/issues/5
+      triggerRegex: /^\s*> ?\[!(\w*)$/,
       suggestionClass: "blockier-callout-suggestion",
       renderMarkdown: (suggestion) => `> [!${suggestion}]`
     });
@@ -227,20 +211,26 @@ var DEFAULT_SETTINGS = {
   showCheckboxSuggestions: false,
   checkboxVariants: ' x><!-/?*nliISpcb"0123456789',
   showCalloutSuggestions: true,
-  calloutSuggestions: "note, summary, info, todo, tip, check, help, warning, fail, error, bug, example, quote"
+  calloutSuggestions: "note, summary, info, todo, tip, check, help, warning, fail, error, bug, example, quote",
+  enableSelectBlockEE: true
 };
 var BlockierPlugin = class extends import_obsidian2.Plugin {
   async onload() {
     await this.loadSettings();
     this.addSettingTab(new SettingsTab(this.app, this));
+    this.addCommand({
+      id: "select-block",
+      name: "Select block",
+      editorCallback: (editor) => {
+        runSelectBlock(editor, this.settings.selectAllAvoidsPrefixes);
+      }
+    });
     this.registerEditorExtension(
       import_view.keymap.of([
         {
           key: "Space",
           run: () => {
-            const view = this.app.workspace.getActiveViewOfType(
-              import_obsidian2.MarkdownView
-            );
+            const view = this.app.workspace.getActiveViewOfType(import_obsidian2.MarkdownView);
             if (this.settings.replaceBlocks && view) {
               tryReplace(view.editor);
             }
@@ -249,52 +239,39 @@ var BlockierPlugin = class extends import_obsidian2.Plugin {
         }
       ])
     );
-    this.registerEditorExtension(
-      import_view.keymap.of([
-        {
-          key: "c-a",
-          // ctrl a
-          mac: "m-a",
-          // cmd a
-          run: () => {
-            var _a;
-            const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
-            if (editor) {
-              runSelectBlock(
-                editor,
-                this.settings.selectAllAvoidsPrefixes
-              );
+    if (this.settings.enableSelectBlockEE) {
+      this.registerEditorExtension(
+        import_view.keymap.of([
+          {
+            key: "c-a",
+            // ctrl a
+            mac: "m-a",
+            // cmd a
+            run: () => {
+              var _a;
+              const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
+              if (editor) {
+                runSelectBlock(editor, this.settings.selectAllAvoidsPrefixes);
+              }
+              return true;
             }
-            return true;
           }
-        }
-      ])
-    );
+        ])
+      );
+    }
     if (this.settings.showCheckboxSuggestions) {
       this.registerEditorSuggest(
-        new CheckboxSuggest(
-          this.app,
-          this,
-          this.settings.checkboxVariants
-        )
+        new CheckboxSuggest(this.app, this, this.settings.checkboxVariants)
       );
     }
     if (this.settings.showCalloutSuggestions) {
       this.registerEditorSuggest(
-        new CalloutSuggest(
-          this.app,
-          this,
-          this.settings.calloutSuggestions
-        )
+        new CalloutSuggest(this.app, this, this.settings.calloutSuggestions)
       );
     }
   }
   async loadSettings() {
-    this.settings = Object.assign(
-      {},
-      DEFAULT_SETTINGS,
-      await this.loadData()
-    );
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -316,9 +293,16 @@ var SettingsTab = class extends import_obsidian2.PluginSettingTab {
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Only select paragraphs").setDesc(
-      "Whether the Select block command will avoid selecting block prefixes."
+    new import_obsidian2.Setting(containerEl).setName("Use ctrl/cmd-A for select block").setDesc(
+      "Whether to override ctrl/cmd-A for the select block command. Disable this and set a hotkey in hotkey settings if you prefer a different hotkey."
     ).addToggle(
+      (toggle) => toggle.setValue(this.plugin.settings.enableSelectBlockEE).onChange(async (value) => {
+        this.plugin.settings.enableSelectBlockEE = value;
+        await this.plugin.saveSettings();
+        new import_obsidian2.Notice("Reload required!");
+      })
+    );
+    new import_obsidian2.Setting(containerEl).setName("Only select paragraphs").setDesc("Whether the Select block command will avoid selecting block prefixes.").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.selectAllAvoidsPrefixes).onChange(async (value) => {
         this.plugin.settings.selectAllAvoidsPrefixes = value;
         await this.plugin.saveSettings();
@@ -350,9 +334,7 @@ var SettingsTab = class extends import_obsidian2.PluginSettingTab {
         new import_obsidian2.Notice("Reload required!");
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Callout suggestion variants").setDesc(
-      "Which callouts to be shown in the suggestion. Separate by commas."
-    ).addTextArea(
+    new import_obsidian2.Setting(containerEl).setName("Callout suggestion variants").setDesc("Which callouts to be shown in the suggestion. Separate by commas.").addTextArea(
       (text) => text.setValue(this.plugin.settings.calloutSuggestions).onChange(async (value) => {
         this.plugin.settings.calloutSuggestions = value;
         await this.plugin.saveSettings();

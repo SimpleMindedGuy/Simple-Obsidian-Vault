@@ -198,25 +198,8 @@
   ],
   "switcher:open": [],
   "table-editor-obsidian:table-control-bar": [],
-  "table-editor-obsidian:insert-column": [],
   "obsidian-outliner:move-list-item-up": [],
   "obsidian-outliner:move-list-item-down": [],
-  "table-editor-obsidian:move-column-right": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "ArrowRight"
-    }
-  ],
-  "table-editor-obsidian:move-column-left": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "ArrowLeft"
-    }
-  ],
   "obsidian-languagetool-plugin:ltaccept-suggestion-1": [
     {
       "modifiers": [],
@@ -258,14 +241,6 @@
         "Shift"
       ],
       "key": "L"
-    }
-  ],
-  "obsidian-heading-shifter:increase-heading": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "."
     }
   ],
   "workspace:next-tab": [
@@ -319,14 +294,6 @@
       "key": "O"
     }
   ],
-  "obsidian-heading-shifter:decrease-heading": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": ","
-    }
-  ],
   "editor:focus-top": [
     {
       "modifiers": [
@@ -342,22 +309,6 @@
         "Mod"
       ],
       "key": " "
-    }
-  ],
-  "obsidian-heading-shifter:insert-heading-deeper": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "ArrowRight"
-    }
-  ],
-  "obsidian-heading-shifter:insert-heading-higher": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "ArrowLeft"
     }
   ],
   "editor:toggle-numbered-list": [
@@ -478,7 +429,7 @@
         "Mod",
         "Shift"
       ],
-      "key": "G"
+      "key": "V"
     }
   ],
   "graph:open-local": [
@@ -488,6 +439,115 @@
         "Mod"
       ],
       "key": "G"
+    }
+  ],
+  "obsidian-heading-shifter:increase-heading": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "."
+    }
+  ],
+  "obsidian-heading-shifter:decrease-heading": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": ","
+    }
+  ],
+  "obsidian-heading-shifter:insert-heading-deeper": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowRight"
+    }
+  ],
+  "obsidian-heading-shifter:insert-heading-higher": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "ArrowLeft"
+    }
+  ],
+  "obsidian-timestamper:obsidian-fast-timestamp": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "G"
+    }
+  ],
+  "obsidian-timestamper:obsidian-fast-datestamp": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "G"
+    }
+  ],
+  "editor:open-search": [],
+  "editor:open-search-replace": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "F"
+    }
+  ],
+  "slides:start": [
+    {
+      "modifiers": [],
+      "key": "F5"
+    }
+  ],
+  "table-editor-obsidian:delete-column": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "Delete"
+    }
+  ],
+  "table-editor-obsidian:delete-row": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "Backspace"
+    }
+  ],
+  "table-editor-obsidian:insert-column": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "\\"
+    }
+  ],
+  "table-editor-obsidian:insert-row": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "Enter"
+    }
+  ],
+  "workspace:split-vertical": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "]"
     }
   ]
 }

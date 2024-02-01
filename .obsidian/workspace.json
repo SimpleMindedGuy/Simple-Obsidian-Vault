@@ -4,16 +4,37 @@
     "type": "split",
     "children": [
       {
-        "id": "e488f3ace0dbb691",
+        "id": "c58df5604aded664",
         "type": "tabs",
         "children": [
           {
-            "id": "a225fb54a4769b52",
+            "id": "e322a8705fca8c57",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {}
+            }
+          },
+          {
+            "id": "f52c74f4b26c3eb2",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "99-Templates/01-Weekly/Weekly.md",
+                "mode": "source",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "92ecfa69f7939097",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "00-Daily/2024/2024-01-31.md",
                 "mode": "preview",
                 "backlinks": true,
                 "source": true
@@ -21,12 +42,77 @@
             }
           },
           {
-            "id": "22523c95fe73264f",
+            "id": "5e4941122feef1b4",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "00-Daily/2024/2024-01-31.md",
+                "mode": "preview",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "b47d19e1dc5acbe8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "9999 - Accounts.md",
+                "mode": "source",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "6979be65b89d65ce",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Home.md",
+                "mode": "preview",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "17ba4a6a616bad3f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "9999 - Accounts.md",
+                "mode": "preview",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "6b366031cead751b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "12-Video/07-Simple Talk/12-Tom is sick of society/Tom is sick of society Description.md",
+                "mode": "source",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "08153b55611357d4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "12-Video/07-Simple Talk/07-Problems with education/Problems with education Description.md",
                 "mode": "source",
                 "backlinks": true,
                 "source": true
@@ -34,7 +120,7 @@
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 5
       }
     ],
     "direction": "vertical"
@@ -72,6 +158,17 @@
                 "sortOrder": "byModifiedTime"
               }
             }
+          },
+          {
+            "id": "d0d83656605c5435",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
           }
         ]
       },
@@ -92,7 +189,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 258
+    "width": 275
   },
   "right": {
     "id": "cf0c977f7f90dfd4",
@@ -101,7 +198,7 @@
       {
         "id": "5cc77365d0d8e474",
         "type": "tabs",
-        "dimension": 36.016096579476866,
+        "dimension": 33.601609657947684,
         "children": [
           {
             "id": "206300cfce5ca9b9",
@@ -109,17 +206,6 @@
             "state": {
               "type": "calendar",
               "state": {}
-            }
-          },
-          {
-            "id": "d0d83656605c5435",
-            "type": "leaf",
-            "state": {
-              "type": "tag",
-              "state": {
-                "sortOrder": "frequency",
-                "useHierarchy": true
-              }
             }
           },
           {
@@ -135,18 +221,8 @@
       {
         "id": "5c1134142e0ac0a6",
         "type": "tabs",
-        "dimension": 63.98390342052314,
+        "dimension": 66.39839034205231,
         "children": [
-          {
-            "id": "6311cc4f6775fc4d",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "README.md"
-              }
-            }
-          },
           {
             "id": "6380d82b8ad9214e",
             "type": "leaf",
@@ -156,12 +232,22 @@
             }
           },
           {
+            "id": "6311cc4f6775fc4d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Home.md"
+              }
+            }
+          },
+          {
             "id": "74f905f6442c0d00",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
+                "file": "Home.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -173,13 +259,13 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
+                "file": "Home.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
                 "searchQuery": "",
-                "backlinkCollapsed": true,
+                "backlinkCollapsed": false,
                 "unlinkedCollapsed": false
               }
             }
@@ -190,7 +276,7 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "README.md"
+                "file": "Home.md"
               }
             }
           },
@@ -200,88 +286,89 @@
             "state": {
               "type": "all-properties",
               "state": {
-                "sortOrder": "frequency"
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
               }
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 368,
-    "collapsed": true
+    "width": 380
   },
   "left-ribbon": {
     "hiddenItems": {
-      "obsidian-gallery:Gallery": false,
       "graph:Open graph view": false,
       "audio-recorder:Start/stop recording": false,
       "switcher:Open quick switcher": true,
       "canvas:Create new canvas": false,
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
-      "command-palette:Open command palette": true,
+      "command-palette:Open command palette": false,
       "markdown-importer:Open format converter": false,
       "zk-prefixer:Create new unique note": true,
       "workspaces:Manage workspace layouts": true,
       "dbfolder:Create a new database table": false,
-      "webpage-html-export:Export Vault to HTML": false,
-      "homepage:Open homepage": false,
-      "templater-obsidian:Templater": false,
       "obsidian-excalidraw-plugin:Create new drawing": false,
+      "homepage:Open homepage": false,
+      "obsidian-gallery:Gallery": false,
+      "webpage-html-export:Export Vault to HTML": false,
+      "templater-obsidian:Templater": false,
       "pomodoro-timer:Toggle timer panel": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "22523c95fe73264f",
+  "active": "6979be65b89d65ce",
   "lastOpenFiles": [
+    "9999 - Accounts.md",
     "Home.md",
-    "99-Templates/99-Commands/MoveDiaryMedia.md",
-    "99-Templates/Config.md",
-    "99-Templates/Utility documentation.md",
-    "99-Templates/NewDocument.md",
-    "15-University/04 - Artificial Intelligence/Artificial Intelligence Progress.md",
-    "15-University/05 - Computation theory/Computation theory Progress.md",
-    "15-University/06 - Wireless Networking/Wireless Networking Progress.md",
-    "11-Learning/02 - Introduction to Mathematics/Introduction to Mathematics Progress.md",
-    "11-Learning/02 - Introduction to Mathematics/Introduction to Mathematics Description.md",
-    "10-Project/01-Simple Web App (React)/SubNotes/0001 - Nav Bar.md",
-    "10-Project/01-Simple Web App (React)/SubNotes/07 - Drag and Drop.md",
-    "10-Project/01-Simple Web App (React)/SubNotes/05 - Container Design.md",
-    "10-Project/01-Simple Web App (React)/SubNotes/04 - NavBar Design.md",
-    "10-Project/01-Simple Web App (React)/SubNotes/0003 - Starting a ReactJS project.md",
-    "10-Project/01-Simple Web App (React)/SubNotes/0002 - General Post look.md",
-    "10-Project/01-Simple Web App (React)/Simple Web App (React) Progress.md",
-    "10-Project/01-Simple Web App (React)/Simple Web App (React) Description.md",
-    "10-Project/02-Simple Obsidian Vault/Simple Obsidian Vault Description.md",
-    "10-Project/02-Simple Obsidian Vault/Simple Obsidian Vault Progress.md",
-    "99-Templates/Untitled.md",
-    "99-Templates/99-Commands/MakeSubNote.md",
-    "99-Templates/99-Commands/MakeSubDocument.md",
-    "99-Templates/Habit Tracking Documentation.md",
-    "99-Templates/99-Commands/MoveWeeklyMedia.md",
-    "04-Test/01-456/456 Description.md",
-    "Filll/Year-2023/Month-12/Week-52",
-    "Filll/Year-2023/Month-12",
-    "Filll/Year-2023",
-    "Filll",
-    "Filll/Year-2023/Month-12/Week-52/00-1700587320939987.jpg",
-    "Filll/Year-2023/Month-12/Week-52/04-images.jpg",
-    "Filll/Year-2023/Month-12/Week-52/02-1.jpg",
-    "Filll/Year-2023/Month-12/Week-52/03-5ueacr.jpg",
-    "04-Test/01-456/Media",
-    "Filll/Year-2023/Month-12/Week-52/01-VRChat_2023-11-15_20-02-24.203_3840x2160.png",
-    "04-Test/01-456/SubNote",
-    "10-Project/04-Better Title/00-Deez Nuts",
-    "10-Project/04-Better Title",
-    "10-Project/04-Better Title/01-another cool sub document",
-    "10-Project/04-Better Title/00-A cool sub document",
-    "80-Gallery/Screenshot_20230520_164944.png",
+    "00-Daily/2024/2024-01-31.md",
+    "00-Daily/2024/2024-01-30.md",
+    "00-Daily/2024/2024-01-29.md",
+    "01-Weekly/2024/2024-W05.md",
+    "99-Templates/01-Weekly/Weekly.md",
+    "12-Video/07-Simple Talk/14-Schizophrenia/Schizophrenia Description.md",
+    "12-Video/08-General/00-Simple Obsidian Setup Rewrok/Simple Obsidian Setup Rewrok Description.md",
+    "12-Video/Video.md",
+    "12-Video/07-Simple Talk/14-Schizophrenia",
+    "12-Video/07-Simple Talk/13-Toxic society/Toxic society Description.md",
+    "12-Video/07-Simple Talk/12-Tom is sick of society/Tom is sick of society Description.md",
+    "12-Video/07-Simple Talk/13-Toxic society",
+    "12-Video/07-Simple Talk/12-Tom is sick of society",
+    "12-Video/07-Simple Talk/07-Problems with education/Problems with education Description.md",
+    "12-Video/07-Simple Talk/08-Crazy or Dishonest/Crazy or Dishonest Description.md",
+    "12-Video/07-Simple Talk/09-Free will/Free will Description.md",
+    "12-Video/07-Simple Talk/10-Factors for Social Degradations/Factors for Social Degradations Description.md",
+    "12-Video/07-Simple Talk/11-Delusion and bad comprehension skills/Delusion and bad comprehension skills Description.md",
+    "12-Video/07-Simple Talk/11-Delusion and bad comprehension skills",
+    "12-Video/03-Clips/12-Casually Racist/Casually Racist Description.md",
+    "12-Video/03-Clips/09-Tom hate fox/Media/00-Clip - Tom hate fox.mp4",
+    "12-Video/07-Simple Talk/03-Tom Dream 2/Media/00-Simple Talk - Tom Dream2.mp4",
+    "12-Video/03-Clips/09-Tom hate fox/Tom hate fox Description.md",
+    "12-Video/03-Clips/10-Stupid jokes/Stupid jokes Description.md",
+    "12-Video/03-Clips/11-Fatty can't eat ducks/Fatty can't eat ducks Description.md",
+    "12-Video/03-Clips/13-Avrage 4chan conversation/Avrage 4chan conversation Description.md",
+    "12-Video/03-Clips/13-Avrage 4chan conversation",
+    "12-Video/03-Clips/12-Casually Racist",
+    "12-Video/03-Clips/11-Fatty can't eat ducks",
+    "12-Video/03-Clips/10-Stupid jokes",
+    "14-Book/03-The C programming Language/The C programming Language Progress.md",
+    "14-Book/03-The C programming Language/The C programming Language Tracking.md",
+    "14-Book/03-The C programming Language/The C programming Language Description.md",
+    "14-Book/03-The C programming Language/SubNote/01-Variables and Arithmetic Expressions.md",
     "80-Gallery/Pasted Image 20221029121616_801.png",
-    "80-Gallery/Pasted Image 20221118172352_611.png",
     "80-Gallery/Pasted Image 20230313214352_482.png",
-    "80-Gallery/create_user.gif",
+    "80-Gallery/Screenshot_20230205_030330.png",
+    "80-Gallery/Screenshot_20230204_003109.png",
+    "80-Gallery/Pasted Image 20221118172352_611.png",
+    "80-Gallery/Screenshot_20230520_164944.png",
+    "80-Gallery/Screenshot_20230520_193622.png",
+    "80-Gallery/Screenshot_20230521_224028.png",
+    "80-Gallery/Screenshot_20230521_224053.png",
+    "80-Gallery/Simple Podcast thumpnails.png",
     "Templates/Activity/Canvas Subnote.canvas"
   ]
 }

@@ -70,7 +70,7 @@ function getAutoDirectionPlugin(rtlPlugin) {
       this.rtlPlugin = rtlPlugin;
       this.view = view;
       const editorInfo = this.view.state.field(import_obsidian.editorInfoField);
-      if (editorInfo instanceof import_obsidian.MarkdownView) {
+      if (editorInfo && editorInfo instanceof import_obsidian.MarkdownView && editorInfo.editMode) {
         this.rtlPlugin.adjustDirectionToView(editorInfo, this);
       }
       this.rtlPlugin.handleIframeEditor(this.view.dom, this.view, editorInfo.file, this);
@@ -200,8 +200,7 @@ function breaksToDivs(el) {
     if (splitText.length > 1) {
       let newInnerHtml = "";
       splitText.map((line) => {
-        newInnerHtml += `<div class="esm-split">${line}</div>
-`;
+        newInnerHtml += `<div class="esm-split">${line}</div>`;
       });
       el.innerHTML = newInnerHtml;
     }
@@ -225,7 +224,6 @@ function detectCanvasElement(el, ctx, setPreviewDirection) {
 }
 var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
   let shouldAddDir = false, addedDir = false;
-  const childNodes = [];
   detectCanvasElement(el, ctx, setPreviewDirection);
   breaksToDivs(el);
   for (let i = 0; i < el.childNodes.length; i++) {
@@ -236,9 +234,12 @@ var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
         addedDir = true;
         lastDetectedDir = dir;
         if (specialNodes.contains(el.nodeName) && el.parentElement) {
-          addDirClassIfNotAddedBefore(el.parentElement, dirClass(dir));
+          let target = nonSpecialParent(el.parentElement);
+          if (target != null) {
+            addDirClassIfNotAddedBefore(target, dirClass(dir));
+          }
         } else {
-          el.addClass(dirClass(dir));
+          addDirClassIfNotAddedBefore(el, dirClass(dir));
           if (el.parentElement && el.parentElement.nodeName === "LI") {
             addDirClassIfNotAddedBefore(el.parentElement, dirClass(dir));
           }
@@ -247,13 +248,10 @@ var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
       shouldAddDir = true;
       continue;
     }
-    childNodes.push(n);
+    autoDirectionPostProcessor(n, ctx, setPreviewDirection);
     if (i === el.childNodes.length - 1 && shouldAddDir && !addedDir) {
       el.addClass(dirClass(lastDetectedDir));
     }
-  }
-  for (let i = 0; i < childNodes.length; i++) {
-    autoDirectionPostProcessor(childNodes[i], ctx, setPreviewDirection);
   }
   if (el.nodeName === "UL") {
     const lis = el.querySelectorAll("li");
@@ -274,6 +272,12 @@ function addDirClassIfNotAddedBefore(el, cls) {
     return;
   }
   el.addClass(cls);
+}
+function nonSpecialParent(el) {
+  while (specialNodes.contains(el.nodeName)) {
+    el = el.parentElement;
+  }
+  return el;
 }
 
 // main.ts

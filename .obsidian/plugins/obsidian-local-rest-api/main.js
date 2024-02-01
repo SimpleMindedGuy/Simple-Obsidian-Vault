@@ -17609,7 +17609,7 @@ var require_lib2 = __commonJS({
     function mapMonths(f) {
       const ms = [];
       for (let i = 1; i <= 12; i++) {
-        const dt = DateTime.utc(2016, i, 1);
+        const dt = DateTime.utc(2009, i, 1);
         ms.push(f(dt));
       }
       return ms;
@@ -17622,8 +17622,8 @@ var require_lib2 = __commonJS({
       }
       return ms;
     }
-    function listStuff(loc, length, defaultOK, englishFn, intlFn) {
-      const mode = loc.listingMode(defaultOK);
+    function listStuff(loc, length, englishFn, intlFn) {
+      const mode = loc.listingMode();
       if (mode === "error") {
         return null;
       } else if (mode === "en") {
@@ -17664,8 +17664,11 @@ var require_lib2 = __commonJS({
     var PolyDateFormatter = class {
       constructor(dt, intl, opts) {
         this.opts = opts;
+        this.originalZone = void 0;
         let z = void 0;
-        if (dt.zone.isUniversal) {
+        if (this.opts.timeZone) {
+          this.dt = dt;
+        } else if (dt.zone.type === "fixed") {
           const gmtOffset = -1 * (dt.offset / 60);
           const offsetZ = gmtOffset >= 0 ? `Etc/GMT+${gmtOffset}` : `Etc/GMT${gmtOffset}`;
           if (dt.offset !== 0 && IANAZone.create(offsetZ).valid) {
@@ -17673,27 +17676,47 @@ var require_lib2 = __commonJS({
             this.dt = dt;
           } else {
             z = "UTC";
-            if (opts.timeZoneName) {
-              this.dt = dt;
-            } else {
-              this.dt = dt.offset === 0 ? dt : DateTime.fromMillis(dt.ts + dt.offset * 60 * 1e3);
-            }
+            this.dt = dt.offset === 0 ? dt : dt.setZone("UTC").plus({ minutes: dt.offset });
+            this.originalZone = dt.zone;
           }
         } else if (dt.zone.type === "system") {
           this.dt = dt;
-        } else {
+        } else if (dt.zone.type === "iana") {
           this.dt = dt;
           z = dt.zone.name;
+        } else {
+          z = "UTC";
+          this.dt = dt.setZone("UTC").plus({ minutes: dt.offset });
+          this.originalZone = dt.zone;
         }
         const intlOpts = __spreadValues({}, this.opts);
         intlOpts.timeZone = intlOpts.timeZone || z;
         this.dtf = getCachedDTF(intl, intlOpts);
       }
       format() {
+        if (this.originalZone) {
+          return this.formatToParts().map(({ value }) => value).join("");
+        }
         return this.dtf.format(this.dt.toJSDate());
       }
       formatToParts() {
-        return this.dtf.formatToParts(this.dt.toJSDate());
+        const parts = this.dtf.formatToParts(this.dt.toJSDate());
+        if (this.originalZone) {
+          return parts.map((part) => {
+            if (part.type === "timeZoneName") {
+              const offsetName = this.originalZone.offsetName(this.dt.ts, {
+                locale: this.dt.locale,
+                format: this.opts.timeZoneName
+              });
+              return __spreadProps(__spreadValues({}, part), {
+                value: offsetName
+              });
+            } else {
+              return part;
+            }
+          });
+        }
+        return parts;
       }
       resolvedOptions() {
         return this.dtf.resolvedOptions();
@@ -17778,8 +17801,8 @@ var require_lib2 = __commonJS({
       redefaultToSystem(alts = {}) {
         return this.clone(__spreadProps(__spreadValues({}, alts), { defaultToEN: false }));
       }
-      months(length, format = false, defaultOK = true) {
-        return listStuff(this, length, defaultOK, months, () => {
+      months(length, format = false) {
+        return listStuff(this, length, months, () => {
           const intl = format ? { month: length, day: "numeric" } : { month: length }, formatStr = format ? "format" : "standalone";
           if (!this.monthsCache[formatStr][length]) {
             this.monthsCache[formatStr][length] = mapMonths((dt) => this.extract(dt, intl, "month"));
@@ -17787,8 +17810,8 @@ var require_lib2 = __commonJS({
           return this.monthsCache[formatStr][length];
         });
       }
-      weekdays(length, format = false, defaultOK = true) {
-        return listStuff(this, length, defaultOK, weekdays, () => {
+      weekdays(length, format = false) {
+        return listStuff(this, length, weekdays, () => {
           const intl = format ? { weekday: length, year: "numeric", month: "long", day: "numeric" } : { weekday: length }, formatStr = format ? "format" : "standalone";
           if (!this.weekdaysCache[formatStr][length]) {
             this.weekdaysCache[formatStr][length] = mapWeekdays((dt) => this.extract(dt, intl, "weekday"));
@@ -17796,8 +17819,8 @@ var require_lib2 = __commonJS({
           return this.weekdaysCache[formatStr][length];
         });
       }
-      meridiems(defaultOK = true) {
-        return listStuff(this, void 0, defaultOK, () => meridiems, () => {
+      meridiems() {
+        return listStuff(this, void 0, () => meridiems, () => {
           if (!this.meridiemCache) {
             const intl = { hour: "numeric", hourCycle: "h12" };
             this.meridiemCache = [DateTime.utc(2016, 11, 13, 9), DateTime.utc(2016, 11, 13, 19)].map((dt) => this.extract(dt, intl, "dayperiod"));
@@ -17805,8 +17828,8 @@ var require_lib2 = __commonJS({
           return this.meridiemCache;
         });
       }
-      eras(length, defaultOK = true) {
-        return listStuff(this, length, defaultOK, eras, () => {
+      eras(length) {
+        return listStuff(this, length, eras, () => {
           const intl = { era: length };
           if (!this.eraCache[length]) {
             this.eraCache[length] = [DateTime.utc(-40, 1, 1), DateTime.utc(2017, 1, 1)].map((dt) => this.extract(dt, intl, "era"));
@@ -17940,7 +17963,7 @@ var require_lib2 = __commonJS({
           return FixedOffsetZone.parseSpecifier(lowered) || IANAZone.create(input);
       } else if (isNumber(input)) {
         return FixedOffsetZone.instance(input);
-      } else if (typeof input === "object" && input.offset && typeof input.offset === "number") {
+      } else if (typeof input === "object" && "offset" in input && typeof input.offset === "function") {
         return input;
       } else {
         return new InvalidZone(input);
@@ -18110,7 +18133,7 @@ var require_lib2 = __commonJS({
       let d = Date.UTC(obj.year, obj.month - 1, obj.day, obj.hour, obj.minute, obj.second, obj.millisecond);
       if (obj.year < 100 && obj.year >= 0) {
         d = new Date(d);
-        d.setUTCFullYear(d.getUTCFullYear() - 1900);
+        d.setUTCFullYear(obj.year, obj.month - 1, obj.day);
       }
       return +d;
     }
@@ -18350,7 +18373,7 @@ var require_lib2 = __commonJS({
           const c = fmt.charAt(i);
           if (c === "'") {
             if (currentFull.length > 0) {
-              splits.push({ literal: bracketed, val: currentFull });
+              splits.push({ literal: bracketed || /^\s+$/.test(currentFull), val: currentFull });
             }
             current = null;
             currentFull = "";
@@ -18361,14 +18384,14 @@ var require_lib2 = __commonJS({
             currentFull += c;
           } else {
             if (currentFull.length > 0) {
-              splits.push({ literal: false, val: currentFull });
+              splits.push({ literal: /^\s+$/.test(currentFull), val: currentFull });
             }
             currentFull = c;
             current = c;
           }
         }
         if (currentFull.length > 0) {
-          splits.push({ literal: bracketed, val: currentFull });
+          splits.push({ literal: bracketed || /^\s+$/.test(currentFull), val: currentFull });
         }
         return splits;
       }
@@ -18387,21 +18410,21 @@ var require_lib2 = __commonJS({
         const df = this.systemLoc.dtFormatter(dt, __spreadValues(__spreadValues({}, this.opts), opts));
         return df.format();
       }
-      formatDateTime(dt, opts = {}) {
-        const df = this.loc.dtFormatter(dt, __spreadValues(__spreadValues({}, this.opts), opts));
-        return df.format();
+      dtFormatter(dt, opts = {}) {
+        return this.loc.dtFormatter(dt, __spreadValues(__spreadValues({}, this.opts), opts));
       }
-      formatDateTimeParts(dt, opts = {}) {
-        const df = this.loc.dtFormatter(dt, __spreadValues(__spreadValues({}, this.opts), opts));
-        return df.formatToParts();
+      formatDateTime(dt, opts) {
+        return this.dtFormatter(dt, opts).format();
       }
-      formatInterval(interval, opts = {}) {
-        const df = this.loc.dtFormatter(interval.start, __spreadValues(__spreadValues({}, this.opts), opts));
+      formatDateTimeParts(dt, opts) {
+        return this.dtFormatter(dt, opts).formatToParts();
+      }
+      formatInterval(interval, opts) {
+        const df = this.dtFormatter(interval.start, opts);
         return df.dtf.formatRange(interval.start.toJSDate(), interval.end.toJSDate());
       }
-      resolvedOptions(dt, opts = {}) {
-        const df = this.loc.dtFormatter(dt, __spreadValues(__spreadValues({}, this.opts), opts));
-        return df.resolvedOptions();
+      resolvedOptions(dt, opts) {
+        return this.dtFormatter(dt, opts).resolvedOptions();
       }
       num(n2, p = 0) {
         if (this.opts.forceSimple) {
@@ -18884,19 +18907,38 @@ var require_lib2 = __commonJS({
       };
       return new Duration(conf);
     }
-    function antiTrunc(n2) {
-      return n2 < 0 ? Math.floor(n2) : Math.ceil(n2);
-    }
-    function convert(matrix, fromMap, fromUnit, toMap, toUnit) {
-      const conv = matrix[toUnit][fromUnit], raw = fromMap[fromUnit] / conv, sameSign = Math.sign(raw) === Math.sign(toMap[toUnit]), added = !sameSign && toMap[toUnit] !== 0 && Math.abs(raw) <= 1 ? antiTrunc(raw) : Math.trunc(raw);
-      toMap[toUnit] += added;
-      fromMap[fromUnit] -= added * conv;
+    function durationToMillis(matrix, vals) {
+      var _a;
+      let sum = (_a = vals.milliseconds) != null ? _a : 0;
+      for (const unit of reverseUnits.slice(1)) {
+        if (vals[unit]) {
+          sum += vals[unit] * matrix[unit]["milliseconds"];
+        }
+      }
+      return sum;
     }
     function normalizeValues(matrix, vals) {
-      reverseUnits.reduce((previous, current) => {
+      const factor = durationToMillis(matrix, vals) < 0 ? -1 : 1;
+      orderedUnits$1.reduceRight((previous, current) => {
         if (!isUndefined(vals[current])) {
           if (previous) {
-            convert(matrix, vals, previous, vals, current);
+            const previousVal = vals[previous] * factor;
+            const conv = matrix[current][previous];
+            const rollUp = Math.floor(previousVal / conv);
+            vals[current] += rollUp * factor;
+            vals[previous] -= rollUp * conv * factor;
+          }
+          return current;
+        } else {
+          return previous;
+        }
+      }, null);
+      orderedUnits$1.reduce((previous, current) => {
+        if (!isUndefined(vals[current])) {
+          if (previous) {
+            const fraction = vals[previous] % 1;
+            vals[previous] -= fraction;
+            vals[current] += fraction * matrix[previous][current];
           }
           return current;
         } else {
@@ -19020,6 +19062,8 @@ var require_lib2 = __commonJS({
         return this.isValid ? Formatter.create(this.loc, fmtOpts).formatDurationFromString(this, fmt) : INVALID$2;
       }
       toHuman(opts = {}) {
+        if (!this.isValid)
+          return INVALID$2;
         const l2 = orderedUnits$1.map((unit) => {
           const val = this.values[unit];
           if (isUndefined(val)) {
@@ -19064,25 +19108,16 @@ var require_lib2 = __commonJS({
         const millis = this.toMillis();
         if (millis < 0 || millis >= 864e5)
           return null;
-        opts = __spreadValues({
+        opts = __spreadProps(__spreadValues({
           suppressMilliseconds: false,
           suppressSeconds: false,
           includePrefix: false,
           format: "extended"
-        }, opts);
-        const value = this.shiftTo("hours", "minutes", "seconds", "milliseconds");
-        let fmt = opts.format === "basic" ? "hhmm" : "hh:mm";
-        if (!opts.suppressSeconds || value.seconds !== 0 || value.milliseconds !== 0) {
-          fmt += opts.format === "basic" ? "ss" : ":ss";
-          if (!opts.suppressMilliseconds || value.milliseconds !== 0) {
-            fmt += ".SSS";
-          }
-        }
-        let str = value.toFormat(fmt);
-        if (opts.includePrefix) {
-          str = "T" + str;
-        }
-        return str;
+        }, opts), {
+          includeOffset: false
+        });
+        const dateTime = DateTime.fromMillis(millis, { zone: "UTC" });
+        return dateTime.toISOTime(opts);
       }
       toJSON() {
         return this.toISO();
@@ -19091,7 +19126,9 @@ var require_lib2 = __commonJS({
         return this.toISO();
       }
       toMillis() {
-        return this.as("milliseconds");
+        if (!this.isValid)
+          return NaN;
+        return durationToMillis(this.matrix, this.values);
       }
       valueOf() {
         return this.toMillis();
@@ -19175,11 +19212,6 @@ var require_lib2 = __commonJS({
             const i = Math.trunc(own);
             built[k] = i;
             accumulated[k] = (own * 1e3 - i * 1e3) / 1e3;
-            for (const down in vals) {
-              if (orderedUnits$1.indexOf(down) > orderedUnits$1.indexOf(k)) {
-                convert(this.matrix, vals, down, built, k);
-              }
-            }
           } else if (isNumber(vals[k])) {
             accumulated[k] = vals[k];
           }
@@ -19189,7 +19221,8 @@ var require_lib2 = __commonJS({
             built[lastUnit] += key === lastUnit ? accumulated[key] : accumulated[key] / this.matrix[lastUnit][key];
           }
         }
-        return clone$1(this, { values: built }, true).normalize();
+        normalizeValues(this.matrix, built);
+        return clone$1(this, { values: built }, true);
       }
       shiftToAll() {
         if (!this.isValid)
@@ -19370,7 +19403,7 @@ var require_lib2 = __commonJS({
         if (!this.isValid)
           return NaN;
         const start = this.start.startOf(unit), end = this.end.startOf(unit);
-        return Math.floor(end.diff(start, unit).get(unit)) + 1;
+        return Math.floor(end.diff(start, unit).get(unit)) + (end.valueOf() !== this.end.valueOf());
       }
       hasSame(unit) {
         return this.isValid ? this.isEmpty() || this.e.minus(1).hasSame(this.s, unit) : false;
@@ -19609,6 +19642,11 @@ var require_lib2 = __commonJS({
           if (highWater > later) {
             results[unit]--;
             cursor = earlier.plus(results);
+            if (cursor > later) {
+              highWater = cursor;
+              results[unit]--;
+              cursor = earlier.plus(results);
+            }
           } else {
             cursor = highWater;
           }
@@ -19744,9 +19782,9 @@ var require_lib2 = __commonJS({
         }
         switch (t.val) {
           case "G":
-            return oneOf(loc.eras("short", false), 0);
+            return oneOf(loc.eras("short"), 0);
           case "GG":
-            return oneOf(loc.eras("long", false), 0);
+            return oneOf(loc.eras("long"), 0);
           case "y":
             return intUnit(oneToSix);
           case "yy":
@@ -19762,17 +19800,17 @@ var require_lib2 = __commonJS({
           case "MM":
             return intUnit(two);
           case "MMM":
-            return oneOf(loc.months("short", true, false), 1);
+            return oneOf(loc.months("short", true), 1);
           case "MMMM":
-            return oneOf(loc.months("long", true, false), 1);
+            return oneOf(loc.months("long", true), 1);
           case "L":
             return intUnit(oneOrTwo);
           case "LL":
             return intUnit(two);
           case "LLL":
-            return oneOf(loc.months("short", false, false), 1);
+            return oneOf(loc.months("short", false), 1);
           case "LLLL":
-            return oneOf(loc.months("long", false, false), 1);
+            return oneOf(loc.months("long", false), 1);
           case "d":
             return intUnit(oneOrTwo);
           case "dd":
@@ -19825,13 +19863,13 @@ var require_lib2 = __commonJS({
           case "c":
             return intUnit(one);
           case "EEE":
-            return oneOf(loc.weekdays("short", false, false), 1);
+            return oneOf(loc.weekdays("short", false), 1);
           case "EEEE":
-            return oneOf(loc.weekdays("long", false, false), 1);
+            return oneOf(loc.weekdays("long", false), 1);
           case "ccc":
-            return oneOf(loc.weekdays("short", true, false), 1);
+            return oneOf(loc.weekdays("short", true), 1);
           case "cccc":
-            return oneOf(loc.weekdays("long", true, false), 1);
+            return oneOf(loc.weekdays("long", true), 1);
           case "Z":
           case "ZZ":
             return offset(new RegExp(`([+-]${oneOrTwo.source})(?::(${two.source}))?`), 2);
@@ -19839,6 +19877,8 @@ var require_lib2 = __commonJS({
             return offset(new RegExp(`([+-]${oneOrTwo.source})(${two.source})?`), 2);
           case "z":
             return simple(/[a-z_+-/]{1,256}?/i);
+          case " ":
+            return simple(/[^\S\n\r]/);
           default:
             return literal(t);
         }
@@ -19870,9 +19910,13 @@ var require_lib2 = __commonJS({
       },
       dayperiod: "a",
       dayPeriod: "a",
-      hour: {
+      hour12: {
         numeric: "h",
         "2-digit": "hh"
+      },
+      hour24: {
+        numeric: "H",
+        "2-digit": "HH"
       },
       minute: {
         numeric: "m",
@@ -19887,16 +19931,31 @@ var require_lib2 = __commonJS({
         short: "ZZZ"
       }
     };
-    function tokenForPart(part, formatOpts) {
+    function tokenForPart(part, formatOpts, resolvedOpts) {
       const { type, value } = part;
       if (type === "literal") {
+        const isSpace = /^\s+$/.test(value);
         return {
-          literal: true,
-          val: value
+          literal: !isSpace,
+          val: isSpace ? " " : value
         };
       }
       const style = formatOpts[type];
-      let val = partTypeStyleToTokenVal[type];
+      let actualType = type;
+      if (type === "hour") {
+        if (formatOpts.hour12 != null) {
+          actualType = formatOpts.hour12 ? "hour12" : "hour24";
+        } else if (formatOpts.hourCycle != null) {
+          if (formatOpts.hourCycle === "h11" || formatOpts.hourCycle === "h12") {
+            actualType = "hour12";
+          } else {
+            actualType = "hour24";
+          }
+        } else {
+          actualType = resolvedOpts.hour12 ? "hour12" : "hour24";
+        }
+      }
+      let val = partTypeStyleToTokenVal[actualType];
       if (typeof val === "object") {
         val = val[style];
       }
@@ -20043,8 +20102,10 @@ var require_lib2 = __commonJS({
         return null;
       }
       const formatter = Formatter.create(locale, formatOpts);
-      const parts = formatter.formatDateTimeParts(getDummyDateTime());
-      return parts.map((p) => tokenForPart(p, formatOpts));
+      const df = formatter.dtFormatter(getDummyDateTime());
+      const parts = df.formatToParts();
+      const resolvedOpts = df.resolvedOptions();
+      return parts.map((p) => tokenForPart(p, formatOpts, resolvedOpts));
     }
     var nonLeapLadder = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
     var leapLadder = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
@@ -20226,7 +20287,7 @@ var require_lib2 = __commonJS({
     }
     function parseDataToDateTime(parsed, parsedZone, opts, format, text, specificOffset) {
       const { setZone, zone } = opts;
-      if (parsed && Object.keys(parsed).length !== 0) {
+      if (parsed && Object.keys(parsed).length !== 0 || parsedZone) {
         const interpretationZone = parsedZone || zone, inst = DateTime.fromObject(parsed, __spreadProps(__spreadValues({}, opts), {
           zone: interpretationZone,
           specificOffset
@@ -20264,13 +20325,13 @@ var require_lib2 = __commonJS({
       if (extended) {
         c += ":";
         c += padStart(o.c.minute);
-        if (o.c.second !== 0 || !suppressSeconds) {
+        if (o.c.millisecond !== 0 || o.c.second !== 0 || !suppressSeconds) {
           c += ":";
         }
       } else {
         c += padStart(o.c.minute);
       }
-      if (o.c.second !== 0 || !suppressSeconds) {
+      if (o.c.millisecond !== 0 || o.c.second !== 0 || !suppressSeconds) {
         c += padStart(o.c.second);
         if (o.c.millisecond !== 0 || !suppressMilliseconds) {
           c += ".";
@@ -20712,6 +20773,29 @@ var require_lib2 = __commonJS({
           return this.offset > this.set({ month: 1, day: 1 }).offset || this.offset > this.set({ month: 5 }).offset;
         }
       }
+      getPossibleOffsets() {
+        if (!this.isValid || this.isOffsetFixed) {
+          return [this];
+        }
+        const dayMs = 864e5;
+        const minuteMs = 6e4;
+        const localTS = objToLocalTS(this.c);
+        const oEarlier = this.zone.offset(localTS - dayMs);
+        const oLater = this.zone.offset(localTS + dayMs);
+        const o1 = this.zone.offset(localTS - oEarlier * minuteMs);
+        const o2 = this.zone.offset(localTS - oLater * minuteMs);
+        if (o1 === o2) {
+          return [this];
+        }
+        const ts1 = localTS - o1 * minuteMs;
+        const ts2 = localTS - o2 * minuteMs;
+        const c1 = tsToObj(ts1, o1);
+        const c2 = tsToObj(ts2, o2);
+        if (c1.hour === c2.hour && c1.minute === c2.minute && c1.second === c2.second && c1.millisecond === c2.millisecond) {
+          return [clone(this, { ts: ts1 }), clone(this, { ts: ts2 })];
+        }
+        return [this];
+      }
       get isInLeapYear() {
         return isLeapYear(this.year);
       }
@@ -21119,6 +21203,7 @@ var require_lib2 = __commonJS({
       enableDataviewJs: false,
       enableInlineDataviewJs: false,
       prettyRenderInlineFields: true,
+      prettyRenderInlineFieldsInLivePreview: true,
       dataviewJsKeyword: "dataviewjs"
     });
     var Success = class {
@@ -21206,6 +21291,7 @@ var require_lib2 = __commonJS({
     })(Result || (Result = {}));
     var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
     var parsimmon_umd_min = { exports: {} };
+    parsimmon_umd_min.exports;
     (function(module3, exports3) {
       !function(n2, t) {
         module3.exports = t();
@@ -21828,9 +21914,10 @@ var require_lib2 = __commonJS({
           }) }, n2.exports = e;
         }]);
       });
-    })(parsimmon_umd_min);
+    })(parsimmon_umd_min, parsimmon_umd_min.exports);
+    var parsimmon_umd_minExports = parsimmon_umd_min.exports;
     var emojiRegex = () => {
-      return /(?:[#*0-9]\uFE0F?\u20E3|[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23ED-\u23EF\u23F1\u23F2\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB\u25FC\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692\u2694-\u2697\u2699\u269B\u269C\u26A0\u26A7\u26AA\u26B0\u26B1\u26BD\u26BE\u26C4\u26C8\u26CF\u26D1\u26D3\u26E9\u26F0-\u26F5\u26F7\u26F8\u26FA\u2702\u2708\u2709\u270F\u2712\u2714\u2716\u271D\u2721\u2733\u2734\u2744\u2747\u2757\u2763\u27A1\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B55\u3030\u303D\u3297\u3299]\uFE0F?|[\u261D\u270C\u270D](?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?|[\u270A\u270B](?:\uD83C[\uDFFB-\uDFFF])?|[\u23E9-\u23EC\u23F0\u23F3\u25FD\u2693\u26A1\u26AB\u26C5\u26CE\u26D4\u26EA\u26FD\u2705\u2728\u274C\u274E\u2753-\u2755\u2795-\u2797\u27B0\u27BF\u2B50]|\u26F9(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|\u2764\uFE0F?(?:\u200D(?:\uD83D\uDD25|\uD83E\uDE79))?|\uD83C(?:[\uDC04\uDD70\uDD71\uDD7E\uDD7F\uDE02\uDE37\uDF21\uDF24-\uDF2C\uDF36\uDF7D\uDF96\uDF97\uDF99-\uDF9B\uDF9E\uDF9F\uDFCD\uDFCE\uDFD4-\uDFDF\uDFF5\uDFF7]\uFE0F?|[\uDF85\uDFC2\uDFC7](?:\uD83C[\uDFFB-\uDFFF])?|[\uDFC3\uDFC4\uDFCA](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDFCB\uDFCC](?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDCCF\uDD8E\uDD91-\uDD9A\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF84\uDF86-\uDF93\uDFA0-\uDFC1\uDFC5\uDFC6\uDFC8\uDFC9\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF8-\uDFFF]|\uDDE6\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF]|\uDDE7\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF]|\uDDE8\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF]|\uDDE9\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF]|\uDDEA\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA]|\uDDEB\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7]|\uDDEC\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE]|\uDDED\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA]|\uDDEE\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9]|\uDDEF\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5]|\uDDF0\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF]|\uDDF1\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE]|\uDDF2\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF]|\uDDF3\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF]|\uDDF4\uD83C\uDDF2|\uDDF5\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE]|\uDDF6\uD83C\uDDE6|\uDDF7\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC]|\uDDF8\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF]|\uDDF9\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF]|\uDDFA\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF]|\uDDFB\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA]|\uDDFC\uD83C[\uDDEB\uDDF8]|\uDDFD\uD83C\uDDF0|\uDDFE\uD83C[\uDDEA\uDDF9]|\uDDFF\uD83C[\uDDE6\uDDF2\uDDFC]|\uDFF3\uFE0F?(?:\u200D(?:\u26A7\uFE0F?|\uD83C\uDF08))?|\uDFF4(?:\u200D\u2620\uFE0F?|\uDB40\uDC67\uDB40\uDC62\uDB40(?:\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDC73\uDB40\uDC63\uDB40\uDC74|\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F)?)|\uD83D(?:[\uDC3F\uDCFD\uDD49\uDD4A\uDD6F\uDD70\uDD73\uDD76-\uDD79\uDD87\uDD8A-\uDD8D\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA\uDECB\uDECD-\uDECF\uDEE0-\uDEE5\uDEE9\uDEF0\uDEF3]\uFE0F?|[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC](?:\uD83C[\uDFFB-\uDFFF])?|[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD74\uDD90](?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?|[\uDC00-\uDC07\uDC09-\uDC14\uDC16-\uDC3A\uDC3C-\uDC3E\uDC40\uDC44\uDC45\uDC51-\uDC65\uDC6A\uDC79-\uDC7B\uDC7D-\uDC80\uDC84\uDC88-\uDC8E\uDC90\uDC92-\uDCA9\uDCAB-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDDA4\uDDFB-\uDE2D\uDE2F-\uDE34\uDE37-\uDE44\uDE48-\uDE4A\uDE80-\uDEA2\uDEA4-\uDEB3\uDEB7-\uDEBF\uDEC1-\uDEC5\uDED0-\uDED2\uDED5-\uDED7\uDEDD-\uDEDF\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB\uDFF0]|\uDC08(?:\u200D\u2B1B)?|\uDC15(?:\u200D\uD83E\uDDBA)?|\uDC3B(?:\u200D\u2744\uFE0F?)?|\uDC41\uFE0F?(?:\u200D\uD83D\uDDE8\uFE0F?)?|\uDC68(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDC68\uDC69]\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFE])))?))?|\uDC69(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?[\uDC68\uDC69]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?|\uDC69\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?))|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFE])))?))?|\uDC6F(?:\u200D[\u2640\u2642]\uFE0F?)?|\uDD75(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|\uDE2E(?:\u200D\uD83D\uDCA8)?|\uDE35(?:\u200D\uD83D\uDCAB)?|\uDE36(?:\u200D\uD83C\uDF2B\uFE0F?)?)|\uD83E(?:[\uDD0C\uDD0F\uDD18-\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5\uDEC3-\uDEC5\uDEF0\uDEF2-\uDEF6](?:\uD83C[\uDFFB-\uDFFF])?|[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDDDE\uDDDF](?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD0D\uDD0E\uDD10-\uDD17\uDD20-\uDD25\uDD27-\uDD2F\uDD3A\uDD3F-\uDD45\uDD47-\uDD76\uDD78-\uDDB4\uDDB7\uDDBA\uDDBC-\uDDCC\uDDD0\uDDE0-\uDDFF\uDE70-\uDE74\uDE78-\uDE7C\uDE80-\uDE86\uDE90-\uDEAC\uDEB0-\uDEBA\uDEC0-\uDEC2\uDED0-\uDED9\uDEE0-\uDEE7]|\uDD3C(?:\u200D[\u2640\u2642]\uFE0F?|\uD83C[\uDFFB-\uDFFF])?|\uDDD1(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?))?|\uDEF1(?:\uD83C(?:\uDFFB(?:\u200D\uD83E\uDEF2\uD83C[\uDFFC-\uDFFF])?|\uDFFC(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFD-\uDFFF])?|\uDFFD(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])?|\uDFFE(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFD\uDFFF])?|\uDFFF(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFE])?))?))/g;
+      return /[#*0-9]\uFE0F?\u20E3|[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23ED-\u23EF\u23F1\u23F2\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB\u25FC\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692\u2694-\u2697\u2699\u269B\u269C\u26A0\u26A7\u26AA\u26B0\u26B1\u26BD\u26BE\u26C4\u26C8\u26CF\u26D1\u26D3\u26E9\u26F0-\u26F5\u26F7\u26F8\u26FA\u2702\u2708\u2709\u270F\u2712\u2714\u2716\u271D\u2721\u2733\u2734\u2744\u2747\u2757\u2763\u27A1\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B55\u3030\u303D\u3297\u3299]\uFE0F?|[\u261D\u270C\u270D](?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?|[\u270A\u270B](?:\uD83C[\uDFFB-\uDFFF])?|[\u23E9-\u23EC\u23F0\u23F3\u25FD\u2693\u26A1\u26AB\u26C5\u26CE\u26D4\u26EA\u26FD\u2705\u2728\u274C\u274E\u2753-\u2755\u2795-\u2797\u27B0\u27BF\u2B50]|\u26F9(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|\u2764\uFE0F?(?:\u200D(?:\uD83D\uDD25|\uD83E\uDE79))?|\uD83C(?:[\uDC04\uDD70\uDD71\uDD7E\uDD7F\uDE02\uDE37\uDF21\uDF24-\uDF2C\uDF36\uDF7D\uDF96\uDF97\uDF99-\uDF9B\uDF9E\uDF9F\uDFCD\uDFCE\uDFD4-\uDFDF\uDFF5\uDFF7]\uFE0F?|[\uDF85\uDFC2\uDFC7](?:\uD83C[\uDFFB-\uDFFF])?|[\uDFC3\uDFC4\uDFCA](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDFCB\uDFCC](?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDCCF\uDD8E\uDD91-\uDD9A\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF84\uDF86-\uDF93\uDFA0-\uDFC1\uDFC5\uDFC6\uDFC8\uDFC9\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF8-\uDFFF]|\uDDE6\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF]|\uDDE7\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF]|\uDDE8\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF]|\uDDE9\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF]|\uDDEA\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA]|\uDDEB\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7]|\uDDEC\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE]|\uDDED\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA]|\uDDEE\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9]|\uDDEF\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5]|\uDDF0\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF]|\uDDF1\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE]|\uDDF2\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF]|\uDDF3\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF]|\uDDF4\uD83C\uDDF2|\uDDF5\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE]|\uDDF6\uD83C\uDDE6|\uDDF7\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC]|\uDDF8\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF]|\uDDF9\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF]|\uDDFA\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF]|\uDDFB\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA]|\uDDFC\uD83C[\uDDEB\uDDF8]|\uDDFD\uD83C\uDDF0|\uDDFE\uD83C[\uDDEA\uDDF9]|\uDDFF\uD83C[\uDDE6\uDDF2\uDDFC]|\uDFF3\uFE0F?(?:\u200D(?:\u26A7\uFE0F?|\uD83C\uDF08))?|\uDFF4(?:\u200D\u2620\uFE0F?|\uDB40\uDC67\uDB40\uDC62\uDB40(?:\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDC73\uDB40\uDC63\uDB40\uDC74|\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F)?)|\uD83D(?:[\uDC08\uDC26](?:\u200D\u2B1B)?|[\uDC3F\uDCFD\uDD49\uDD4A\uDD6F\uDD70\uDD73\uDD76-\uDD79\uDD87\uDD8A-\uDD8D\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA\uDECB\uDECD-\uDECF\uDEE0-\uDEE5\uDEE9\uDEF0\uDEF3]\uFE0F?|[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC](?:\uD83C[\uDFFB-\uDFFF])?|[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD74\uDD90](?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?|[\uDC00-\uDC07\uDC09-\uDC14\uDC16-\uDC25\uDC27-\uDC3A\uDC3C-\uDC3E\uDC40\uDC44\uDC45\uDC51-\uDC65\uDC6A\uDC79-\uDC7B\uDC7D-\uDC80\uDC84\uDC88-\uDC8E\uDC90\uDC92-\uDCA9\uDCAB-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDDA4\uDDFB-\uDE2D\uDE2F-\uDE34\uDE37-\uDE44\uDE48-\uDE4A\uDE80-\uDEA2\uDEA4-\uDEB3\uDEB7-\uDEBF\uDEC1-\uDEC5\uDED0-\uDED2\uDED5-\uDED7\uDEDC-\uDEDF\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB\uDFF0]|\uDC15(?:\u200D\uD83E\uDDBA)?|\uDC3B(?:\u200D\u2744\uFE0F?)?|\uDC41\uFE0F?(?:\u200D\uD83D\uDDE8\uFE0F?)?|\uDC68(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDC68\uDC69]\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFE])))?))?|\uDC69(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?[\uDC68\uDC69]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?|\uDC69\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?))|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFE])))?))?|\uDC6F(?:\u200D[\u2640\u2642]\uFE0F?)?|\uDD75(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|\uDE2E(?:\u200D\uD83D\uDCA8)?|\uDE35(?:\u200D\uD83D\uDCAB)?|\uDE36(?:\u200D\uD83C\uDF2B\uFE0F?)?)|\uD83E(?:[\uDD0C\uDD0F\uDD18-\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5\uDEC3-\uDEC5\uDEF0\uDEF2-\uDEF8](?:\uD83C[\uDFFB-\uDFFF])?|[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDDDE\uDDDF](?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD0D\uDD0E\uDD10-\uDD17\uDD20-\uDD25\uDD27-\uDD2F\uDD3A\uDD3F-\uDD45\uDD47-\uDD76\uDD78-\uDDB4\uDDB7\uDDBA\uDDBC-\uDDCC\uDDD0\uDDE0-\uDDFF\uDE70-\uDE7C\uDE80-\uDE88\uDE90-\uDEBD\uDEBF-\uDEC2\uDECE-\uDEDB\uDEE0-\uDEE8]|\uDD3C(?:\u200D[\u2640\u2642]\uFE0F?|\uD83C[\uDFFB-\uDFFF])?|\uDDD1(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF-\uDDB3\uDDBC\uDDBD]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF])))?))?|\uDEF1(?:\uD83C(?:\uDFFB(?:\u200D\uD83E\uDEF2\uD83C[\uDFFC-\uDFFF])?|\uDFFC(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFD-\uDFFF])?|\uDFFD(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])?|\uDFFE(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFD\uDFFF])?|\uDFFF(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFE])?))?)/g;
     };
     function normalizeDuration(dur) {
       if (dur === void 0 || dur === null)
@@ -21844,8 +21931,8 @@ var require_lib2 = __commonJS({
         path2 = path2.substring(0, path2.length - 3);
       return path2;
     }
-    parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.regex(new RegExp(emojiRegex(), "")), parsimmon_umd_min.exports.regex(/[0-9\p{Letter}_-]+/u).map((str) => str.toLocaleLowerCase()), parsimmon_umd_min.exports.whitespace.map((_) => "-"), parsimmon_umd_min.exports.any.map((_) => "")).many().map((result) => result.join(""));
-    var HEADER_CANONICALIZER = parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.regex(new RegExp(emojiRegex(), "")), parsimmon_umd_min.exports.regex(/[0-9\p{Letter}_-]+/u), parsimmon_umd_min.exports.whitespace.map((_) => " "), parsimmon_umd_min.exports.any.map((_) => " ")).many().map((result) => {
+    parsimmon_umd_minExports.alt(parsimmon_umd_minExports.regex(new RegExp(emojiRegex(), "")), parsimmon_umd_minExports.regex(/[0-9\p{Letter}_-]+/u).map((str) => str.toLocaleLowerCase()), parsimmon_umd_minExports.whitespace.map((_) => "-"), parsimmon_umd_minExports.any.map((_) => "")).many().map((result) => result.join(""));
+    var HEADER_CANONICALIZER = parsimmon_umd_minExports.alt(parsimmon_umd_minExports.regex(new RegExp(emojiRegex(), "")), parsimmon_umd_minExports.regex(/[0-9\p{Letter}_-]+/u), parsimmon_umd_minExports.whitespace.map((_) => " "), parsimmon_umd_minExports.any.map((_) => " ")).many().map((result) => {
       return result.join("").split(/\s+/).join(" ").trim();
     });
     function normalizeHeaderForLink(header) {
@@ -21853,7 +21940,7 @@ var require_lib2 = __commonJS({
     }
     function renderMinimalDuration(dur) {
       dur = normalizeDuration(dur);
-      dur = Duration.fromObject(Object.fromEntries(Object.entries(dur.toObject()).filter(([, quantity]) => quantity > 0)));
+      dur = Duration.fromObject(Object.fromEntries(Object.entries(dur.toObject()).filter(([, quantity]) => quantity != 0)));
       return dur.toHuman();
     }
     var Values;
@@ -22165,9 +22252,6 @@ var require_lib2 = __commonJS({
       Groupings2.count = count;
     })(Groupings || (Groupings = {}));
     var Link = class {
-      constructor(fields) {
-        Object.assign(this, fields);
-      }
       static file(path2, embed = false, display) {
         return new Link({
           path: path2,
@@ -22207,6 +22291,9 @@ var require_lib2 = __commonJS({
       }
       static fromObject(object) {
         return new Link(object);
+      }
+      constructor(fields) {
+        Object.assign(this, fields);
       }
       equals(other) {
         if (other == void 0 || other == null)
@@ -22483,7 +22570,7 @@ var require_lib2 = __commonJS({
       return Link.infer(link, false, display);
     }
     function createBinaryParser(child, sep, combine) {
-      return parsimmon_umd_min.exports.seqMap(child, parsimmon_umd_min.exports.seq(parsimmon_umd_min.exports.optWhitespace, sep, parsimmon_umd_min.exports.optWhitespace, child).many(), (first, rest) => {
+      return parsimmon_umd_minExports.seqMap(child, parsimmon_umd_minExports.seq(parsimmon_umd_minExports.optWhitespace, sep, parsimmon_umd_minExports.optWhitespace, child).many(), (first, rest) => {
         if (rest.length == 0)
           return first;
         let node = combine(first, rest[0][1], rest[0][3]);
@@ -22494,7 +22581,7 @@ var require_lib2 = __commonJS({
       });
     }
     function chainOpt(base, ...funcs) {
-      return parsimmon_umd_min.exports.custom((success, failure) => {
+      return parsimmon_umd_minExports.custom((success, failure) => {
         return (input, i) => {
           let result = base._(input, i);
           if (!result.status)
@@ -22509,10 +22596,10 @@ var require_lib2 = __commonJS({
         };
       });
     }
-    var EXPRESSION = parsimmon_umd_min.exports.createLanguage({
-      number: (q) => parsimmon_umd_min.exports.regexp(/-?[0-9]+(\.[0-9]+)?/).map((str) => Number.parseFloat(str)).desc("number"),
-      string: (q) => parsimmon_umd_min.exports.string('"').then(parsimmon_umd_min.exports.alt(q.escapeCharacter, parsimmon_umd_min.exports.noneOf('"\\')).atLeast(0).map((chars) => chars.join(""))).skip(parsimmon_umd_min.exports.string('"')).desc("string"),
-      escapeCharacter: (_) => parsimmon_umd_min.exports.string("\\").then(parsimmon_umd_min.exports.any).map((escaped) => {
+    var EXPRESSION = parsimmon_umd_minExports.createLanguage({
+      number: (q) => parsimmon_umd_minExports.regexp(/-?[0-9]+(\.[0-9]+)?/).map((str) => Number.parseFloat(str)).desc("number"),
+      string: (q) => parsimmon_umd_minExports.string('"').then(parsimmon_umd_minExports.alt(q.escapeCharacter, parsimmon_umd_minExports.noneOf('"\\')).atLeast(0).map((chars) => chars.join(""))).skip(parsimmon_umd_minExports.string('"')).desc("string"),
+      escapeCharacter: (_) => parsimmon_umd_minExports.string("\\").then(parsimmon_umd_minExports.any).map((escaped) => {
         if (escaped === '"')
           return '"';
         if (escaped === "\\")
@@ -22520,19 +22607,19 @@ var require_lib2 = __commonJS({
         else
           return "\\" + escaped;
       }),
-      bool: (_) => parsimmon_umd_min.exports.regexp(/true|false|True|False/).map((str) => str.toLowerCase() == "true").desc("boolean ('true' or 'false')"),
-      tag: (_) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("#"), parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.regexp(/[^\u2000-\u206F\u2E00-\u2E7F'!"#$%&()*+,.:;<=>?@^`{|}~\[\]\\\s]/).desc("text")).many(), (start, rest) => start + rest.join("")).desc("tag ('#hello/stuff')"),
-      identifier: (_) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.regexp(/\p{Letter}/u), parsimmon_umd_min.exports.regexp(EMOJI_REGEX).desc("text")), parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.regexp(/[0-9\p{Letter}_-]/u), parsimmon_umd_min.exports.regexp(EMOJI_REGEX).desc("text")).many(), (first, rest) => first + rest.join("")).desc("variable identifier"),
-      link: (_) => parsimmon_umd_min.exports.regexp(/\[\[([^\[\]]*?)\]\]/u, 1).map((linkInner) => parseInnerLink(linkInner)).desc("file link"),
-      embedLink: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("!").atMost(1), q.link, (p, l2) => {
+      bool: (_) => parsimmon_umd_minExports.regexp(/true|false|True|False/).map((str) => str.toLowerCase() == "true").desc("boolean ('true' or 'false')"),
+      tag: (_) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("#"), parsimmon_umd_minExports.alt(parsimmon_umd_minExports.regexp(/[^\u2000-\u206F\u2E00-\u2E7F'!"#$%&()*+,.:;<=>?@^`{|}~\[\]\\\s]/).desc("text")).many(), (start, rest) => start + rest.join("")).desc("tag ('#hello/stuff')"),
+      identifier: (_) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.alt(parsimmon_umd_minExports.regexp(/\p{Letter}/u), parsimmon_umd_minExports.regexp(EMOJI_REGEX).desc("text")), parsimmon_umd_minExports.alt(parsimmon_umd_minExports.regexp(/[0-9\p{Letter}_-]/u), parsimmon_umd_minExports.regexp(EMOJI_REGEX).desc("text")).many(), (first, rest) => first + rest.join("")).desc("variable identifier"),
+      link: (_) => parsimmon_umd_minExports.regexp(/\[\[([^\[\]]*?)\]\]/u, 1).map((linkInner) => parseInnerLink(linkInner)).desc("file link"),
+      embedLink: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("!").atMost(1), q.link, (p, l2) => {
         if (p.length > 0)
           l2.embed = true;
         return l2;
       }).desc("file link"),
-      binaryPlusMinus: (_) => parsimmon_umd_min.exports.regexp(/\+|-/).map((str) => str).desc("'+' or '-'"),
-      binaryMulDiv: (_) => parsimmon_umd_min.exports.regexp(/\*|\/|%/).map((str) => str).desc("'*' or '/' or '%'"),
-      binaryCompareOp: (_) => parsimmon_umd_min.exports.regexp(/>=|<=|!=|>|<|=/).map((str) => str).desc("'>=' or '<=' or '!=' or '=' or '>' or '<'"),
-      binaryBooleanOp: (_) => parsimmon_umd_min.exports.regexp(/and|or|&|\|/i).map((str) => {
+      binaryPlusMinus: (_) => parsimmon_umd_minExports.regexp(/\+|-/).map((str) => str).desc("'+' or '-'"),
+      binaryMulDiv: (_) => parsimmon_umd_minExports.regexp(/\*|\/|%/).map((str) => str).desc("'*' or '/' or '%'"),
+      binaryCompareOp: (_) => parsimmon_umd_minExports.regexp(/>=|<=|!=|>|<|=/).map((str) => str).desc("'>=' or '<=' or '!=' or '=' or '>' or '<'"),
+      binaryBooleanOp: (_) => parsimmon_umd_minExports.regexp(/and|or|&|\|/i).map((str) => {
         if (str.toLowerCase() == "and")
           return "&";
         else if (str.toLowerCase() == "or")
@@ -22540,53 +22627,53 @@ var require_lib2 = __commonJS({
         else
           return str;
       }).desc("'and' or 'or'"),
-      rootDate: (_) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/\d{4}/), parsimmon_umd_min.exports.string("-"), parsimmon_umd_min.exports.regexp(/\d{2}/), (year, _2, month) => {
+      rootDate: (_) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/\d{4}/), parsimmon_umd_minExports.string("-"), parsimmon_umd_minExports.regexp(/\d{2}/), (year, _2, month) => {
         return DateTime.fromObject({ year: Number.parseInt(year), month: Number.parseInt(month) });
       }).desc("date in format YYYY-MM[-DDTHH-MM-SS.MS]"),
-      dateShorthand: (_) => parsimmon_umd_min.exports.alt(...Object.keys(DATE_SHORTHANDS).sort((a, b) => b.length - a.length).map(parsimmon_umd_min.exports.string)),
-      date: (q) => chainOpt(q.rootDate, (ym) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("-"), parsimmon_umd_min.exports.regexp(/\d{2}/), (_, day) => ym.set({ day: Number.parseInt(day) })), (ymd) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("T"), parsimmon_umd_min.exports.regexp(/\d{2}/), (_, hour) => ymd.set({ hour: Number.parseInt(hour) })), (ymdh) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string(":"), parsimmon_umd_min.exports.regexp(/\d{2}/), (_, minute) => ymdh.set({ minute: Number.parseInt(minute) })), (ymdhm) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string(":"), parsimmon_umd_min.exports.regexp(/\d{2}/), (_, second) => ymdhm.set({ second: Number.parseInt(second) })), (ymdhms) => parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("."), parsimmon_umd_min.exports.regexp(/\d{3}/), (_, millisecond) => ymdhms.set({ millisecond: Number.parseInt(millisecond) })), parsimmon_umd_min.exports.succeed(ymdhms)), (dt) => parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("+").or(parsimmon_umd_min.exports.string("-")), parsimmon_umd_min.exports.regexp(/\d{1,2}(:\d{2})?/), (pm, hr) => dt.setZone("UTC" + pm + hr, { keepLocalTime: true })), parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("Z"), () => dt.setZone("utc", { keepLocalTime: true })), parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("["), parsimmon_umd_min.exports.regexp(/[0-9A-Za-z+-\/]+/u), parsimmon_umd_min.exports.string("]"), (_a, zone, _b) => dt.setZone(zone, { keepLocalTime: true })))).assert((dt) => dt.isValid, "valid date").desc("date in format YYYY-MM[-DDTHH-MM-SS.MS]"),
-      datePlus: (q) => parsimmon_umd_min.exports.alt(q.dateShorthand.map((d) => DATE_SHORTHANDS[d]()), q.date).desc("date in format YYYY-MM[-DDTHH-MM-SS.MS] or in shorthand"),
-      durationType: (_) => parsimmon_umd_min.exports.alt(...Object.keys(DURATION_TYPES).sort((a, b) => b.length - a.length).map(parsimmon_umd_min.exports.string)),
-      duration: (q) => parsimmon_umd_min.exports.seqMap(q.number, parsimmon_umd_min.exports.optWhitespace, q.durationType, (count, _, t) => DURATION_TYPES[t].mapUnits((x) => x * count)).sepBy1(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace).or(parsimmon_umd_min.exports.optWhitespace)).map((durations) => durations.reduce((p, c) => p.plus(c))).desc("duration like 4hr2min"),
-      rawNull: (_) => parsimmon_umd_min.exports.string("null"),
+      dateShorthand: (_) => parsimmon_umd_minExports.alt(...Object.keys(DATE_SHORTHANDS).sort((a, b) => b.length - a.length).map(parsimmon_umd_minExports.string)),
+      date: (q) => chainOpt(q.rootDate, (ym) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("-"), parsimmon_umd_minExports.regexp(/\d{2}/), (_, day) => ym.set({ day: Number.parseInt(day) })), (ymd) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("T"), parsimmon_umd_minExports.regexp(/\d{2}/), (_, hour) => ymd.set({ hour: Number.parseInt(hour) })), (ymdh) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string(":"), parsimmon_umd_minExports.regexp(/\d{2}/), (_, minute) => ymdh.set({ minute: Number.parseInt(minute) })), (ymdhm) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string(":"), parsimmon_umd_minExports.regexp(/\d{2}/), (_, second) => ymdhm.set({ second: Number.parseInt(second) })), (ymdhms) => parsimmon_umd_minExports.alt(parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("."), parsimmon_umd_minExports.regexp(/\d{3}/), (_, millisecond) => ymdhms.set({ millisecond: Number.parseInt(millisecond) })), parsimmon_umd_minExports.succeed(ymdhms)), (dt) => parsimmon_umd_minExports.alt(parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("+").or(parsimmon_umd_minExports.string("-")), parsimmon_umd_minExports.regexp(/\d{1,2}(:\d{2})?/), (pm, hr) => dt.setZone("UTC" + pm + hr, { keepLocalTime: true })), parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("Z"), () => dt.setZone("utc", { keepLocalTime: true })), parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("["), parsimmon_umd_minExports.regexp(/[0-9A-Za-z+-\/]+/u), parsimmon_umd_minExports.string("]"), (_a, zone, _b) => dt.setZone(zone, { keepLocalTime: true })))).assert((dt) => dt.isValid, "valid date").desc("date in format YYYY-MM[-DDTHH-MM-SS.MS]"),
+      datePlus: (q) => parsimmon_umd_minExports.alt(q.dateShorthand.map((d) => DATE_SHORTHANDS[d]()), q.date).desc("date in format YYYY-MM[-DDTHH-MM-SS.MS] or in shorthand"),
+      durationType: (_) => parsimmon_umd_minExports.alt(...Object.keys(DURATION_TYPES).sort((a, b) => b.length - a.length).map(parsimmon_umd_minExports.string)),
+      duration: (q) => parsimmon_umd_minExports.seqMap(q.number, parsimmon_umd_minExports.optWhitespace, q.durationType, (count, _, t) => DURATION_TYPES[t].mapUnits((x) => x * count)).sepBy1(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace).or(parsimmon_umd_minExports.optWhitespace)).map((durations) => durations.reduce((p, c) => p.plus(c))).desc("duration like 4hr2min"),
+      rawNull: (_) => parsimmon_umd_minExports.string("null"),
       tagSource: (q) => q.tag.map((tag) => Sources.tag(tag)),
-      csvSource: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("csv(").skip(parsimmon_umd_min.exports.optWhitespace), q.string, parsimmon_umd_min.exports.string(")"), (_1, path2, _2) => Sources.csv(path2)),
+      csvSource: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("csv(").skip(parsimmon_umd_minExports.optWhitespace), q.string, parsimmon_umd_minExports.string(")"), (_1, path2, _2) => Sources.csv(path2)),
       linkIncomingSource: (q) => q.link.map((link) => Sources.link(link.path, true)),
-      linkOutgoingSource: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("outgoing(").skip(parsimmon_umd_min.exports.optWhitespace), q.link, parsimmon_umd_min.exports.string(")"), (_1, link, _2) => Sources.link(link.path, false)),
+      linkOutgoingSource: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("outgoing(").skip(parsimmon_umd_minExports.optWhitespace), q.link, parsimmon_umd_minExports.string(")"), (_1, link, _2) => Sources.link(link.path, false)),
       folderSource: (q) => q.string.map((str) => Sources.folder(str)),
-      parensSource: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("("), parsimmon_umd_min.exports.optWhitespace, q.source, parsimmon_umd_min.exports.optWhitespace, parsimmon_umd_min.exports.string(")"), (_1, _2, field, _3, _4) => field),
-      negateSource: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.string("-"), parsimmon_umd_min.exports.string("!")), q.atomSource, (_, source) => Sources.negate(source)),
-      atomSource: (q) => parsimmon_umd_min.exports.alt(q.parensSource, q.negateSource, q.linkOutgoingSource, q.linkIncomingSource, q.folderSource, q.tagSource, q.csvSource),
+      parensSource: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("("), parsimmon_umd_minExports.optWhitespace, q.source, parsimmon_umd_minExports.optWhitespace, parsimmon_umd_minExports.string(")"), (_1, _2, field, _3, _4) => field),
+      negateSource: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.alt(parsimmon_umd_minExports.string("-"), parsimmon_umd_minExports.string("!")), q.atomSource, (_, source) => Sources.negate(source)),
+      atomSource: (q) => parsimmon_umd_minExports.alt(q.parensSource, q.negateSource, q.linkOutgoingSource, q.linkIncomingSource, q.folderSource, q.tagSource, q.csvSource),
       binaryOpSource: (q) => createBinaryParser(q.atomSource, q.binaryBooleanOp.map((s2) => s2), Sources.binaryOp),
       source: (q) => q.binaryOpSource,
       variableField: (q) => q.identifier.chain((r) => {
         if (KEYWORDS.includes(r.toUpperCase())) {
-          return parsimmon_umd_min.exports.fail("Variable fields cannot be a keyword (" + KEYWORDS.join(" or ") + ")");
+          return parsimmon_umd_minExports.fail("Variable fields cannot be a keyword (" + KEYWORDS.join(" or ") + ")");
         } else {
-          return parsimmon_umd_min.exports.succeed(Fields.variable(r));
+          return parsimmon_umd_minExports.succeed(Fields.variable(r));
         }
       }).desc("variable"),
       numberField: (q) => q.number.map((val) => Fields.literal(val)).desc("number"),
       stringField: (q) => q.string.map((val) => Fields.literal(val)).desc("string"),
       boolField: (q) => q.bool.map((val) => Fields.literal(val)).desc("boolean"),
-      dateField: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("date("), parsimmon_umd_min.exports.optWhitespace, q.datePlus, parsimmon_umd_min.exports.optWhitespace, parsimmon_umd_min.exports.string(")"), (prefix, _1, date, _2, postfix) => Fields.literal(date)).desc("date"),
-      durationField: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("dur("), parsimmon_umd_min.exports.optWhitespace, q.duration, parsimmon_umd_min.exports.optWhitespace, parsimmon_umd_min.exports.string(")"), (prefix, _1, dur, _2, postfix) => Fields.literal(dur)).desc("duration"),
+      dateField: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("date("), parsimmon_umd_minExports.optWhitespace, q.datePlus, parsimmon_umd_minExports.optWhitespace, parsimmon_umd_minExports.string(")"), (prefix, _1, date, _2, postfix) => Fields.literal(date)).desc("date"),
+      durationField: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("dur("), parsimmon_umd_minExports.optWhitespace, q.duration, parsimmon_umd_minExports.optWhitespace, parsimmon_umd_minExports.string(")"), (prefix, _1, dur, _2, postfix) => Fields.literal(dur)).desc("duration"),
       nullField: (q) => q.rawNull.map((_) => Fields.NULL),
       linkField: (q) => q.link.map((f) => Fields.literal(f)),
-      listField: (q) => q.field.sepBy(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace)).wrap(parsimmon_umd_min.exports.string("[").skip(parsimmon_umd_min.exports.optWhitespace), parsimmon_umd_min.exports.optWhitespace.then(parsimmon_umd_min.exports.string("]"))).map((l2) => Fields.list(l2)).desc("list ('[1, 2, 3]')"),
-      objectField: (q) => parsimmon_umd_min.exports.seqMap(q.identifier.or(q.string), parsimmon_umd_min.exports.string(":").trim(parsimmon_umd_min.exports.optWhitespace), q.field, (name, _sep, value) => {
+      listField: (q) => q.field.sepBy(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace)).wrap(parsimmon_umd_minExports.string("[").skip(parsimmon_umd_minExports.optWhitespace), parsimmon_umd_minExports.optWhitespace.then(parsimmon_umd_minExports.string("]"))).map((l2) => Fields.list(l2)).desc("list ('[1, 2, 3]')"),
+      objectField: (q) => parsimmon_umd_minExports.seqMap(q.identifier.or(q.string), parsimmon_umd_minExports.string(":").trim(parsimmon_umd_minExports.optWhitespace), q.field, (name, _sep, value) => {
         return { name, value };
-      }).sepBy(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace)).wrap(parsimmon_umd_min.exports.string("{").skip(parsimmon_umd_min.exports.optWhitespace), parsimmon_umd_min.exports.optWhitespace.then(parsimmon_umd_min.exports.string("}"))).map((vals) => {
+      }).sepBy(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace)).wrap(parsimmon_umd_minExports.string("{").skip(parsimmon_umd_minExports.optWhitespace), parsimmon_umd_minExports.optWhitespace.then(parsimmon_umd_minExports.string("}"))).map((vals) => {
         let res = {};
         for (let entry of vals)
           res[entry.name] = entry.value;
         return Fields.object(res);
       }).desc("object ('{ a: 1, b: 2 }')"),
-      atomInlineField: (q) => parsimmon_umd_min.exports.alt(q.date, q.duration.map((d) => normalizeDuration(d)), q.string, q.tag, q.embedLink, q.bool, q.number, q.rawNull),
-      inlineFieldList: (q) => q.atomInlineField.sepBy(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace).lookahead(q.atomInlineField)),
-      inlineField: (q) => parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.seqMap(q.atomInlineField, parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace), q.inlineFieldList, (f, _s, l2) => [f].concat(l2)), q.atomInlineField),
-      atomField: (q) => parsimmon_umd_min.exports.alt(q.embedLink.map((l2) => Fields.literal(l2)), q.negatedField, q.linkField, q.listField, q.objectField, q.lambdaField, q.parensField, q.boolField, q.numberField, q.stringField, q.dateField, q.durationField, q.nullField, q.variableField),
-      indexField: (q) => parsimmon_umd_min.exports.seqMap(q.atomField, parsimmon_umd_min.exports.alt(q.dotPostfix, q.indexPostfix, q.functionPostfix).many(), (obj, postfixes) => {
+      atomInlineField: (q) => parsimmon_umd_minExports.alt(q.date, q.duration.map((d) => normalizeDuration(d)), q.string, q.tag, q.embedLink, q.bool, q.number, q.rawNull),
+      inlineFieldList: (q) => q.atomInlineField.sepBy(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace).lookahead(q.atomInlineField)),
+      inlineField: (q) => parsimmon_umd_minExports.alt(parsimmon_umd_minExports.seqMap(q.atomInlineField, parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace), q.inlineFieldList, (f, _s, l2) => [f].concat(l2)), q.atomInlineField),
+      atomField: (q) => parsimmon_umd_minExports.alt(q.embedLink.map((l2) => Fields.literal(l2)), q.negatedField, q.linkField, q.listField, q.objectField, q.lambdaField, q.parensField, q.boolField, q.numberField, q.stringField, q.dateField, q.durationField, q.nullField, q.variableField),
+      indexField: (q) => parsimmon_umd_minExports.seqMap(q.atomField, parsimmon_umd_minExports.alt(q.dotPostfix, q.indexPostfix, q.functionPostfix).many(), (obj, postfixes) => {
         let result = obj;
         for (let post of postfixes) {
           switch (post.type) {
@@ -22603,18 +22690,18 @@ var require_lib2 = __commonJS({
         }
         return result;
       }),
-      negatedField: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("!"), q.indexField, (_, field) => Fields.negate(field)).desc("negated field"),
-      parensField: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("("), parsimmon_umd_min.exports.optWhitespace, q.field, parsimmon_umd_min.exports.optWhitespace, parsimmon_umd_min.exports.string(")"), (_1, _2, field, _3, _4) => field),
-      lambdaField: (q) => parsimmon_umd_min.exports.seqMap(q.identifier.sepBy(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace)).wrap(parsimmon_umd_min.exports.string("(").trim(parsimmon_umd_min.exports.optWhitespace), parsimmon_umd_min.exports.string(")").trim(parsimmon_umd_min.exports.optWhitespace)), parsimmon_umd_min.exports.string("=>").trim(parsimmon_umd_min.exports.optWhitespace), q.field, (ident, _ignore, value) => {
+      negatedField: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("!"), q.indexField, (_, field) => Fields.negate(field)).desc("negated field"),
+      parensField: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("("), parsimmon_umd_minExports.optWhitespace, q.field, parsimmon_umd_minExports.optWhitespace, parsimmon_umd_minExports.string(")"), (_1, _2, field, _3, _4) => field),
+      lambdaField: (q) => parsimmon_umd_minExports.seqMap(q.identifier.sepBy(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace)).wrap(parsimmon_umd_minExports.string("(").trim(parsimmon_umd_minExports.optWhitespace), parsimmon_umd_minExports.string(")").trim(parsimmon_umd_minExports.optWhitespace)), parsimmon_umd_minExports.string("=>").trim(parsimmon_umd_minExports.optWhitespace), q.field, (ident, _ignore, value) => {
         return { type: "lambda", arguments: ident, value };
       }),
-      dotPostfix: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("."), q.identifier, (_, field) => {
+      dotPostfix: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("."), q.identifier, (_, field) => {
         return { type: "dot", field };
       }),
-      indexPostfix: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("["), parsimmon_umd_min.exports.optWhitespace, q.field, parsimmon_umd_min.exports.optWhitespace, parsimmon_umd_min.exports.string("]"), (_, _2, field, _3, _4) => {
+      indexPostfix: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("["), parsimmon_umd_minExports.optWhitespace, q.field, parsimmon_umd_minExports.optWhitespace, parsimmon_umd_minExports.string("]"), (_, _2, field, _3, _4) => {
         return { type: "index", field };
       }),
-      functionPostfix: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.string("("), parsimmon_umd_min.exports.optWhitespace, q.field.sepBy(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace)), parsimmon_umd_min.exports.optWhitespace, parsimmon_umd_min.exports.string(")"), (_, _1, fields, _2, _3) => {
+      functionPostfix: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.string("("), parsimmon_umd_minExports.optWhitespace, q.field.sepBy(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace)), parsimmon_umd_minExports.optWhitespace, parsimmon_umd_minExports.string(")"), (_, _1, fields, _2, _3) => {
         return { type: "function", fields };
       }),
       binaryMulDivField: (q) => createBinaryParser(q.indexField, q.binaryMulDiv, Fields.binaryOp),
@@ -22643,7 +22730,7 @@ var require_lib2 = __commonJS({
       QueryFields2.sortBy = sortBy;
     })(QueryFields || (QueryFields = {}));
     function captureRaw(base) {
-      return parsimmon_umd_min.exports.custom((success, failure) => {
+      return parsimmon_umd_minExports.custom((success, failure) => {
         return (input, i) => {
           let result = base._(input, i);
           if (!result.status)
@@ -22655,11 +22742,14 @@ var require_lib2 = __commonJS({
     function stripNewlines(text) {
       return text.split(/[\r\n]+/).map((t) => t.trim()).join("");
     }
-    var QUERY_LANGUAGE = parsimmon_umd_min.exports.createLanguage({
-      queryType: (q) => parsimmon_umd_min.exports.alt(parsimmon_umd_min.exports.regexp(/TABLE|LIST|TASK|CALENDAR/i)).map((str) => str.toLowerCase()).desc("query type ('TABLE', 'LIST', 'TASK', or 'CALENDAR')"),
-      explicitNamedField: (q) => parsimmon_umd_min.exports.seqMap(EXPRESSION.field.skip(parsimmon_umd_min.exports.whitespace), parsimmon_umd_min.exports.regexp(/AS/i).skip(parsimmon_umd_min.exports.whitespace), EXPRESSION.identifier.or(EXPRESSION.string), (field, _as, ident) => QueryFields.named(ident, field)),
-      namedField: (q) => parsimmon_umd_min.exports.alt(q.explicitNamedField, captureRaw(EXPRESSION.field).map(([value, text]) => QueryFields.named(stripNewlines(text), value))),
-      sortField: (q) => parsimmon_umd_min.exports.seqMap(EXPRESSION.field.skip(parsimmon_umd_min.exports.optWhitespace), parsimmon_umd_min.exports.regexp(/ASCENDING|DESCENDING|ASC|DESC/i).atMost(1), (field, dir) => {
+    function precededByWhitespaceIfNotEof(if_eof, parser) {
+      return parsimmon_umd_minExports.eof.map(if_eof).or(parsimmon_umd_minExports.whitespace.then(parser));
+    }
+    var QUERY_LANGUAGE = parsimmon_umd_minExports.createLanguage({
+      queryType: (q) => parsimmon_umd_minExports.alt(parsimmon_umd_minExports.regexp(/TABLE|LIST|TASK|CALENDAR/i)).map((str) => str.toLowerCase()).desc("query type ('TABLE', 'LIST', 'TASK', or 'CALENDAR')"),
+      explicitNamedField: (q) => parsimmon_umd_minExports.seqMap(EXPRESSION.field.skip(parsimmon_umd_minExports.whitespace), parsimmon_umd_minExports.regexp(/AS/i).skip(parsimmon_umd_minExports.whitespace), EXPRESSION.identifier.or(EXPRESSION.string), (field, _as, ident) => QueryFields.named(ident, field)),
+      namedField: (q) => parsimmon_umd_minExports.alt(q.explicitNamedField, captureRaw(EXPRESSION.field).map(([value, text]) => QueryFields.named(stripNewlines(text), value))),
+      sortField: (q) => parsimmon_umd_minExports.seqMap(EXPRESSION.field.skip(parsimmon_umd_minExports.optWhitespace), parsimmon_umd_minExports.regexp(/ASCENDING|DESCENDING|ASC|DESC/i).atMost(1), (field, dir) => {
         let direction = dir.length == 0 ? "ascending" : dir[0].toLowerCase();
         if (direction == "desc")
           direction = "descending";
@@ -22670,52 +22760,53 @@ var require_lib2 = __commonJS({
           direction
         };
       }),
-      headerClause: (q) => q.queryType.skip(parsimmon_umd_min.exports.whitespace).chain((qtype) => {
-        switch (qtype) {
-          case "table":
-            return parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/WITHOUT\s+ID/i).skip(parsimmon_umd_min.exports.optWhitespace).atMost(1), parsimmon_umd_min.exports.sepBy(q.namedField, parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace)), (withoutId, fields) => {
-              return { type: "table", fields, showId: withoutId.length == 0 };
-            });
+      headerClause: (q) => q.queryType.chain((type) => {
+        switch (type) {
+          case "table": {
+            return precededByWhitespaceIfNotEof(() => ({ type, fields: [], showId: true }), parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/WITHOUT\s+ID/i).skip(parsimmon_umd_minExports.optWhitespace).atMost(1), parsimmon_umd_minExports.sepBy(q.namedField, parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace)), (withoutId, fields) => {
+              return { type, fields, showId: withoutId.length == 0 };
+            }));
+          }
           case "list":
-            return parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/WITHOUT\s+ID/i).skip(parsimmon_umd_min.exports.optWhitespace).atMost(1), EXPRESSION.field.atMost(1), (withoutId, format) => {
+            return precededByWhitespaceIfNotEof(() => ({ type, format: void 0, showId: true }), parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/WITHOUT\s+ID/i).skip(parsimmon_umd_minExports.optWhitespace).atMost(1), EXPRESSION.field.atMost(1), (withoutId, format) => {
               return {
-                type: "list",
+                type,
                 format: format.length == 1 ? format[0] : void 0,
                 showId: withoutId.length == 0
               };
-            });
+            }));
           case "task":
-            return parsimmon_umd_min.exports.succeed({ type: "task" });
+            return parsimmon_umd_minExports.succeed({ type });
           case "calendar":
-            return parsimmon_umd_min.exports.seqMap(q.namedField, (field) => {
+            return parsimmon_umd_minExports.whitespace.then(parsimmon_umd_minExports.seqMap(q.namedField, (field) => {
               return {
-                type: "calendar",
+                type,
                 showId: true,
                 field
               };
-            });
+            }));
           default:
-            return parsimmon_umd_min.exports.fail(`Unrecognized query type '${qtype}'`);
+            return parsimmon_umd_minExports.fail(`Unrecognized query type '${type}'`);
         }
       }).desc("TABLE or LIST or TASK or CALENDAR"),
-      fromClause: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/FROM/i), parsimmon_umd_min.exports.whitespace, EXPRESSION.source, (_1, _2, source) => source),
-      whereClause: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/WHERE/i), parsimmon_umd_min.exports.whitespace, EXPRESSION.field, (where, _, field) => {
+      fromClause: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/FROM/i), parsimmon_umd_minExports.whitespace, EXPRESSION.source, (_1, _2, source) => source),
+      whereClause: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/WHERE/i), parsimmon_umd_minExports.whitespace, EXPRESSION.field, (where, _, field) => {
         return { type: "where", clause: field };
       }).desc("WHERE <expression>"),
-      sortByClause: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/SORT/i), parsimmon_umd_min.exports.whitespace, q.sortField.sepBy1(parsimmon_umd_min.exports.string(",").trim(parsimmon_umd_min.exports.optWhitespace)), (sort, _1, fields) => {
+      sortByClause: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/SORT/i), parsimmon_umd_minExports.whitespace, q.sortField.sepBy1(parsimmon_umd_minExports.string(",").trim(parsimmon_umd_minExports.optWhitespace)), (sort, _1, fields) => {
         return { type: "sort", fields };
       }).desc("SORT field [ASC/DESC]"),
-      limitClause: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/LIMIT/i), parsimmon_umd_min.exports.whitespace, EXPRESSION.field, (limit, _1, field) => {
+      limitClause: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/LIMIT/i), parsimmon_umd_minExports.whitespace, EXPRESSION.field, (limit, _1, field) => {
         return { type: "limit", amount: field };
       }).desc("LIMIT <value>"),
-      flattenClause: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/FLATTEN/i).skip(parsimmon_umd_min.exports.whitespace), q.namedField, (_, field) => {
+      flattenClause: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/FLATTEN/i).skip(parsimmon_umd_minExports.whitespace), q.namedField, (_, field) => {
         return { type: "flatten", field };
       }).desc("FLATTEN <value> [AS <name>]"),
-      groupByClause: (q) => parsimmon_umd_min.exports.seqMap(parsimmon_umd_min.exports.regexp(/GROUP BY/i).skip(parsimmon_umd_min.exports.whitespace), q.namedField, (_, field) => {
+      groupByClause: (q) => parsimmon_umd_minExports.seqMap(parsimmon_umd_minExports.regexp(/GROUP BY/i).skip(parsimmon_umd_minExports.whitespace), q.namedField, (_, field) => {
         return { type: "group", field };
       }).desc("GROUP BY <value> [AS <name>]"),
-      clause: (q) => parsimmon_umd_min.exports.alt(q.fromClause, q.whereClause, q.sortByClause, q.limitClause, q.groupByClause, q.flattenClause),
-      query: (q) => parsimmon_umd_min.exports.seqMap(q.headerClause.trim(parsimmon_umd_min.exports.optWhitespace), q.fromClause.trim(parsimmon_umd_min.exports.optWhitespace).atMost(1), q.clause.trim(parsimmon_umd_min.exports.optWhitespace).many(), (header, from, clauses) => {
+      clause: (q) => parsimmon_umd_minExports.alt(q.fromClause, q.whereClause, q.sortByClause, q.limitClause, q.groupByClause, q.flattenClause),
+      query: (q) => parsimmon_umd_minExports.seqMap(q.headerClause.trim(parsimmon_umd_minExports.optWhitespace), q.fromClause.trim(parsimmon_umd_minExports.optWhitespace).atMost(1), q.clause.trim(parsimmon_umd_minExports.optWhitespace).many(), (header, from, clauses) => {
         return {
           header,
           source: from.length == 0 ? Sources.folder("") : from[0],
@@ -23744,9 +23835,9 @@ var require_http_errors = __commonJS({
   }
 });
 
-// node_modules/ms/index.js
+// node_modules/body-parser/node_modules/ms/index.js
 var require_ms = __commonJS({
-  "node_modules/ms/index.js"(exports2, module2) {
+  "node_modules/body-parser/node_modules/ms/index.js"(exports2, module2) {
     var s = 1e3;
     var m = s * 60;
     var h = m * 60;
@@ -38002,6 +38093,104 @@ var require_merge_descriptors = __commonJS({
   }
 });
 
+// node_modules/finalhandler/node_modules/ms/index.js
+var require_ms2 = __commonJS({
+  "node_modules/finalhandler/node_modules/ms/index.js"(exports2, module2) {
+    var s = 1e3;
+    var m = s * 60;
+    var h = m * 60;
+    var d = h * 24;
+    var y = d * 365.25;
+    module2.exports = function(val, options) {
+      options = options || {};
+      var type = typeof val;
+      if (type === "string" && val.length > 0) {
+        return parse(val);
+      } else if (type === "number" && isNaN(val) === false) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+      }
+      throw new Error("val is not a non-empty string or a valid number. val=" + JSON.stringify(val));
+    };
+    function parse(str) {
+      str = String(str);
+      if (str.length > 100) {
+        return;
+      }
+      var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+      if (!match) {
+        return;
+      }
+      var n = parseFloat(match[1]);
+      var type = (match[2] || "ms").toLowerCase();
+      switch (type) {
+        case "years":
+        case "year":
+        case "yrs":
+        case "yr":
+        case "y":
+          return n * y;
+        case "days":
+        case "day":
+        case "d":
+          return n * d;
+        case "hours":
+        case "hour":
+        case "hrs":
+        case "hr":
+        case "h":
+          return n * h;
+        case "minutes":
+        case "minute":
+        case "mins":
+        case "min":
+        case "m":
+          return n * m;
+        case "seconds":
+        case "second":
+        case "secs":
+        case "sec":
+        case "s":
+          return n * s;
+        case "milliseconds":
+        case "millisecond":
+        case "msecs":
+        case "msec":
+        case "ms":
+          return n;
+        default:
+          return void 0;
+      }
+    }
+    function fmtShort(ms) {
+      if (ms >= d) {
+        return Math.round(ms / d) + "d";
+      }
+      if (ms >= h) {
+        return Math.round(ms / h) + "h";
+      }
+      if (ms >= m) {
+        return Math.round(ms / m) + "m";
+      }
+      if (ms >= s) {
+        return Math.round(ms / s) + "s";
+      }
+      return ms + "ms";
+    }
+    function fmtLong(ms) {
+      return plural(ms, d, "day") || plural(ms, h, "hour") || plural(ms, m, "minute") || plural(ms, s, "second") || ms + " ms";
+    }
+    function plural(ms, n, name) {
+      if (ms < n) {
+        return;
+      }
+      if (ms < n * 1.5) {
+        return Math.floor(ms / n) + " " + name;
+      }
+      return Math.ceil(ms / n) + " " + name + "s";
+    }
+  }
+});
+
 // node_modules/finalhandler/node_modules/debug/src/debug.js
 var require_debug2 = __commonJS({
   "node_modules/finalhandler/node_modules/debug/src/debug.js"(exports2, module2) {
@@ -38010,7 +38199,7 @@ var require_debug2 = __commonJS({
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
-    exports2.humanize = require_ms();
+    exports2.humanize = require_ms2();
     exports2.names = [];
     exports2.skips = [];
     exports2.formatters = {};
@@ -38656,15 +38845,113 @@ var require_methods = __commonJS({
   }
 });
 
-// node_modules/debug/src/debug.js
+// node_modules/express/node_modules/ms/index.js
+var require_ms3 = __commonJS({
+  "node_modules/express/node_modules/ms/index.js"(exports2, module2) {
+    var s = 1e3;
+    var m = s * 60;
+    var h = m * 60;
+    var d = h * 24;
+    var y = d * 365.25;
+    module2.exports = function(val, options) {
+      options = options || {};
+      var type = typeof val;
+      if (type === "string" && val.length > 0) {
+        return parse(val);
+      } else if (type === "number" && isNaN(val) === false) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+      }
+      throw new Error("val is not a non-empty string or a valid number. val=" + JSON.stringify(val));
+    };
+    function parse(str) {
+      str = String(str);
+      if (str.length > 100) {
+        return;
+      }
+      var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+      if (!match) {
+        return;
+      }
+      var n = parseFloat(match[1]);
+      var type = (match[2] || "ms").toLowerCase();
+      switch (type) {
+        case "years":
+        case "year":
+        case "yrs":
+        case "yr":
+        case "y":
+          return n * y;
+        case "days":
+        case "day":
+        case "d":
+          return n * d;
+        case "hours":
+        case "hour":
+        case "hrs":
+        case "hr":
+        case "h":
+          return n * h;
+        case "minutes":
+        case "minute":
+        case "mins":
+        case "min":
+        case "m":
+          return n * m;
+        case "seconds":
+        case "second":
+        case "secs":
+        case "sec":
+        case "s":
+          return n * s;
+        case "milliseconds":
+        case "millisecond":
+        case "msecs":
+        case "msec":
+        case "ms":
+          return n;
+        default:
+          return void 0;
+      }
+    }
+    function fmtShort(ms) {
+      if (ms >= d) {
+        return Math.round(ms / d) + "d";
+      }
+      if (ms >= h) {
+        return Math.round(ms / h) + "h";
+      }
+      if (ms >= m) {
+        return Math.round(ms / m) + "m";
+      }
+      if (ms >= s) {
+        return Math.round(ms / s) + "s";
+      }
+      return ms + "ms";
+    }
+    function fmtLong(ms) {
+      return plural(ms, d, "day") || plural(ms, h, "hour") || plural(ms, m, "minute") || plural(ms, s, "second") || ms + " ms";
+    }
+    function plural(ms, n, name) {
+      if (ms < n) {
+        return;
+      }
+      if (ms < n * 1.5) {
+        return Math.floor(ms / n) + " " + name;
+      }
+      return Math.ceil(ms / n) + " " + name + "s";
+    }
+  }
+});
+
+// node_modules/express/node_modules/debug/src/debug.js
 var require_debug3 = __commonJS({
-  "node_modules/debug/src/debug.js"(exports2, module2) {
+  "node_modules/express/node_modules/debug/src/debug.js"(exports2, module2) {
     exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
     exports2.coerce = coerce;
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
-    exports2.humanize = require_ms();
+    exports2.humanize = require_ms3();
     exports2.instances = [];
     exports2.names = [];
     exports2.skips = [];
@@ -38785,9 +39072,9 @@ var require_debug3 = __commonJS({
   }
 });
 
-// node_modules/debug/src/browser.js
+// node_modules/express/node_modules/debug/src/browser.js
 var require_browser3 = __commonJS({
-  "node_modules/debug/src/browser.js"(exports2, module2) {
+  "node_modules/express/node_modules/debug/src/browser.js"(exports2, module2) {
     exports2 = module2.exports = require_debug3();
     exports2.log = log2;
     exports2.formatArgs = formatArgs;
@@ -39057,9 +39344,9 @@ var require_supports_color = __commonJS({
   }
 });
 
-// node_modules/debug/src/node.js
+// node_modules/express/node_modules/debug/src/node.js
 var require_node3 = __commonJS({
-  "node_modules/debug/src/node.js"(exports2, module2) {
+  "node_modules/express/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
     var util = require("util");
     exports2 = module2.exports = require_debug3();
@@ -39230,9 +39517,9 @@ var require_node3 = __commonJS({
   }
 });
 
-// node_modules/debug/src/index.js
+// node_modules/express/node_modules/debug/src/index.js
 var require_src3 = __commonJS({
-  "node_modules/debug/src/index.js"(exports2, module2) {
+  "node_modules/express/node_modules/debug/src/index.js"(exports2, module2) {
     if (typeof process === "undefined" || process.type === "renderer") {
       module2.exports = require_browser3();
     } else {
@@ -42744,6 +43031,574 @@ var require_cookie = __commonJS({
   }
 });
 
+// node_modules/send/node_modules/debug/node_modules/ms/index.js
+var require_ms4 = __commonJS({
+  "node_modules/send/node_modules/debug/node_modules/ms/index.js"(exports2, module2) {
+    var s = 1e3;
+    var m = s * 60;
+    var h = m * 60;
+    var d = h * 24;
+    var y = d * 365.25;
+    module2.exports = function(val, options) {
+      options = options || {};
+      var type = typeof val;
+      if (type === "string" && val.length > 0) {
+        return parse(val);
+      } else if (type === "number" && isNaN(val) === false) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+      }
+      throw new Error("val is not a non-empty string or a valid number. val=" + JSON.stringify(val));
+    };
+    function parse(str) {
+      str = String(str);
+      if (str.length > 100) {
+        return;
+      }
+      var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+      if (!match) {
+        return;
+      }
+      var n = parseFloat(match[1]);
+      var type = (match[2] || "ms").toLowerCase();
+      switch (type) {
+        case "years":
+        case "year":
+        case "yrs":
+        case "yr":
+        case "y":
+          return n * y;
+        case "days":
+        case "day":
+        case "d":
+          return n * d;
+        case "hours":
+        case "hour":
+        case "hrs":
+        case "hr":
+        case "h":
+          return n * h;
+        case "minutes":
+        case "minute":
+        case "mins":
+        case "min":
+        case "m":
+          return n * m;
+        case "seconds":
+        case "second":
+        case "secs":
+        case "sec":
+        case "s":
+          return n * s;
+        case "milliseconds":
+        case "millisecond":
+        case "msecs":
+        case "msec":
+        case "ms":
+          return n;
+        default:
+          return void 0;
+      }
+    }
+    function fmtShort(ms) {
+      if (ms >= d) {
+        return Math.round(ms / d) + "d";
+      }
+      if (ms >= h) {
+        return Math.round(ms / h) + "h";
+      }
+      if (ms >= m) {
+        return Math.round(ms / m) + "m";
+      }
+      if (ms >= s) {
+        return Math.round(ms / s) + "s";
+      }
+      return ms + "ms";
+    }
+    function fmtLong(ms) {
+      return plural(ms, d, "day") || plural(ms, h, "hour") || plural(ms, m, "minute") || plural(ms, s, "second") || ms + " ms";
+    }
+    function plural(ms, n, name) {
+      if (ms < n) {
+        return;
+      }
+      if (ms < n * 1.5) {
+        return Math.floor(ms / n) + " " + name;
+      }
+      return Math.ceil(ms / n) + " " + name + "s";
+    }
+  }
+});
+
+// node_modules/send/node_modules/debug/src/debug.js
+var require_debug4 = __commonJS({
+  "node_modules/send/node_modules/debug/src/debug.js"(exports2, module2) {
+    exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
+    exports2.coerce = coerce;
+    exports2.disable = disable;
+    exports2.enable = enable;
+    exports2.enabled = enabled;
+    exports2.humanize = require_ms4();
+    exports2.instances = [];
+    exports2.names = [];
+    exports2.skips = [];
+    exports2.formatters = {};
+    function selectColor(namespace) {
+      var hash = 0, i;
+      for (i in namespace) {
+        hash = (hash << 5) - hash + namespace.charCodeAt(i);
+        hash |= 0;
+      }
+      return exports2.colors[Math.abs(hash) % exports2.colors.length];
+    }
+    function createDebug(namespace) {
+      var prevTime;
+      function debug() {
+        if (!debug.enabled)
+          return;
+        var self2 = debug;
+        var curr = +new Date();
+        var ms = curr - (prevTime || curr);
+        self2.diff = ms;
+        self2.prev = prevTime;
+        self2.curr = curr;
+        prevTime = curr;
+        var args2 = new Array(arguments.length);
+        for (var i = 0; i < args2.length; i++) {
+          args2[i] = arguments[i];
+        }
+        args2[0] = exports2.coerce(args2[0]);
+        if (typeof args2[0] !== "string") {
+          args2.unshift("%O");
+        }
+        var index = 0;
+        args2[0] = args2[0].replace(/%([a-zA-Z%])/g, function(match, format) {
+          if (match === "%%")
+            return match;
+          index++;
+          var formatter = exports2.formatters[format];
+          if (typeof formatter === "function") {
+            var val = args2[index];
+            match = formatter.call(self2, val);
+            args2.splice(index, 1);
+            index--;
+          }
+          return match;
+        });
+        exports2.formatArgs.call(self2, args2);
+        var logFn = debug.log || exports2.log || console.log.bind(console);
+        logFn.apply(self2, args2);
+      }
+      debug.namespace = namespace;
+      debug.enabled = exports2.enabled(namespace);
+      debug.useColors = exports2.useColors();
+      debug.color = selectColor(namespace);
+      debug.destroy = destroy;
+      if (typeof exports2.init === "function") {
+        exports2.init(debug);
+      }
+      exports2.instances.push(debug);
+      return debug;
+    }
+    function destroy() {
+      var index = exports2.instances.indexOf(this);
+      if (index !== -1) {
+        exports2.instances.splice(index, 1);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    function enable(namespaces) {
+      exports2.save(namespaces);
+      exports2.names = [];
+      exports2.skips = [];
+      var i;
+      var split = (typeof namespaces === "string" ? namespaces : "").split(/[\s,]+/);
+      var len = split.length;
+      for (i = 0; i < len; i++) {
+        if (!split[i])
+          continue;
+        namespaces = split[i].replace(/\*/g, ".*?");
+        if (namespaces[0] === "-") {
+          exports2.skips.push(new RegExp("^" + namespaces.substr(1) + "$"));
+        } else {
+          exports2.names.push(new RegExp("^" + namespaces + "$"));
+        }
+      }
+      for (i = 0; i < exports2.instances.length; i++) {
+        var instance = exports2.instances[i];
+        instance.enabled = exports2.enabled(instance.namespace);
+      }
+    }
+    function disable() {
+      exports2.enable("");
+    }
+    function enabled(name) {
+      if (name[name.length - 1] === "*") {
+        return true;
+      }
+      var i, len;
+      for (i = 0, len = exports2.skips.length; i < len; i++) {
+        if (exports2.skips[i].test(name)) {
+          return false;
+        }
+      }
+      for (i = 0, len = exports2.names.length; i < len; i++) {
+        if (exports2.names[i].test(name)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function coerce(val) {
+      if (val instanceof Error)
+        return val.stack || val.message;
+      return val;
+    }
+  }
+});
+
+// node_modules/send/node_modules/debug/src/browser.js
+var require_browser4 = __commonJS({
+  "node_modules/send/node_modules/debug/src/browser.js"(exports2, module2) {
+    exports2 = module2.exports = require_debug4();
+    exports2.log = log2;
+    exports2.formatArgs = formatArgs;
+    exports2.save = save;
+    exports2.load = load;
+    exports2.useColors = useColors;
+    exports2.storage = typeof chrome != "undefined" && typeof chrome.storage != "undefined" ? chrome.storage.local : localstorage();
+    exports2.colors = [
+      "#0000CC",
+      "#0000FF",
+      "#0033CC",
+      "#0033FF",
+      "#0066CC",
+      "#0066FF",
+      "#0099CC",
+      "#0099FF",
+      "#00CC00",
+      "#00CC33",
+      "#00CC66",
+      "#00CC99",
+      "#00CCCC",
+      "#00CCFF",
+      "#3300CC",
+      "#3300FF",
+      "#3333CC",
+      "#3333FF",
+      "#3366CC",
+      "#3366FF",
+      "#3399CC",
+      "#3399FF",
+      "#33CC00",
+      "#33CC33",
+      "#33CC66",
+      "#33CC99",
+      "#33CCCC",
+      "#33CCFF",
+      "#6600CC",
+      "#6600FF",
+      "#6633CC",
+      "#6633FF",
+      "#66CC00",
+      "#66CC33",
+      "#9900CC",
+      "#9900FF",
+      "#9933CC",
+      "#9933FF",
+      "#99CC00",
+      "#99CC33",
+      "#CC0000",
+      "#CC0033",
+      "#CC0066",
+      "#CC0099",
+      "#CC00CC",
+      "#CC00FF",
+      "#CC3300",
+      "#CC3333",
+      "#CC3366",
+      "#CC3399",
+      "#CC33CC",
+      "#CC33FF",
+      "#CC6600",
+      "#CC6633",
+      "#CC9900",
+      "#CC9933",
+      "#CCCC00",
+      "#CCCC33",
+      "#FF0000",
+      "#FF0033",
+      "#FF0066",
+      "#FF0099",
+      "#FF00CC",
+      "#FF00FF",
+      "#FF3300",
+      "#FF3333",
+      "#FF3366",
+      "#FF3399",
+      "#FF33CC",
+      "#FF33FF",
+      "#FF6600",
+      "#FF6633",
+      "#FF9900",
+      "#FF9933",
+      "#FFCC00",
+      "#FFCC33"
+    ];
+    function useColors() {
+      if (typeof window !== "undefined" && window.process && window.process.type === "renderer") {
+        return true;
+      }
+      if (typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+        return false;
+      }
+      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+    }
+    exports2.formatters.j = function(v) {
+      try {
+        return JSON.stringify(v);
+      } catch (err) {
+        return "[UnexpectedJSONParseError]: " + err.message;
+      }
+    };
+    function formatArgs(args2) {
+      var useColors2 = this.useColors;
+      args2[0] = (useColors2 ? "%c" : "") + this.namespace + (useColors2 ? " %c" : " ") + args2[0] + (useColors2 ? "%c " : " ") + "+" + exports2.humanize(this.diff);
+      if (!useColors2)
+        return;
+      var c = "color: " + this.color;
+      args2.splice(1, 0, c, "color: inherit");
+      var index = 0;
+      var lastC = 0;
+      args2[0].replace(/%[a-zA-Z%]/g, function(match) {
+        if (match === "%%")
+          return;
+        index++;
+        if (match === "%c") {
+          lastC = index;
+        }
+      });
+      args2.splice(lastC, 0, c);
+    }
+    function log2() {
+      return typeof console === "object" && console.log && Function.prototype.apply.call(console.log, console, arguments);
+    }
+    function save(namespaces) {
+      try {
+        if (namespaces == null) {
+          exports2.storage.removeItem("debug");
+        } else {
+          exports2.storage.debug = namespaces;
+        }
+      } catch (e) {
+      }
+    }
+    function load() {
+      var r;
+      try {
+        r = exports2.storage.debug;
+      } catch (e) {
+      }
+      if (!r && typeof process !== "undefined" && "env" in process) {
+        r = process.env.DEBUG;
+      }
+      return r;
+    }
+    exports2.enable(load());
+    function localstorage() {
+      try {
+        return window.localStorage;
+      } catch (e) {
+      }
+    }
+  }
+});
+
+// node_modules/send/node_modules/debug/src/node.js
+var require_node4 = __commonJS({
+  "node_modules/send/node_modules/debug/src/node.js"(exports2, module2) {
+    var tty = require("tty");
+    var util = require("util");
+    exports2 = module2.exports = require_debug4();
+    exports2.init = init;
+    exports2.log = log2;
+    exports2.formatArgs = formatArgs;
+    exports2.save = save;
+    exports2.load = load;
+    exports2.useColors = useColors;
+    exports2.colors = [6, 2, 3, 4, 5, 1];
+    try {
+      supportsColor = require_supports_color();
+      if (supportsColor && supportsColor.level >= 2) {
+        exports2.colors = [
+          20,
+          21,
+          26,
+          27,
+          32,
+          33,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          56,
+          57,
+          62,
+          63,
+          68,
+          69,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          92,
+          93,
+          98,
+          99,
+          112,
+          113,
+          128,
+          129,
+          134,
+          135,
+          148,
+          149,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171,
+          172,
+          173,
+          178,
+          179,
+          184,
+          185,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          207,
+          208,
+          209,
+          214,
+          215,
+          220,
+          221
+        ];
+      }
+    } catch (err) {
+    }
+    var supportsColor;
+    exports2.inspectOpts = Object.keys(process.env).filter(function(key) {
+      return /^debug_/i.test(key);
+    }).reduce(function(obj, key) {
+      var prop = key.substring(6).toLowerCase().replace(/_([a-z])/g, function(_, k) {
+        return k.toUpperCase();
+      });
+      var val = process.env[key];
+      if (/^(yes|on|true|enabled)$/i.test(val))
+        val = true;
+      else if (/^(no|off|false|disabled)$/i.test(val))
+        val = false;
+      else if (val === "null")
+        val = null;
+      else
+        val = Number(val);
+      obj[prop] = val;
+      return obj;
+    }, {});
+    function useColors() {
+      return "colors" in exports2.inspectOpts ? Boolean(exports2.inspectOpts.colors) : tty.isatty(process.stderr.fd);
+    }
+    exports2.formatters.o = function(v) {
+      this.inspectOpts.colors = this.useColors;
+      return util.inspect(v, this.inspectOpts).split("\n").map(function(str) {
+        return str.trim();
+      }).join(" ");
+    };
+    exports2.formatters.O = function(v) {
+      this.inspectOpts.colors = this.useColors;
+      return util.inspect(v, this.inspectOpts);
+    };
+    function formatArgs(args2) {
+      var name = this.namespace;
+      var useColors2 = this.useColors;
+      if (useColors2) {
+        var c = this.color;
+        var colorCode = "[3" + (c < 8 ? c : "8;5;" + c);
+        var prefix = "  " + colorCode + ";1m" + name + " [0m";
+        args2[0] = prefix + args2[0].split("\n").join("\n" + prefix);
+        args2.push(colorCode + "m+" + exports2.humanize(this.diff) + "[0m");
+      } else {
+        args2[0] = getDate() + name + " " + args2[0];
+      }
+    }
+    function getDate() {
+      if (exports2.inspectOpts.hideDate) {
+        return "";
+      } else {
+        return new Date().toISOString() + " ";
+      }
+    }
+    function log2() {
+      return process.stderr.write(util.format.apply(util, arguments) + "\n");
+    }
+    function save(namespaces) {
+      if (namespaces == null) {
+        delete process.env.DEBUG;
+      } else {
+        process.env.DEBUG = namespaces;
+      }
+    }
+    function load() {
+      return process.env.DEBUG;
+    }
+    function init(debug) {
+      debug.inspectOpts = {};
+      var keys = Object.keys(exports2.inspectOpts);
+      for (var i = 0; i < keys.length; i++) {
+        debug.inspectOpts[keys[i]] = exports2.inspectOpts[keys[i]];
+      }
+    }
+    exports2.enable(load());
+  }
+});
+
+// node_modules/send/node_modules/debug/src/index.js
+var require_src4 = __commonJS({
+  "node_modules/send/node_modules/debug/src/index.js"(exports2, module2) {
+    if (typeof process === "undefined" || process.type === "renderer") {
+      module2.exports = require_browser4();
+    } else {
+      module2.exports = require_node4();
+    }
+  }
+});
+
 // node_modules/destroy/index.js
 var require_destroy = __commonJS({
   "node_modules/destroy/index.js"(exports2, module2) {
@@ -42779,7 +43634,7 @@ var require_destroy = __commonJS({
 });
 
 // node_modules/send/node_modules/ms/index.js
-var require_ms2 = __commonJS({
+var require_ms5 = __commonJS({
   "node_modules/send/node_modules/ms/index.js"(exports2, module2) {
     var s = 1e3;
     var m = s * 60;
@@ -42895,7 +43750,7 @@ var require_send = __commonJS({
   "node_modules/send/index.js"(exports2, module2) {
     "use strict";
     var createError = require_http_errors();
-    var debug = require_src3()("send");
+    var debug = require_src4()("send");
     var destroy = require_destroy();
     var encodeUrl = require_encodeurl();
     var escapeHtml = require_escape_html();
@@ -42903,7 +43758,7 @@ var require_send = __commonJS({
     var fresh = require_fresh();
     var fs = require("fs");
     var mime2 = require_mime_types();
-    var ms = require_ms2();
+    var ms = require_ms5();
     var onFinished = require_on_finished();
     var parseRange = require_range_parser();
     var path2 = require("path");
@@ -45399,7 +46254,7 @@ var import_path = __toModule(require("path"));
 // src/types.ts
 var ErrorCode;
 (function(ErrorCode2) {
-  ErrorCode2[ErrorCode2["TextOrByteContentEncodingRequired"] = 40010] = "TextOrByteContentEncodingRequired";
+  ErrorCode2[ErrorCode2["TextContentEncodingRequired"] = 40010] = "TextContentEncodingRequired";
   ErrorCode2[ErrorCode2["ContentTypeSpecificationRequired"] = 40011] = "ContentTypeSpecificationRequired";
   ErrorCode2[ErrorCode2["InvalidContentForContentType"] = 40015] = "InvalidContentForContentType";
   ErrorCode2[ErrorCode2["InvalidContentInsertionPositionValue"] = 40050] = "InvalidContentInsertionPositionValue";
@@ -45453,6 +46308,19 @@ function getSplicePosition(fileLines, heading, insert, ignoreNewLines) {
   }
   return splicePosition;
 }
+function toArrayBuffer(arr) {
+  if (arr instanceof Uint8Array) {
+    return arr.buffer.slice(arr.byteOffset, arr.byteOffset + arr.byteLength);
+  }
+  if (arr instanceof DataView) {
+    return arr.buffer.slice(arr.byteOffset, arr.byteOffset + arr.byteLength);
+  }
+  if (arr instanceof ArrayBuffer) {
+    return arr;
+  }
+  const encoder = new TextEncoder();
+  return encoder.encode(JSON.stringify(arr)).buffer;
+}
 
 // src/constants.ts
 var CERT_NAME = "obsidian-local-rest-api.crt";
@@ -45472,7 +46340,7 @@ var ERROR_CODE_MESSAGES = {
   [ErrorCode.PeriodIsNotEnabled]: "Specified period is not enabled.",
   [ErrorCode.PeriodicNoteDoesNotExist]: "Periodic note does not exist for the specified period.",
   [ErrorCode.RequestMethodValidOnlyForFiles]: "Request method is valid only for file paths, not directories.",
-  [ErrorCode.TextOrByteContentEncodingRequired]: "Incoming content must be sent with a bytes or text content encoding.  Be sure to set a Content-type header matching application/* or text/*.",
+  [ErrorCode.TextContentEncodingRequired]: "Incoming content must be text data and have an appropriate text/* Content-type header set (e.g. text/markdown).",
   [ErrorCode.InvalidFilterQuery]: "The query you provided could not be processed."
 };
 var ContentTypes;
@@ -45486,6 +46354,7 @@ var ContentTypes;
 var DefaultBearerTokenHeaderName = "Authorization";
 var DefaultBindingHost = "127.0.0.1";
 var LicenseUrl = "https://raw.githubusercontent.com/coddingtonbear/obsidian-local-rest-api/main/LICENSE";
+var MaximumRequestSize = "1024mb";
 
 // src/requestHandler.ts
 var RequestHandler = class {
@@ -45553,7 +46422,7 @@ var RequestHandler = class {
     message: message2,
     errorCode
   }) {
-    let errorMessages = [];
+    const errorMessages = [];
     if (errorCode) {
       errorMessages.push(ERROR_CODE_MESSAGES[errorCode]);
     } else {
@@ -45647,17 +46516,15 @@ var RequestHandler = class {
         });
         return;
       }
-      if (typeof req.body != "string") {
-        this.returnCannedResponse(res, {
-          errorCode: ErrorCode.TextOrByteContentEncodingRequired
-        });
-        return;
-      }
       try {
         yield this.app.vault.createFolder(import_path.default.dirname(filepath));
       } catch (e) {
       }
-      yield this.app.vault.adapter.write(filepath, req.body);
+      if (typeof req.body === "string") {
+        yield this.app.vault.adapter.write(filepath, req.body);
+      } else {
+        yield this.app.vault.adapter.writeBinary(filepath, toArrayBuffer(req.body));
+      }
       this.returnCannedResponse(res, { statusCode: 204 });
       return;
     });
@@ -45695,7 +46562,7 @@ var RequestHandler = class {
       }
       if (typeof req.body != "string") {
         this.returnCannedResponse(res, {
-          errorCode: ErrorCode.TextOrByteContentEncodingRequired
+          errorCode: ErrorCode.TextContentEncodingRequired
         });
         return;
       }
@@ -45748,7 +46615,7 @@ var RequestHandler = class {
       }
       if (typeof req.body != "string") {
         this.returnCannedResponse(res, {
-          errorCode: ErrorCode.TextOrByteContentEncodingRequired
+          errorCode: ErrorCode.TextContentEncodingRequired
         });
         return;
       }
@@ -45864,7 +46731,8 @@ var RequestHandler = class {
   }
   periodicGetOrCreateNote(periodName) {
     return __async(this, null, function* () {
-      let [file, err] = this.periodicGetNote(periodName);
+      const [gottenFile, err] = this.periodicGetNote(periodName);
+      let file = gottenFile;
       if (err === ErrorCode.PeriodicNoteDoesNotExist) {
         const [period] = this.periodicGetInterface(periodName);
         const now = window.moment(Date.now());
@@ -46035,47 +46903,6 @@ var RequestHandler = class {
       res.json(results);
     });
   }
-  searchGuiPost(req, res) {
-    return __async(this, null, function* () {
-      var _a;
-      const results = [];
-      const query = req.query.query;
-      const contextLength = (_a = parseInt(req.query.contextLength, 10)) != null ? _a : 100;
-      this.app.internalPlugins.getPluginById("global-search").instance.openGlobalSearch(query);
-      const searchDom = this.app.workspace.getLeavesOfType("search")[0].view.dom;
-      yield new Promise((resolve) => {
-        setTimeout(() => {
-          if (!searchDom.working) {
-            resolve();
-            return;
-          }
-          const interval = setInterval(() => {
-            if (!searchDom.working) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 2e3);
-        }, 100);
-      });
-      for (const result of searchDom.children) {
-        const matches = [];
-        for (const match of result.result.content) {
-          matches.push({
-            match: {
-              start: match[0],
-              end: match[1]
-            },
-            context: result.content.slice(Math.max(match[0] - contextLength, 0), match[1] + contextLength)
-          });
-        }
-        results.push({
-          filename: result.file.path,
-          matches
-        });
-      }
-      res.json(results);
-    });
-  }
   valueIsSaneTruthy(value) {
     if (value === void 0 || value === null) {
       return false;
@@ -46196,12 +47023,21 @@ var RequestHandler = class {
     this.api.use((0, import_response_time.default)());
     this.api.use((0, import_cors.default)());
     this.api.use(this.authenticationMiddleware.bind(this));
-    this.api.use(import_body_parser.default.text({ type: "text/*" }));
-    this.api.use(import_body_parser.default.text({ type: ContentTypes.dataviewDql }));
-    this.api.use(import_body_parser.default.json({ type: ContentTypes.json }));
-    this.api.use(import_body_parser.default.json({ type: ContentTypes.olrapiNoteJson }));
-    this.api.use(import_body_parser.default.json({ type: ContentTypes.jsonLogic }));
-    this.api.use(import_body_parser.default.raw({ type: "application/*" }));
+    this.api.use(import_body_parser.default.text({ type: "text/*", limit: MaximumRequestSize }));
+    this.api.use(import_body_parser.default.text({
+      type: ContentTypes.dataviewDql,
+      limit: MaximumRequestSize
+    }));
+    this.api.use(import_body_parser.default.json({ type: ContentTypes.json, limit: MaximumRequestSize }));
+    this.api.use(import_body_parser.default.json({
+      type: ContentTypes.olrapiNoteJson,
+      limit: MaximumRequestSize
+    }));
+    this.api.use(import_body_parser.default.json({
+      type: ContentTypes.jsonLogic,
+      limit: MaximumRequestSize
+    }));
+    this.api.use(import_body_parser.default.raw({ type: "*/*", limit: MaximumRequestSize }));
     this.api.route("/active/").get(this.activeFileGet.bind(this)).put(this.activeFilePut.bind(this)).patch(this.activeFilePatch.bind(this)).post(this.activeFilePost.bind(this)).delete(this.activeFileDelete.bind(this));
     this.api.route("/vault/(.*)").get(this.vaultGet.bind(this)).put(this.vaultPut.bind(this)).patch(this.vaultPatch.bind(this)).post(this.vaultPost.bind(this)).delete(this.vaultDelete.bind(this));
     this.api.route("/periodic/:period/").get(this.periodicGet.bind(this)).put(this.periodicPut.bind(this)).patch(this.periodicPatch.bind(this)).post(this.periodicPost.bind(this)).delete(this.periodicDelete.bind(this));
@@ -46209,7 +47045,6 @@ var RequestHandler = class {
     this.api.route("/commands/:commandId/").post(this.commandPost.bind(this));
     this.api.route("/search/").post(this.searchQueryPost.bind(this));
     this.api.route("/search/simple/").post(this.searchSimplePost.bind(this));
-    this.api.route("/search/gui/").post(this.searchGuiPost.bind(this));
     this.api.route("/open/(.*)").post(this.openPost.bind(this));
     this.api.get(`/${CERT_NAME}`, this.certificateGet.bind(this));
     this.api.get("/", this.root.bind(this));
@@ -46473,7 +47308,7 @@ var LocalRestApiSettingTab = class extends import_obsidian2.PluginSettingTab {
         this.plugin.refreshServerState();
       }).setValue(this.plugin.settings.crypto.publicKey));
       new import_obsidian2.Setting(containerEl).setName("Private Key").addTextArea((cb) => cb.onChange((value) => {
-        this.plugin.settings.crypto.publicKey = value;
+        this.plugin.settings.crypto.privateKey = value;
         this.plugin.saveSettings();
         this.plugin.refreshServerState();
       }).setValue(this.plugin.settings.crypto.privateKey));

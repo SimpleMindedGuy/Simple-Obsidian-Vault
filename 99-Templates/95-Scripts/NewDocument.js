@@ -191,6 +191,7 @@ let TemplatePath = `99-Templates`,
 async function main(tp,Active){
 
     
+
     console.log(`reading the Config File`)
     currentFile = await app.vault.getAbstractFileByPath(ConfigPath)
 
@@ -203,9 +204,12 @@ async function main(tp,Active){
     Meta[modifiedKey] = tp.date.now ("");
     if(!Active)
     {
+
+        
         //  Reading the NewDocuemnt file
         console.log(`reading the New Document file`)
         currentFile = await app.vault.getAbstractFileByPath(NewDocumentPath)
+        
         await RunFileCommands(currentFile,tp)
     
         console.warn("Meta")
@@ -218,6 +222,8 @@ async function main(tp,Active){
 
     console.warn(`Reading active file `)
     console.log(currentFile)
+
+
     await RunFileCommands(currentFile,tp)
     console.warn(`Meta`);
     console.warn(Meta);
@@ -237,6 +243,8 @@ module.exports = main
 async function RunFileCommands(File,tp)
 {
     // Reading the config file
+
+    
     console.log("Reading file . . . ")
     console.log(File)
 
@@ -275,7 +283,7 @@ async function RunFileCommands(File,tp)
  */
 async function RemoveCommandBlock(file){
 
-    const CommandBlockRegExp = new RegExp(/(?<=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)\n*{{3}:{3}(.*?)\:{3}}{3}\n*(?=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)/smgi);
+    const CommandBlockRegExp = new RegExp(/(?<=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)^\n*{{3}:{3}(.*?)\:{3}}{3}\n*?(?=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)/smgi);
 
     let Text = await app.vault.read(file)
 
@@ -1455,7 +1463,9 @@ async function ReplaceYmlWithMetaIntoFile(file)
 
     }
 
-    const newText = Text.replace(isYmlBlock[0],newBlock)
+    const TitleRegExp = new RegExp (/^\#{1}\ [\u0020-\uffff]+$/gmi)
+
+    const newText = Text.replace(isYmlBlock[0],newBlock).replace(TitleRegExp,`# ${Meta[titleKey]}`)
 
     console.log(newText)
 
@@ -1731,33 +1741,54 @@ async function GetTemplates(Directory){
 async function GetOptionalTemplates(TemplateList,isMultiTemplate,tp){
 
     let Templates = [];
+    let OptionList = []
     
     const DefaultRegExp = await RegExp(/^Description (?:Template)\.(md)$/gm)
 
     console.log(`Choosing templates form @ :`);
-    console.log(TemplateList);
+    // console.log(TemplateList);
+
+
+    let defaultIndex ;
+
+    let text = `Optional Templates`;
 
     for(const Temp in TemplateList)
     {
-        const isDefault = await DefaultRegExp.test(TemplateList[Temp].name)
-        console.log(TemplateList[Temp].name)
+        console.log(TemplateList[Temp])
+        const isDefault = await TemplateList[Temp].name.match(DefaultRegExp)
 
         if(isDefault)
         {
-            Templates.push(TemplateList[Temp])
-            TemplateList.splice(TemplateList[Temp],1)
+            defaultIndex = Temp
             continue
         }
+        await OptionList.push(TemplateList[Temp].name)
+        
+
+    }
+    if(defaultIndex)
+    {
+        text += `\n- ${TemplateList[defaultIndex].name}`
+        Templates.push(TemplateList[defaultIndex])
+        TemplateList.splice(defaultIndex,1)
     }
 
+  
+
     let isChoosing = true;
-    
-    let Choises = ""
     let errormsg=""
     
+    const noti = new Notice(`${text}`,99999999)
+
+
     console.log(`user is choosing`)
     while(isChoosing)
     {
+        console.log(`lists`)
+        console.log(TemplateList)
+        console.log(OptionList)
+
         if(TemplateList.length == 0)
         {
             console.log(`No more options, exiting the loop`)
@@ -1765,23 +1796,19 @@ async function GetOptionalTemplates(TemplateList,isMultiTemplate,tp){
             isChoosing =  false;
             continue;
         }
-
-        let log = `Optional Templates`
-        for(const Temp in TemplateList)
-        {
-            log +=`\n${Temp} : ${TemplateList[Temp].name}`
-        }
-    
-        Choises = "Chosen :\n"
-        for(const temp of Templates)
-        {
-            Choises += `${temp.name}\n`;
-        }
+   
 
         // display a dialog using templater
-        let Choise = await tp.system.prompt(log+`\n`+Choises+"\n"+errormsg,"",true)
+        // let Choise = await tp.system.prompt(text+`\n`+Choises+"\n"+errormsg,"",true)
+
+
+
+        let Choise = await tp.system.suggester(OptionList,TemplateList,false,`Optional Templates`)
         errormsg =""
 
+        let index = await OptionList.indexOf(Choise);
+
+        TemplateList.indexOf(TemplateList)
         console.log(`Choise : ${Choise}`)
 
         if(Choise === '' || Choise == undefined)
@@ -1791,16 +1818,7 @@ async function GetOptionalTemplates(TemplateList,isMultiTemplate,tp){
             isChoosing =  false;
             continue;
         }
-        // boolean to check if the input is a number
-        let isNumber = !Number.isNaN(parseInt(Choise))
-
-        // if it is a number re run the loob with a error message
-        if(!isNumber)
-        {
-            console.warn(`choise  is not a number`)
-            errormsg = "input has to be a number"
-            continue
-        }
+        
 
         // if the choise is out of bounds re run the loob with a error message
         if(Choise < 0 || Choise > TemplateList.length - 1)
@@ -1810,16 +1828,25 @@ async function GetOptionalTemplates(TemplateList,isMultiTemplate,tp){
             continue
         }
         
-        await Templates.push(TemplateList[Choise])
+        await Templates.push(Choise)
+
+        text += `\n- ${Choise.name}`
 
         if(!isMultiTemplate)
         {
             break
         }
-        await TemplateList.splice(TemplateList[Choise],1)
+        await TemplateList.splice(index-1,1)
+        await OptionList.splice(index-1,1)
+
+        noti.setMessage(`${text}\n${errormsg}`);
 
 
     }
+
+    setTimeout(noti.hide(),TimeLimit)
+    
+
     return Templates ;
 
 }
@@ -1910,19 +1937,21 @@ async function AddDocuemntToOverview(file){
  * @param {string} text - text for the dialog
  * @param {string} argument - key to store user choises in meta.
  * @param {Array} list - list for user to choose from.
- * @param {boolean} isMultiple - allow user to choose muliple options.
- * @param {boolean} isOptional - allow user to not choise any option.
+ * @param {Object} Options - Set of options for how the functions works 
+ * @param {boolean} Options.isMultiple - allow user to choose muliple options.
+ * @param {boolean} Options.isOptional - allow user to not choise any option.
+ * @param {boolean} Options.isExpanding - allows uer to add an option if the option dose not exist, in the list. 
  * @returns {Promise<string|string[]|null>}
  */
-async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
+async function getUserChoise(tp,text,argument,list,Options){
 
     console.log(`choosing from menu :`)
-    console.log(list)
-
-
+    
+    const {isExpanding,isMultiple,isOptional} = Options
+    
+    
     let optionList = JSON.parse(JSON.stringify(list));
-    // text to display menu options
-    let MenuList = ``;
+    console.log(optionList)
     // store error messages
     let errormsg =``;
     // check if user is in chooser state
@@ -1930,16 +1959,18 @@ async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
     let UserChoise
     let choises = 0
 
+    
+    const noti = new Notice(`${text}`,99999999)
+
+
     while(isChoosing){
         console.log('is choosing')
 
-        MenuList = ""
-        for(const option in optionList){
-            MenuList +=`\n${option} : ${optionList[option]}`
-        }
 
         // display a dialog using templater
-        let Choise = await tp.system.prompt(text+MenuList+`\n`+errormsg,"",true)
+        // let Choise = await tp.system.prompt(text+MenuList+`\n`+errormsg,"",true)
+
+        let Choise = await tp.system.suggester(optionList,optionList,false,text)
         errormsg =""
 
         console.log(`Choise : ${Choise}`)
@@ -1954,27 +1985,20 @@ async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
         if(Choise === '' || Choise == undefined)
         {
             // checks the input is mandatory.
-            // if the input is optional, exist on empty entry
-            console.log(`user exiting the loop`)
-            if(isOptional)
+            // if the input is optional, and exist on empty entry
+            if(!isOptional)
             {
-                // change loop boolean to false
-                isChoosing =  false;
+                errormsg ="Choise is required"
+                continue;
             }
-            errormsg ="Input must be a number"
 
-            continue;
-        }
-
-        // boolean to check if the input is a number
-        let isNumber = !Number.isNaN(parseInt(Choise))
-
-        // if it is a number re run the loob with a error message
-        if(!isNumber)
-        {
-            console.warn(`choise  is not a number`)
-            errormsg = "Input has to be a number"
-            continue
+            if(isExpanding)
+            {
+                await getUserEntry(tp,text,argument,isMultiple,isOptional)
+            }
+            // change loop boolean to false
+            console.log(`user exiting the loop`)
+            isChoosing =  false;
         }
 
         // if the choise is out of bounds re run the loob with a error message
@@ -1990,11 +2014,11 @@ async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
             // change loop boolean to false
             isChoosing =  false;
             // Store choise in argument key
-            UserChoise= list[Choise]
-            console.log(`choise : ${Choise} => ${list[Choise]}`)
+            UserChoise= Choise
+            console.log(`choise : ${Choise} => ${Choise}`)
             console.log(Choise)
             console.log(`=>`)
-            console.log(list[Choise])
+            console.log(Choise)
             console.log(`=> in a variable called `)
             console.log(argument)
 
@@ -2006,10 +2030,10 @@ async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
             UserChoise = []
         }
         // Add choiose to Array variable 
-        UserChoise.push(list[Choise]);
+        UserChoise.push(Choise);
         choises++;
         // Store choise in argument key
-        console.log(`choise : ${Choise} => ${list[Choise]} added to `);
+        console.log(`choise : ${Choise} => ${Choise} added to `);
         console.log(`Chosen options `);
         console.log(UserChoise);
 
@@ -2018,6 +2042,10 @@ async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
 
         console.log(`new menu `);
         console.log(optionList);
+        text += `\n- ${Choise}`
+
+        noti.setMessage(`${text}\n${errormsg}`);
+
 
     }
 
@@ -2030,6 +2058,8 @@ async function getUserChoise(tp,text,argument,list,isMultiple,isOptional){
     {
         Meta[argument] = UserChoise;
     }
+
+    setTimeout(noti.hide(),TimeLimit)
 
     return UserChoise
 
@@ -2400,13 +2430,26 @@ const Commands = {
     },
     Select : async (Argument,tp)=>{
         Argument = await ReplaceValues(Argument)
-        await getUserChoise(tp,dialog,Argument,menu,false,false)
+
+        const Options= {
+            isMultiple: false,
+            isOptional: false,
+            isExpanding: false,
+        }
+
+        await getUserChoise(tp,dialog,Argument,menu,Options)
         // await Select(Argument,tp)
     },
     SelectLayer : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
 
-        let choise = await getUserChoise(tp,dialog,Argument,menu,false,false);
+        const Options= {
+            isMultiple: false,
+            isOptional: false,
+            isExpanding: false,
+        }
+
+        let choise = await getUserChoise(tp,dialog,Argument,menu,Options)
 
         if(!choise || Array.isArray(choise))
         {
@@ -2425,12 +2468,25 @@ const Commands = {
     Options : async(Argument,tp)=>{
 
         Argument = await ReplaceValues(Argument);
-        await getUserChoise(tp,dialog,Argument,menu,true,true);
+        const Options= {
+            isMultiple: true,
+            isOptional: true,
+            isExpanding: true,
+        }
+
+        await getUserChoise(tp,dialog,Argument,menu,Options)
         // await Options(Argument,tp)
     },
     Check : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
-        await getUserChoise(tp,dialog,Argument,[true,false],false,false);
+
+        const Options= {
+            isMultiple: false,
+            isOptional: false,
+            isExpanding: false,
+        }
+
+        await getUserChoise(tp,dialog,Argument,[false,true],Options);
         // await Check(Argument,tp)
     },
     Input : async(Argument,tp)=>{

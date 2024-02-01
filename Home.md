@@ -1,21 +1,53 @@
 ---
 banner: "![[Banner/youtube banner5.png]]"
-tags: 
+tags:
   - Dashboard
-alias : 
+aliases:
   - Home
-banner_y: 0.615
+banner_y: 0.5
 ---
 
 ```button
 name New Document
 type append template
-action Commands/NewDocument
+action 99-Commands/NewDocument
 templater true
 ```
 
 
-[[99-Templates/Project/Project|Project]] [[99-Templates/Learning/Learning|Learning]] [[12-Video/Video|Video]] [[14-Book/Book|Book]] [[15-University/University|University]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[[10-Project/Project|Project]] [[11-Learning/Learning|Learning]] [[12-Video/Video|Video]] [[14-Book/Book|Book]] [[15-University/University|University]][[30-People/People|People]]
 
 ```dataviewjs
 await dv.view("98-DataView/View/Activities","hello world")

@@ -2,127 +2,92 @@
   "collapse-filter": false,
   "search": "",
   "showTags": false,
-  "showAttachments": false,
+  "showAttachments": true,
   "hideUnresolved": true,
   "showOrphans": false,
   "collapse-color-groups": false,
   "colorGroups": [
     {
-      "query": "tag:#Video",
+      "query": "tag:#Yearly  ",
       "color": {
         "a": 1,
-        "rgb": 16384000
+        "rgb": 16711680
       }
     },
     {
-      "query": "tag:#Project",
+      "query": "tag:#Monthly  ",
       "color": {
         "a": 1,
-        "rgb": 505069
+        "rgb": 1114367
       }
     },
     {
-      "query": "tag:#Book",
+      "query": "tag:#Weekly  ",
       "color": {
         "a": 1,
-        "rgb": 1453801
+        "rgb": 7460482
       }
     },
     {
-      "query": "tag:#Blog",
+      "query": "tag:#diary  ",
       "color": {
         "a": 1,
-        "rgb": 16749824
+        "rgb": 16777215
       }
     },
     {
-      "query": "tag:#University",
+      "query": "tag:#SubNote",
       "color": {
         "a": 1,
-        "rgb": 2481677
+        "rgb": 14711890
       }
     },
     {
-      "query": "tag:#Learning",
+      "query": "tag:#Progress  ",
       "color": {
         "a": 1,
-        "rgb": 16771584
+        "rgb": 12774189
       }
     },
     {
-      "query": "tag:#overview",
+      "query": "tag:#Overview",
       "color": {
         "a": 1,
-        "rgb": 5188814
+        "rgb": 5395168
       }
     },
     {
-      "query": "tag:#sub_note",
+      "query": "file:Home",
       "color": {
         "a": 1,
-        "rgb": 6454916
+        "rgb": 193042
       }
     },
     {
-      "query": "tag:#progress",
+      "query": "tag:#Description  ",
       "color": {
         "a": 1,
-        "rgb": 5677788
+        "rgb": 237043
       }
     },
     {
-      "query": "tag:#diary",
+      "query": "tag:#Tracking",
       "color": {
         "a": 1,
-        "rgb": 7558815
-      }
-    },
-    {
-      "query": "tag:#excalidraw",
-      "color": {
-        "a": 1,
-        "rgb": 10546853
-      }
-    },
-    {
-      "query": "tag:#tracking",
-      "color": {
-        "a": 1,
-        "rgb": 15100779
-      }
-    },
-    {
-      "query": "tag:#problem",
-      "color": {
-        "a": 1,
-        "rgb": 11276561
-      }
-    },
-    {
-      "query": "tag:#people",
-      "color": {
-        "a": 1,
-        "rgb": 5347969
-      }
-    },
-    {
-      "query": "tag:#home",
-      "color": {
-        "a": 1,
-        "rgb": 16753152
+        "rgb": 12674919
       }
     }
   ],
   "collapse-display": false,
-  "showArrow": true,
-  "textFadeMultiplier": -2.6,
-  "nodeSizeMultiplier": 1.42708333333333,
-  "lineSizeMultiplier": 0.9421875,
+  "showArrow": false,
+  "textFadeMultiplier": -3,
+  "nodeSizeMultiplier": 1.68229166666667,
+  "lineSizeMultiplier": 0.686979166666667,
   "collapse-forces": false,
-  "centerStrength": 0.25,
+  "centerStrength": 0.114583333333333,
   "repelStrength": 20,
   "linkStrength": 1,
-  "linkDistance": 324,
-  "scale": 0.13348388671875,
+  "linkDistance": 500,
+  "scale": 0.017578125,
   "close": false
 }

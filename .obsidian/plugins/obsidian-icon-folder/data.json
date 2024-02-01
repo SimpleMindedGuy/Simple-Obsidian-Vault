@@ -1,6 +1,6 @@
 {
   "settings": {
-    "migrated": 3,
+    "migrated": 4,
     "iconPacksPath": "80-Gallery/Icons",
     "fontSize": 24,
     "emojiStyle": "native",
@@ -295,6 +295,7 @@
     "iconsBackgroundCheckEnabled": false,
     "iconInTitleEnabled": false,
     "iconInFrontmatterEnabled": false,
-    "iconsInNotesEnabled": true
+    "iconsInNotesEnabled": true,
+    "iconIdentifier": ":"
   }
 }

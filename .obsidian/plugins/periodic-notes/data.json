@@ -11,12 +11,12 @@
   "weekly": {
     "format": "YYYY/YYYY-[W]ww",
     "folder": "01-Weekly",
-    "template": "99-Templates/02-Weekly/Weekly.md",
+    "template": "99-Templates/01-Weekly/Weekly.md",
     "enabled": true
   },
   "monthly": {
     "format": "YYYY/YYYY-MM",
-    "template": "99-Templates/01-Monthly/Monthly.md",
+    "template": "99-Templates/02-Monthly/Monthly.md",
     "folder": "02-Monthly",
     "enabled": true
   },

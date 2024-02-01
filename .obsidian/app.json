@@ -35,7 +35,7 @@
     "editor:configure-toolbar",
     "obsidian-reminder-plugin:show-date-chooser"
   ],
-  "promptDelete": false,
+  "promptDelete": true,
   "legacyEditor": false,
   "communityPluginSortOrder": "download",
   "rightToLeft": false,
@@ -53,7 +53,8 @@
     "sense",
     "precisiona",
     "hh",
-    "TextDate"
+    "TextDate",
+    "marka"
   ],
   "livePreview": false,
   "defaultViewMode": "preview",

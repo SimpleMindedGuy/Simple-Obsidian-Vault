@@ -31,8 +31,8 @@ async function UpdateTarget(tp) {
         let current =  (list.match(Itemspattern)) ? list.match(Itemspattern).length : 0
         itemsNumber += current;
         // console.log(`${list.match(Itemspattern)}\n${current}`)
-        console.log(`${value} += ${index+1} * ${current} => ${(index+1) * current} `)
-        value += (index+1) * current;
+        console.log(`${value} += ${index} * ${current} => ${(index) * current} `)
+        value += (index) * current;
     });
 
     Target = itemsNumber * ListNumber;
@@ -44,8 +44,8 @@ async function UpdateTarget(tp) {
     newdata = WorkingData.replace(valuepattern,`🏹: ${value}`)
     newdata = newdata.replace(targetpattern,`🎯: ${Target}`)
 
-    let TargetPersentage = 100;
-    let ValuePersentage = Math.floor((value/Target) * 100)
+    // let TargetPersentage = 100;
+    // let ValuePersentage = Math.floor((value/Target) * 100)
 
     const templaterpattern = new RegExp(/\<\%(?!\+).+\%\>\n/g)
     newdata = newdata.replace(templaterpattern,"")

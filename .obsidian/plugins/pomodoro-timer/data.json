@@ -5,10 +5,14 @@
   "useStatusBarTimer": false,
   "notificationSound": true,
   "customSound": "",
+  "showTaskProgress": true,
+  "enableTaskTracking": false,
   "logFile": "NONE",
+  "logFocused": false,
   "logPath": "",
   "logLevel": "ALL",
   "logTemplate": "",
   "logFormat": "VERBOSE",
-  "useSystemNotification": true
+  "useSystemNotification": true,
+  "taskFormat": "TASKS"
 }
