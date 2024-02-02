@@ -1853,6 +1853,36 @@ async function GetOptionalTemplates(TemplateList,isMultiTemplate,tp){
 
 
 /**
+ * Gets an array of all the directories inside the given Directory{@link dir}
+ * @date 02/02/2024 - 21:12:08
+ *
+ * @async
+ * @param {String} dir
+ * @returns {Promise<Object[]|null>}
+ */
+async function GetDocuemntsNamesFromDirectory(dir)
+{
+    const Directory = await app.vault.getAbstractFileByPath(`${dir}`)
+
+    if (!Directory)
+    {
+        console.log(`Directory dose not exist`)
+        new Notice(`Directory dose not exist`)
+        return null
+    }
+
+    let Documents = []
+    console.log(`Getting Documents`)
+    for(const Doc in Directory.children)
+    {
+        Documents.push(Doc.name);
+    }
+
+    new Notice(`Got Documents names from Directory ${Directory.name}`)
+    return Documents;
+}
+
+/**
  * Adds th provided {@link file} to {@link Overview} if exists.
  * 
  * @date 18/12/2023
@@ -1970,7 +2000,7 @@ async function getUserChoise(tp,text,argument,list,Options){
         // display a dialog using templater
         // let Choise = await tp.system.prompt(text+MenuList+`\n`+errormsg,"",true)
 
-        let Choise = await tp.system.suggester(optionList,optionList,false,text)
+        let Choise = await tp.system.suggester(optionList,optionList,true,text)
         errormsg =""
 
         console.log(`Choise : ${Choise}`)
@@ -1982,13 +2012,15 @@ async function getUserChoise(tp,text,argument,list,Options){
             continue;
         }
 
-        if(Choise === '' || Choise == undefined)
+        if(Choise == undefined)
         {
             // checks the input is mandatory.
             // if the input is optional, and exist on empty entry
             if(!isOptional)
             {
                 errormsg ="Choise is required"
+                noti.setMessage(`${text}\n${errormsg}`);
+
                 continue;
             }
 
@@ -1998,6 +2030,8 @@ async function getUserChoise(tp,text,argument,list,Options){
             }
             // change loop boolean to false
             console.log(`user exiting the loop`)
+
+
             isChoosing =  false;
         }
 
@@ -2006,6 +2040,8 @@ async function getUserChoise(tp,text,argument,list,Options){
         {
             console.warn(`choise  is out of bound`)
             errormsg = "input cannot be lower than 0 or greater than the number of options"
+            noti.setMessage(`${text}\n${errormsg}`);
+
             continue
         }
 

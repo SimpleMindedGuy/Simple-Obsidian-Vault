@@ -10,6 +10,7 @@ kanban-plugin: basic
 🔖: 
 tags:
  - Tracking
+ - People
 alias: 
 ---
 

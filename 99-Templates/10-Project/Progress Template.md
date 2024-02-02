@@ -15,6 +15,8 @@
 🎯: 1
 tags: 
  - Progress
+ - Activity
+ - Project
 alias: 
 banner: "![[Gallery/Banner/youtube banner.png]]"
 ---

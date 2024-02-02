@@ -1,6 +1,5 @@
 ---
 
-kanban-plugin: basic
 🌐: 
 🗓️: 
 🖋️: 
@@ -10,34 +9,29 @@ kanban-plugin: basic
 🏷️: 
 🎫: 
 🎟️: 
+📇: 
 🔖: 
 📊: 
 🏁: 
 🏹: 0
 🎯: 1
+banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
- - Tracking
- - Progress
- - Project
+  - SubNote
 alias: 
+kanban-plugin: advanced
+
 ---
 
 ## TO-DO
 
-- [ ] Introduction
-- [ ] Progress
-- [ ] Goal
 
 
 ## Designing
 
 
 
-## Learning
-
-
-
-## Working in progress
+## In-Progress
 
 
 
@@ -45,15 +39,14 @@ alias:
 
 
 
-## Done
+## Complete
 
-**Complete**
 
 
 
 
 %% kanban:settings
 ```
-{"kanban-plugin":"basic"}
+{"kanban-plugin":"advanced"}
 ```
 %%

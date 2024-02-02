@@ -1,6 +1,5 @@
 ---
 
-kanban-plugin: basic
 🌐: 
 🗓️: 
 🖋️: 
@@ -8,31 +7,30 @@ kanban-plugin: basic
 🎫: 
 🎟️: 
 🔖: 
+kanban-plugin: basic
 tags:
-  - Traking
-  - Personal
-  - Problem
+  - Overview
+
 ---
 
 ## To-Do
 
 
 
-## Documenting
+## Negotiation
 
 
 
-## Proofing
+## Work-On
 
 
 
-## Make a solution for
+## Deploying
 
 
 
-## Overcome
+## Done
 
-**Complete**
 
 
 

@@ -4,13 +4,21 @@ kanban-plugin: basic
 🌐: 
 🗓️: 
 🖋️: 
+✍️: 
+📚: 
 ⬅️: 
 🏷️: 
 🎫: 
 🎟️: 
 🔖: 
+📊: 
+🏁: 
+🏹: 0
+🎯: 1
 tags:
  - Tracking
+ - Book
+ - Activity
 alias: 
 ---
 

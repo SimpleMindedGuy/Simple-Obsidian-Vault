@@ -14,9 +14,9 @@
 🏹: 0
 🎯: 1
 tags:
- - Description
  - Personal
  - Problem
+ - Description
 alias: 
 banner: "![[Banner/typewriter.jpg]]"
 ---

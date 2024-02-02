@@ -2,11 +2,20 @@
 🌐: 
 🗓️: 
 🖋️: 
+✍️: 
+📚: 
+⬅️: 
 🏷️: 
 🎫: 
 🎟️: 
 🔖: 
+📊: 
+🏁: 
+🏹: 0
+🎯: 1
 tags:
+ - Video
+ - Activities
  - Tracking
 kanban-plugin: basic
 alias: 
