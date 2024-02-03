@@ -6,13 +6,12 @@
 🎫: Project
 🎟️: Program
 🔖: testing
-tags: 
- - Excalidraw
- - SubNote
-alias:
- - 00 - testing asdfwq
+tags:
+  - Excalidraw
+  - SubNote
+aliases:
+  - 00 - testing asdfwq
 excalidraw-plugin: parsed
-
 ---
 ==⚠  Switch to EXCALIDRAW VIEW in the MORE OPTIONS menu of this document. ⚠==
 

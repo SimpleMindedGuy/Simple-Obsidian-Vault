@@ -4,24 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "c58df5604aded664",
+        "id": "cd961eb2dc3b5892",
         "type": "tabs",
         "children": [
           {
-            "id": "e322a8705fca8c57",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {}
-            }
-          },
-          {
-            "id": "f52c74f4b26c3eb2",
+            "id": "727a57a54d0cdac1",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "99-Templates/01-Weekly/Weekly.md",
+                "file": "README.md",
                 "mode": "source",
                 "backlinks": true,
                 "source": true
@@ -29,98 +21,19 @@
             }
           },
           {
-            "id": "92ecfa69f7939097",
+            "id": "bc5cd81babfb987f",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "00-Daily/2024/2024-01-31.md",
+                "file": "99-Templates/30-Work/Work.md",
                 "mode": "preview",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "5e4941122feef1b4",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "00-Daily/2024/2024-01-31.md",
-                "mode": "preview",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "b47d19e1dc5acbe8",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "9999 - Accounts.md",
-                "mode": "source",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "6979be65b89d65ce",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Home.md",
-                "mode": "preview",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "17ba4a6a616bad3f",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "9999 - Accounts.md",
-                "mode": "preview",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "6b366031cead751b",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "12-Video/07-Simple Talk/12-Tom is sick of society/Tom is sick of society Description.md",
-                "mode": "source",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "08153b55611357d4",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "12-Video/07-Simple Talk/07-Problems with education/Problems with education Description.md",
-                "mode": "source",
                 "backlinks": true,
                 "source": true
               }
             }
           }
-        ],
-        "currentTab": 5
+        ]
       }
     ],
     "direction": "vertical"
@@ -151,7 +64,7 @@
               "type": "search",
               "state": {
                 "query": "",
-                "matchingCase": true,
+                "matchingCase": false,
                 "explainSearch": true,
                 "collapseAll": false,
                 "extraContext": true,
@@ -237,7 +150,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Home.md"
+                "file": "README.md"
               }
             }
           },
@@ -247,7 +160,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Home.md",
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -259,7 +172,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Home.md",
+                "file": "README.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -276,23 +189,24 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "Home.md"
+                "file": "README.md"
               }
             }
           },
           {
-            "id": "362ded4d22a653a5",
+            "id": "7f1b755e3f390727",
             "type": "leaf",
             "state": {
               "type": "all-properties",
               "state": {
                 "sortOrder": "frequency",
-                "showSearch": false,
+                "showSearch": true,
                 "searchQuery": ""
               }
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
@@ -315,50 +229,50 @@
       "homepage:Open homepage": false,
       "obsidian-gallery:Gallery": false,
       "webpage-html-export:Export Vault to HTML": false,
-      "templater-obsidian:Templater": false,
       "pomodoro-timer:Toggle timer panel": false,
       "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "templater-obsidian:Templater": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "6979be65b89d65ce",
+  "active": "727a57a54d0cdac1",
   "lastOpenFiles": [
-    "9999 - Accounts.md",
-    "Home.md",
-    "00-Daily/2024/2024-01-31.md",
-    "00-Daily/2024/2024-01-30.md",
-    "00-Daily/2024/2024-01-29.md",
-    "01-Weekly/2024/2024-W05.md",
+    "99-Templates/Utility documentation.md",
+    "99-Templates/Habit Tracking Documentation.md",
+    "99-Templates/\".md",
+    "00-Daily/2024/2024-02-02.md",
+    "99-Templates/30-Work/Work.md",
+    "99-Templates/03-Yearly/Yearly.md",
     "99-Templates/01-Weekly/Weekly.md",
-    "12-Video/07-Simple Talk/14-Schizophrenia/Schizophrenia Description.md",
-    "12-Video/08-General/00-Simple Obsidian Setup Rewrok/Simple Obsidian Setup Rewrok Description.md",
-    "12-Video/Video.md",
-    "12-Video/07-Simple Talk/14-Schizophrenia",
-    "12-Video/07-Simple Talk/13-Toxic society/Toxic society Description.md",
-    "12-Video/07-Simple Talk/12-Tom is sick of society/Tom is sick of society Description.md",
-    "12-Video/07-Simple Talk/13-Toxic society",
-    "12-Video/07-Simple Talk/12-Tom is sick of society",
-    "12-Video/07-Simple Talk/07-Problems with education/Problems with education Description.md",
-    "12-Video/07-Simple Talk/08-Crazy or Dishonest/Crazy or Dishonest Description.md",
-    "12-Video/07-Simple Talk/09-Free will/Free will Description.md",
-    "12-Video/07-Simple Talk/10-Factors for Social Degradations/Factors for Social Degradations Description.md",
-    "12-Video/07-Simple Talk/11-Delusion and bad comprehension skills/Delusion and bad comprehension skills Description.md",
-    "12-Video/07-Simple Talk/11-Delusion and bad comprehension skills",
-    "12-Video/03-Clips/12-Casually Racist/Casually Racist Description.md",
-    "12-Video/03-Clips/09-Tom hate fox/Media/00-Clip - Tom hate fox.mp4",
-    "12-Video/07-Simple Talk/03-Tom Dream 2/Media/00-Simple Talk - Tom Dream2.mp4",
-    "12-Video/03-Clips/09-Tom hate fox/Tom hate fox Description.md",
-    "12-Video/03-Clips/10-Stupid jokes/Stupid jokes Description.md",
-    "12-Video/03-Clips/11-Fatty can't eat ducks/Fatty can't eat ducks Description.md",
-    "12-Video/03-Clips/13-Avrage 4chan conversation/Avrage 4chan conversation Description.md",
-    "12-Video/03-Clips/13-Avrage 4chan conversation",
-    "12-Video/03-Clips/12-Casually Racist",
-    "12-Video/03-Clips/11-Fatty can't eat ducks",
-    "12-Video/03-Clips/10-Stupid jokes",
-    "14-Book/03-The C programming Language/The C programming Language Progress.md",
-    "14-Book/03-The C programming Language/The C programming Language Tracking.md",
-    "14-Book/03-The C programming Language/The C programming Language Description.md",
-    "14-Book/03-The C programming Language/SubNote/01-Variables and Arithmetic Expressions.md",
+    "99-Templates/17-Blog/Blog.md",
+    "99-Templates/16-Book/Book.md",
+    "99-Templates/15-People/People.md",
+    "99-Templates/14-University/University.md",
+    "99-Templates/13-Learning/Learning.md",
+    "99-Templates/10-Project/Project.md",
+    "99-Templates/02-Monthly/Monthly.md",
+    "99-Templates/11-Video/Video.md",
+    "99-Templates/12-Problem/Problem.md",
+    "99-Templates/30-Work/Tasks Template.md",
+    "99-Templates/30-Work/Description Template.md",
+    "00-Daily/2024/2024-02-03.md",
+    "99-Templates/00-Daily/Daily.md",
+    "Home.md",
+    "00-Daily/2022/2022-07-01.md",
+    "00-Daily/2022/2022-06-30.md",
+    "00-Daily/2022/2022-07-27.md",
+    "12-Video/03-Clips/0003 - Homing Rocks/Homing Rocks Tracking.md",
+    "12-Video/03-Clips/0003 - Homing Rocks/Homing Rocks Description.md",
+    "19-Work/02-Another test/00-testing job",
+    "19-Work/02-Another test",
+    "19-Work/01-DigiSol/00-Hotel App",
+    "19-Work/01-DigiSol",
+    "19-Work",
+    "04-Work/01-Hotel System",
+    "99-Templates/95-Scripts/test.js",
+    "12-Video/01-Simple Rant/02 - Simple rant 2/Simple Rant : 2 - procrastination.mp4",
+    "12-Video/01-Simple Rant/01 - Simple rant 1/Simple Rant 1.mp4",
+    "14-Book/03-The C programming Language/The C Programming Language - 2nd edition.pdf",
     "80-Gallery/Pasted Image 20221029121616_801.png",
     "80-Gallery/Pasted Image 20230313214352_482.png",
     "80-Gallery/Screenshot_20230205_030330.png",

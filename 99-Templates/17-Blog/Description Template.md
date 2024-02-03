@@ -13,14 +13,12 @@
 🏁: 
 🏹: 0
 🎯: 1
-
 banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
- - Blog
- - Activities
- - Description
-alias: 
-
+  - Blog
+  - Activities
+  - Description
+aliases:
 ---
 # Title
 

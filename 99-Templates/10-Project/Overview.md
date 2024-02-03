@@ -11,8 +11,8 @@ kanban-plugin: basic
 🎟️: 
 🔖: 
 tags:
- - Overview
-alias: 
+  - Overview
+aliases:
 ---
 
 ## To-DO

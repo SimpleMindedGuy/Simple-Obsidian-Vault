@@ -1,5 +1,4 @@
 ---
-
 kanban-plugin: basic
 🌐: 
 🗓️: 
@@ -16,10 +15,10 @@ kanban-plugin: basic
 🏹: 0
 🎯: 1
 tags:
- - Tracking
- - Book
- - Activity
-alias: 
+  - Tracking
+  - Book
+  - Activities
+aliases:
 ---
 
 ## To-do

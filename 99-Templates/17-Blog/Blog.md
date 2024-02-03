@@ -28,11 +28,13 @@ Alias :
 
 List :=> aliases
 
-Dialog :=> {
-Tags :
-}
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
 
-List :=> tags
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
 
 BuildDocument :=>
 

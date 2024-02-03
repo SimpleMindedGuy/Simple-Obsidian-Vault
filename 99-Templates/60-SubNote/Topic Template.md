@@ -10,9 +10,9 @@
 🎟️: 
 🔖: 
 📊: 
-tags: 
- - SubNote
-alias: 
+tags:
+  - SubNote
+aliases:
 ---
 
 # Title

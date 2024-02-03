@@ -21,20 +21,34 @@ Dialog :=> {
 Books to refer to if any
 }
 
-List :=> 📚
+SetSearchQuery :=> ("/")
+SetSearchKey :=> 📚
+GetQueryList :=> menu
+
+
+SetSearchQuery :=> (" #Book And #Description ")
+SetSearchKey :=> 🏷️
+GetQueryList :=> menu2
+
+Menu :=> [!(menu),!(menu2)]
+
+OptionsAdd :=> 📚
 
 Dialog :=> {
 Names to refer to the document
-Alias :
+Alias : 
 }
 
 List :=> aliases
 
-Dialog :=> {
-Tags :
-}
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
 
-List :=> tags
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
+
 
 BuildDocument :=>
 

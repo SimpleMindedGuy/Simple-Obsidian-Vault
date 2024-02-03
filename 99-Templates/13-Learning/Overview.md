@@ -17,7 +17,7 @@ kanban-plugin: basic
 tags:
   - Overview
   - Learning
-alias: 
+aliases:
 ---
 
 ## To-Do

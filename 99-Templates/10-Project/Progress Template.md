@@ -13,11 +13,11 @@
 🏁: 
 🏹: 0
 🎯: 1
-tags: 
- - Progress
- - Activity
- - Project
-alias: 
+tags:
+  - Progress
+  - Activities
+  - Project
+aliases: 
 banner: "![[Gallery/Banner/youtube banner.png]]"
 ---
 

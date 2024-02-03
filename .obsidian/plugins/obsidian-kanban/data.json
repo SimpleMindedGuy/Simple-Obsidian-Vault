@@ -9,5 +9,6 @@
   "tag-colors": [],
   "metadata-keys": [],
   "lane-width": 300,
-  "show-relative-date": true
+  "hide-date-display": false,
+  "date-colors": []
 }

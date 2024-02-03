@@ -1,5 +1,4 @@
 ---
-
 kanban-plugin: basic
 🌐: 
 🗓️: 
@@ -9,9 +8,9 @@ kanban-plugin: basic
 🎟️: 
 🔖: 
 tags:
- - Tracking
- - People
-alias: 
+  - Tracking
+  - People
+aliases:
 ---
 
 ## Unknown yet

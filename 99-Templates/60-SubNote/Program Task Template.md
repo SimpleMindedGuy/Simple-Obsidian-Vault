@@ -1,5 +1,4 @@
 ---
-
 🌐: 
 🗓️: 
 🖋️: 
@@ -18,9 +17,8 @@
 banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
   - SubNote
-alias: 
+aliases: 
 kanban-plugin: advanced
-
 ---
 
 ## TO-DO

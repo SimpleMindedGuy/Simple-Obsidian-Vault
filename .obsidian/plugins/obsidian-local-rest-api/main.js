@@ -46407,7 +46407,7 @@ var RequestHandler = class {
       delete frontmatter.position;
       const directTags = (_c = ((_b = cache.tags) != null ? _b : []).map((tag) => tag.tag)) != null ? _c : [];
       const frontmatterTags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
-      const filteredTags = [...frontmatterTags, ...directTags].map((tag) => tag.replace(/^#/, "")).filter((value, index, self2) => self2.indexOf(value) === index);
+      const filteredTags = [...frontmatterTags, ...directTags].map((tag) => tag.toString().replace(/^#/, "")).filter((value, index, self2) => self2.indexOf(value) === index);
       return {
         tags: filteredTags,
         frontmatter,

@@ -15,11 +15,10 @@
 🎯: 1
 kanban-plugin: basic
 tags:
- - Tracking
- - Blog
- - Activity
-alias: 
-
+  - Tracking
+  - Blog
+  - Activities
+aliases:
 ---
 
 ## To-do

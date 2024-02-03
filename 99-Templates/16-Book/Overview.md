@@ -1,7 +1,6 @@
 ---
-
 kanban-plugin: basic
-🌐 : 
+🌐: 
 🗓️: 
 🖋️: 
 🏷️: 
@@ -9,8 +8,8 @@ kanban-plugin: basic
 🎟️: 
 🔖: 
 tags:
- - Overview
-alias: 
+  - Overview
+aliases:
 ---
 
 ## Planing

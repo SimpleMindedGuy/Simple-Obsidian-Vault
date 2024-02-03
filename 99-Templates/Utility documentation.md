@@ -28,7 +28,7 @@ is anything that can be used as an option to chose from.
 it can be a number, or it can be a text.
 
 ## tags
-a MetaData value that holds all tags inside the document
+A MetaData value that holds all tags inside the document
 
 ## aliases
 A MetaData value that holds all text values that can refer/link to the document
@@ -96,22 +96,25 @@ the Script is going to look for at least 2 default files.
 
 # Commands
 
-## SetValue :=> `value`or `[value1,value2,...]`
-Sets a value or a list of values in a global variable called `value`, that value can then be stored in another variable using the [[99-Templates/Utility documentation#StoreValue value or value1 value2|StoreValue command]].
+## SetValue
+
+SetValue :=> `value`or `[value1,value2,...]`
+
+Sets a value or a list of values in a global variable called `value`, that value can then be stored in another variable using the [StoreValue command](#StoreValue).
 
 
 >[!note] Example
->SetValue:  => hello world
+>SetValue:=> hello world
 >sets the value of `value` to 'hello world'
->StoreValue : => hello   
+>StoreValue :=> hello   
 >stores the value of `value` in the variable `sayHello`
->SetValue : => [1,2,3,4]
+>SetValue :=> [1,2,3,4]
 >set the value of `value`
 >StoreValue :=> Numbers
 >Stores array [1,2,3,4] in the variable `Numbers`
 
 
-## Command Block `{{{:::  <commands>  :::}}}`
+## Command Block
 All Commands have to be inside the command block, the utility will only for the commands inside only one block in the file that is written in the following form.
 ```
 {{{:::
@@ -125,7 +128,12 @@ All Commands have to be inside the command block, the utility will only for the 
 This is made this way to avoid overwriting text that may look like the commands inside the file, and once the utility is done with the commands, it will remove the block from the file.
 
 
-## SetCreatedKey : => `key`, <br> SetModifiedKey : => `key`, <br> SetTitleKey :=> `key`, <br>SetParentKey :=>`key`
+## Setting Default Keys
+
+SetCreatedKey :=> `key`
+SetModifiedKey :=> `key`
+SetTitleKey :=> `key`
+SetParentKey :=>`key`
 
 
 Changes the `Key` for or the `Meta` variable name for the document's Created date/Modified Date/ Title
@@ -133,7 +141,7 @@ Changes the `Key` for or the `Meta` variable name for the document's Created dat
 Those are mostly set in the [config](./Config) file, which will be read and “executed” before running anything else.
 
 >[!note] Example
-> SetCreatedKey : => 🗓️
+> SetCreatedKey :=> 🗓️
 > stead of storing the created date in a 
 > `Created: 21/1/2020` 
 > it stores it like this 
@@ -143,17 +151,21 @@ Those are mostly set in the [config](./Config) file, which will be read and “e
 Those can be later used in data views and other related things.
 
 
-## StoreValue :=> `key`
+## StoreValue
+
+StoreValue :=> `key`
+
 Stores the current value of the global variable `value` in the provided `key` 
 
+## GetValue
 
+GetValue :=> `key`
 
-## GetValue :=> `key`
 Reads a value of the `key` in the current file, and store it in the `value` global variable. 
 
 That value can then later 
 
-## !(`key`)
+## !(key)
 Adds the ability to put a value of a variable into the document instead of just as MetaData. 
 
 for example 
@@ -167,21 +179,94 @@ for example
 the values will be set at the last stage (when building the document or file), to make sure that the key actually refer to a value. 
 
 
-## Dialog :=> { `Text` } 
-can contain any amount of text, The text is later used to be displayed in the input box dialog, to help guide the user with what type of input is expected. 
+## SetSearchQuery
+
+SetSearchQuery :=> `Text`
+
+Sets a value for a variable in the script with the name `SearchQuery` to the provided `Text`.
+This is used in the command [GetQueryList](#GetQueryList), to get information from all functions that fulfil the query specifications.
 
 
-## Menu :=> [`value`,`value`...]
-Makes a list of options to be displayed alongside the Dialog, to allow the user to choose one or many of the list's options. using the following commands
+## SetSearchKey
 
-- [[99-Templates/Utility documentation#Layer Key optional|layer]]
-- [[99-Templates/Utility documentation#Select key|select]]
-- [[99-Templates/Utility documentation#Options key|Options]]
+SetSearchKey :=> `key`
 
-## SelectLayer : => `Key(optional)`
-Displays a prompt that has a text of `dialog` as well as the options in `Menu`, asking the user to choose only one of the options. 
+Sets a value for a variable in the script with the name `SearchKey` to the provided `Text`.
+This is used in the command [GetQueryList](#GetQueryList), to get A list of all the values of `key` in all the files that fulfil the query specifications.
 
->[!warning] Performance vs Order
+## GetQueryList
+
+GetQueryList :=> `key`
+
+> [!note]
+> This command requires Dataview, and A bit of Dataview Query knowledge, check the [Dataview Documentation](https://github.com/blacksmithgu/obsidian-dataview) for more details on how to write a [query](https://blacksmithgu.github.io/obsidian-dataview/queries/structure/). 
+
+
+Performs a Query search, using the `SearchQuey`, and returns a List of all the values of the `SearchKey`, in all the files that fulfil the query specifications. 
+
+This is useful for getting a list of any value in the whole, vault or in a specific folder in the vault, or for all the files that have a specific `tag/s`
+example of how to get All the `tags` in the whole vault.
+
+
+
+> [!example] 
+> SetSearchQuery :=> ("/")
+> SetSearchKey :=> tags
+> GetQueryList :=> menu
+> Menu :=> \[!(menu)\]
+> in this example,  we specify that we want all the files that are children or nested children of the "root" folder of the current vault.
+> we then store all the values of tags for each file, and store them in a list
+> then it is stored in a `meta` `key` with the name menu.
+> Then uses the `key`(menu) to make the next List/Menu for the user to chsoe from
+> this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd) , [Options](#Options), [OptionsAdd](#OptionsAdd).
+
+
+> [!example] 
+> SetSearchQuery :=>  #Activities and #Description
+> SetSearchKey :=> 🏷️
+> GetQueryList :=> menu
+> Menu :=> \[!(menu)\]
+> in this example,  we specify that we want all the files that have the tag `#Activities` and also have the tag `Description` in the whole vault
+> we then store all the values of 🏷️ for each file, and store them in a list
+> then it is stored in a `meta` `key` with the name menu.
+> Then uses the `key`(menu) to make the next List/Menu for the user to chsoe from
+> this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd) , [Options](#Options), [OptionsAdd](#OptionsAdd).
+
+
+
+
+
+
+## Dialog
+
+Dialog :=> { `Text` } 
+
+can contain any amount of text, The text is later used to be displayed in the input box dialogue, to help guide the user with what type of input is expected. 
+
+
+## Menu
+Menu :=> [`value`,`value`...]
+
+Makes a list of options to be displayed alongside the dialogue, to allow the user to choose one or many of the list's options. using the following commands.
+
+- [Selectlayer](#SelectLayer)
+- [Select](#Select)
+- [SelectAdd](#SelectAdd)
+- [Options](#Options)
+- [OptionsAdd](#OptionsAdd)
+
+
+
+
+## SelectLayer
+
+SelectLayer :=> `Key(optional)`
+
+Displays a prompt that has a text of `dialogue` as well as the options in `Menu`, asking the user to choose only one of the options. 
+
+
+>[!warning] 
+>Performance vs Order
 >Too many layers will negatively affect the performance of your vault.
 
 The value is then added to `layers`.
@@ -189,44 +274,76 @@ The value is then added to `layers`.
 If the key is provided, the value is going to be stored in `Meta` using the variable with the name `Key`
 
 
-## AddLayer : => `value`
+## AddLayer
+
+AddLayer :=> `value`
+
 Adds `value` to `layers` without prompting the user.
 
-## Select :=> `key`
+## Select
+Select :=> `key`
 Displays a prompt that has a text of `dialog` as well as the options in `Menu`, asking the user to choose only one of the options. 
 
 The value is then stored in `Meta` using the variable with the name `Key`
 
+### SelectAdd
 
-## Options :=> `key`
-Displays a prompt that has a text of `dialog` as well as the options in `Menu`, asking the user to choose one  or more of the options. 
+SelectAdd :=> `key`
+
+Works the same way as [Select](#Select), but if the `Mnenu` is empty, or if the user Cancels Prompt, it shows an Input Prompt, to add **one** Entry.
+
+## Options
+
+Options :=> `key`
+
+Displays a prompt that has a text of `dialog` as well as the options in `Menu`, asking the user to choose one or more of the options. 
 
 The value/s is then stored in `Meta` using the variable with the name `Key`
 
+### OptionsAdd
 
-## Input :=> `key`
+OptionsAdd :=> `key`
+
+
+Works the same way as [Options](#Options), but if the `Mnenu` is empty, or if the user Cancels Prompt, it shows an Input Prompt, to add one or more Entries.
+
+## Input
+
+Input :=> `key`
+
+
 Displays a prompt that has a text of `dialog` and takes at least one valid input from the user. 
 
 The value is then stored in `Meta` using the variable with the name `Key`
 
-## List :=> `key`
+## List
+
+List :=> `key`
+
+
 Displays a prompt that has a text of `dialog` and takes one or more valid input from the user.
 
 The list will continuously ask for input till the user adds one empty input. 
 
 The value/s is then stored in `Meta` using the variable with the name `Key`
 
-## Check :=> `key`
-Shows an input dialog for the user with options for True/False values.
+## Check
+
+Check :=> `key`
+
+Shows an input dialogue for the user with options for True/False values.
 The value/s is then stored in `Meta` using the variable with the name `Key`.
 
-## NextFile :=> 
+## NextFile
+
+NextFile :=> 
+
 Tells the script to move to the next file in the `layers` list. 
 
 the script will look for the next file, in the template folder 
 
-> [!note] Example
-> if layers have the values [project,type]
+> [!Example]
+> if layers have the values \[project,type\]
 > when reading the `NextFile:=>` command, it then looks in the Template file (`99-Template`, in the default configuration.)
 > for a folder called `porject`, then it looks for a note with the name `project`.
 > then it tries to look for a command block in that note. 
@@ -242,31 +359,53 @@ the script will look for the next file, in the template folder
 
 
 
-## SetDate :=> `date(optional)`
+## SetDate
+
+SetDate :=> `date(optional)`
+
 Sets the `currentDate` variable to the given date value, if there is no given date value, then the `currentDate` is set to a new Date me .
 
 
-## SetDateFormat :=> `value`
+## SetDateFormat
+
+SetDateFormat :=> `value`
+
 Set the `dateformat` variable.
 
 The default value is `YYYY-MM-DDThh:mm:ssZ` and the result would look like this `2020/12/03 - 01:50 pm` [learn more](https://momentjs.com/docs/#/displaying/format/)
 
-## SetDate :=> `key`          
+## SetDate
+
+SetDate :=> `key`
+
 Stores the `currentDate` in `key`
 
   
-##  StoreFormattedDate :=> `key`
+## StoreFormattedDate
+
+StoreFormattedDate :=> `key`
+
+
 Stores the `currentDate` in key, using the last set format, using the `SetDateFormat` Command.
 
 
-## OverviewKey:   => `value`
+## OverviewKey
+
+OverviewKey :=> `value`
+
 Tells the overview file what value to edit when moving items in the kanban file from one list to another, "`key`" is text value that exists in the metadata of the description file.
 
-## OverviewLayer:   => `value` 
+## OverviewLayer
+
+OverviewLayer :=> `value` 
+
+
 Tells the Script at which layer to make the Overview folder, you can only make one overview file within one specific layer.
 
 
-## MoveMedia :=>  `path`
+## MoveMedia
+
+MoveMedia :=>  `path`
 
 Moves attachments from where ever they are, to the specified path.
 
@@ -283,7 +422,10 @@ Moves attachments from where ever they are, to the specified path.
 
 
 
-## BuildDocument : =>
+## BuildDocument
+
+BuildDocument :=>
+
 1. Creates folders if they don't exist
 	- Folders are created based on the `Layers` array.
 	- Folders are created based on their index in ascending order.
@@ -298,16 +440,23 @@ Moves attachments from where ever they are, to the specified path.
 > and any "default" metadata should be written into the file it self.
 
 
-## BuildSubDocument :=>
-Works the same was as [[99-Templates/Utility documentation#BuildDocument]], with the exception of adding the link to the document of which the script is building a Sub-Document, for.
+## BuildSubDocument
+
+BuildSubDocument :=>
+
+
+Works the same was as [BuildDocument](#BuildDocument), with the exception of adding the link to the document of which the script is building a Sub-Document, for.
 
 By default the parent document key is called `parent`, but in the current configuration it is set to ⬅️
 
 The location of where the SubDirectory will be created depends on `layers` list.
 
 
-## BuildSubNote :=> 
-Works the same was as [[99-Templates/Utility documentation#BuildDocument]], with the exception of adding the link to the document of which the script is building a Sub-Document, for.
+## BuildSubNote
+
+BuildSubNote :=> 
+
+Works the same was as [BuildDocument](#BuildDocument), with the exception of adding the link to the document of which the script is building a Sub-Document, for.
 
 By default the parent document key is called `parent`, but in the current configuration it is set to ⬅️
 
@@ -322,7 +471,10 @@ And it only starts building document folders using the `layers` list, starting f
 > and then it makes a Numbered file, using the Chosen Template, in the SubNote Folder.
 
 
-## BuildInFile : =>
+## BuildInFile
+
+BuildInFile :=>
+
 Used only to Take input from the user, and then use it to write metadata in the current file. 
 
 

@@ -1,5 +1,4 @@
 ---
-
 🌐: 
 🗓️: 
 🖋️: 
@@ -20,9 +19,8 @@ tags:
   - Wrok
   - Activities
   - Description
-alias: 
+aliases: 
 kanban-plugin: advanced
-
 ---
 
 ## TO-DO

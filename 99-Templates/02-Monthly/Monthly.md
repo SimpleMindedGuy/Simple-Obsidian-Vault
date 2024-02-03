@@ -20,25 +20,62 @@
 😶: 
 🗓️: <%   tp.date.now ("") %>
 🖋️: 
-🏷️: "" 
-tags: 
- - Monthly
-alias: 
- - <%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY-MM") %>
-
-
+🏷️: ""
+tags:
+  - Monthly
+aliases:
+  - <%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY-MM") %>
 dayName: "{{date: dddd}}"
-day: {{ date: DD }}
-
+day:
+  "{ date: DD }": 
 monthNmber: "{{date: MMMM}}"
-month: {{ date: MM }} 
-
-week: {{ date: ww }}
-year: {{ date: YYYY }}
-
+month:
+  "{ date: MM }": 
+week:
+  "{ date: ww }": 
+year:
+  "{ date: YYYY }": 
 banner: "![[80-Gallery/Banner/youtube banner.png]]"
 banner_icon: 🗓️
 ---
+# Title
+
+Input :=> 🏷️
+
+Dialog :=> {
+Books to refer to if any
+}
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> 📚
+GetQueryList :=> menu
+
+
+SetSearchQuery :=> (" #Book And #Description ")
+SetSearchKey :=> 🏷️
+GetQueryList :=> menu2
+
+Menu :=> [!(menu),!(menu2)]
+
+OptionsAdd :=> 📚
+
+Dialog :=> {
+Names to refer to the document
+Alias : 
+}
+
+List :=> aliases
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
+
+List :=> tags
+
 
 ## Days
 

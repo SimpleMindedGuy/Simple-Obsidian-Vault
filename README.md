@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This is my obsidian vault setup with all my scripts, and utilities. 
+This is my obsidian vault self up with all my scripts, and utilities. 
 
-The goal of this setup is to make Making documents and Organizing them much easier, as well as Habit tracking and data visualization.
+The goal of this setup is to make Making documents and organizing them much easier, as well as Habit tracking and data visualization.
 It is still under development, and the script could still needs a lot of documentation, but this version works almost perfectly, If you find any bugs please report that in the issues section.
 
 
@@ -17,13 +17,13 @@ This is a Script that reads a file, and looks for specific commands within it, t
 
 It is meant to simplify scripts that do useful things, like where to create files, what kind of Data is expected for those files and how to group them together based on Options that are provided for the user.
 
-Look up the [Utility documentation](./99-Templates/Utility%20documentation.md) for the Script for more information on what commands do, If you have any suggestions for commands, please create an issue ticket for it, preferably with an `enhancement` label.
+Look up the [Utility documentation](./99-Templates/Utility%20documentation) for the Script for more information on what commands do, If you have any suggestions for commands, please create an issue ticket for it, preferably with an `enhancement` label.
 
 ### Habit tracking
 
 Added some script to read Daily, Weekly, And Monthly note's **MetaData** to display them using graphs and tables, the variables themselves are customizable, all you have to do is edit the 3 files, the editing process is a little lengthy currently, and I'm trying to work out a way to make that process shorter.
 
-But currently it only works for data that is collected from periodic notes, Read the [Habit Tracking Documentation](./99-Templates/Habit%20Tracking%20Documentation.md) for more information, and understand how it works.
+But currently it only works for data that is collected from periodic notes, Read the [documentation](./99-Templates/Habit%20Tracking%20Documentation) for more information, and understand how it works.
 
 >[!important] 
 > You need to make sure that the variables names exactly match the ones you're looking for, and those same variables have to also be included in the templates you're trying to set its value in 
@@ -33,7 +33,7 @@ But currently it only works for data that is collected from periodic notes, Read
 ## Necessary Plugins
 Using a collection of plugins mainly
 This script would be basically impossible for me due to my limited knowledge.
-- [bsidian-periodic-notes](https://github.com/liamcain/obsidian-periodic-notes)
+- [obsidian-periodic-notes](https://github.com/liamcain/obsidian-periodic-notes)
 	For Managing Daily notes
 - [obsidian-kanban](https://github.com/mgmeyers/obsidian-kanban)
 	To track documents status, and documents progress
@@ -50,3 +50,12 @@ This script would be basically impossible for me due to my limited knowledge.
 - [buttons](https://github.com/shabegom/buttons)
 	Fort executing Templater  commands.
 
+# License
+The script (all files in the [99-Templater](./99-Templater), [90-CustomJS](./90-CustomJS), [DataView](./98-DataView) ) is licenced under the  MIT License
+```
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```

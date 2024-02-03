@@ -15,10 +15,10 @@
 🎯: 1
 banner: "![[Banner/typewriter.jpg]]"
 tags:
- - People
- - Personal
- - Description
-alias:
+  - People
+  - Personal
+  - Description
+aliases:
 ---
 # Title
 introduction

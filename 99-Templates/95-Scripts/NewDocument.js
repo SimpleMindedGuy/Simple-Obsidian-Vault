@@ -1,3 +1,15 @@
+
+
+/**
+ * Stops the script from executing and applies no changes to anything. 
+ * Conditions : 
+ * - When user does not provide a valid mandatory value. 
+ * @date 03/02/2024 - 01:03:21
+ *
+ * @type {boolean}
+ */
+let BreakScript = false;
+
 /**
  * The time given for a function before it finishes.
  * if the function dose not return anything, the function is then suspended, and it the value null is given. 
@@ -131,6 +143,19 @@ let createdKey="Created",
     parentKey= "Parent",
     OverviewKey= null,
     OverviewLayer= null
+
+
+
+/**
+ * Values used for using Dataview to search for Keys, using search filters
+ * @date 02/02/2024 - 23:34:17
+ * @typedef {string} SearchQuery - Use to make a query of all the files that full fill those properties.
+ * @typedef {string} SearchKey - The key that holds the returned value. 
+ * @typedef {string[]|number[]} SearchData - A list of all values matching the query.
+ */
+let SearchQuery ="",
+    SearchKey = "",
+    SearchData;
 
 
 
@@ -442,6 +467,12 @@ async function RunCommands(CommandLines,tp){
         console.log(`Command : ${Command}`)
         console.log(`Argument : ${Argument}`)
         await Commands[Command](Argument,tp)
+        // stop executing the script.
+        if(BreakScript)
+        {
+            new Notice("You provided null/invalid value for a mandatory input.\nScript cannot continue.")
+            break;
+        }
     }
 }
 
@@ -639,16 +670,19 @@ async function Dialog(Argument,tp){
  * @async
  * @param {string|undefined} Argument
  * @param {object|null} tp
- * @returns {Promise<void>}
+ * @returns {Promise<String[]|null>}
  */
 async function Menu(Argument,tp){
     console.log(`Setting new Menu to`);
 
+    let list = []
     if(!Argument)
     {
         console.warn(`Cannot get new menu values form Null/Undefined`)
-        console.warn(Argument)
-        return
+        list = []
+        console.warn(`Seeting menu to an empty menu`)
+        console.log(menu)
+        return list
     }
     const Bracet= new RegExp(/((?<=\ *\[)([\u0000-\u0008|\u0010-\uffff])+(?=\ *\]))/gm)
 
@@ -660,13 +694,15 @@ async function Menu(Argument,tp){
 
     if(!isMatch)
     {
+        menu = new Array
         console.warn(`No menu items found `)
-        console.warn(isMatch)
-        return 
+        console.warn(`Seeting menu to an empty menu`)
+        console.log(menu)
+        return  null
     }
-    menu = isMatch[0].split(",");
-
+    // prevent duplicates
     console.log(menu);
+    return [...new Set(isMatch[0].split(","))]
 }
 
 
@@ -1680,6 +1716,7 @@ async function MakeBuildPath(tp,BuildRoot,BuildList,isNumbered,MakeOverview){
             // Getting kanbanHelper from MetaData
             let MetaEdit =  await app.plugins.plugins["metaedit"].settings.KanbanHelper;
             
+            
             // making sure that that over view key is set/provided
             if(!OverviewKey)
             {
@@ -1851,36 +1888,109 @@ async function GetOptionalTemplates(TemplateList,isMultiTemplate,tp){
 
 }
 
-
 /**
- * Gets an array of all the directories inside the given Directory{@link dir}
+ * Gets an list/array of all the values of the {@link SearchKey}, using the {@link SearchQuery}
+ * Stores that list/array in {@link Value}
  * @date 02/02/2024 - 21:12:08
- *
+ * @param {String} SearchQuery The query of the Search 
+ * @param {String} SearchKey The requested Value to be returned
  * @async
- * @param {String} dir
  * @returns {Promise<Object[]|null>}
  */
-async function GetDocuemntsNamesFromDirectory(dir)
+async function GetQueryList(SearchQuery,SearchKey)
 {
-    const Directory = await app.vault.getAbstractFileByPath(`${dir}`)
+    let List = [];
+    let Dataview =  await app.plugins.plugins["dataview"].api;
 
-    if (!Directory)
+    console.log(`Starting a Search Query `)
+    console.log(`SearchQuery is : `)
+    console.log(SearchQuery)
+    console.log(`SearchKey is : `)
+    console.log(SearchKey)
+
+    if(!Dataview)
     {
-        console.log(`Directory dose not exist`)
-        new Notice(`Directory dose not exist`)
+        console.warn(`dataview was not provided, install dataview to be able to use "GetQueryList" command.`)
+        new Notice(`dataview was not provided, install dataview to be able to use "GetQueryList" command.`,20000)
+        return null
+    }
+    
+    if(SearchQuery == ""|| !SearchQuery)
+    {
+        console.warn(`Query is was not provided, cannot query nothing, if you want to query all files provide directry\nUsing the command: \nSetSearchQuery :=> Query\nusing the follwing format \n("<directory>") or ("/")\n
+        please note that prenthesis are required`);
+        new Notice(`Query is was not provided, cannot query nothing, if you want to query all files provide directry \nusing the follwing format \n("<directory>") or ("/")\n
+        please note that prenthesis are required`,20000);
         return null
     }
 
-    let Documents = []
-    console.log(`Getting Documents`)
-    for(const Doc in Directory.children)
+    if(SearchQuery == ""|| !SearchQuery)
     {
-        Documents.push(Doc.name);
+        console.warn(`Query key is not provided the sceript dose not know what query to search for\nUse the command\nSetSearchKey :=> key\nto set hte query key.`);
+        new Notice(`Query key is not provided the sceript dose not know what query to search for\nUse the command\nSetSearchKey :=> key\nto set hte query key.`,20000)
+        return null
     }
 
-    new Notice(`Got Documents names from Directory ${Directory.name}`)
-    return Documents;
+    let Pages = await Dataview
+    .pages(`${SearchQuery}`)
+    // .where(p => p[`🗓️`] > `2022/09/19`)
+
+    for (const page of Pages)
+    {
+        console.log(page[`${SearchKey}`])
+        console.log(page.file.link)
+        
+        if(!page[`${SearchKey}`])
+        {
+            continue
+        }
+        if(Array.isArray(page[`${SearchKey}`]))
+        {
+            List = [ ...List , ...page[`${SearchKey}`] ]
+            continue
+        }
+
+        List.push(page[`${SearchKey}`]);
+
+    }
+    console.log(`Query List is : `)
+    console.log(List)
+    List = [...new Set([...List])]
+    return List
 }
+
+
+
+// /**
+//  * Gets an array of all the directories inside the given Directory{@link dir}
+//  * @date 02/02/2024 - 21:12:08
+//  *
+//  * @async
+//  * @param {String} dir
+//  * @returns {Promise<Object[]|null>}
+//  */
+// async function GetDocuemntsNamesFromDirectory(dir)
+// {
+//     const Directory = await app.vault.getAbstractFileByPath(`${dir}`)
+
+//     if (!Directory)
+//     {
+//         console.log(`Directory dose not exist`)
+//         new Notice(`Directory dose not exist`)
+//         return null
+//     }
+
+//     let Documents = []
+//     console.log(`Getting Documents`)
+//     for(const Doc in Directory.children)
+//     {
+//         Documents.push(Doc.name);
+//     }
+
+//     new Notice(`Got Documents names from Directory ${Directory.name}`)
+//     return Documents;
+// }
+
 
 /**
  * Adds th provided {@link file} to {@link Overview} if exists.
@@ -1965,7 +2075,6 @@ async function AddDocuemntToOverview(file){
  * @async
  * @param {object} tp - templater object to display dialog, and take user input.
  * @param {string} text - text for the dialog
- * @param {string} argument - key to store user choises in meta.
  * @param {Array} list - list for user to choose from.
  * @param {Object} Options - Set of options for how the functions works 
  * @param {boolean} Options.isMultiple - allow user to choose muliple options.
@@ -1973,14 +2082,15 @@ async function AddDocuemntToOverview(file){
  * @param {boolean} Options.isExpanding - allows uer to add an option if the option dose not exist, in the list. 
  * @returns {Promise<string|string[]|null>}
  */
-async function getUserChoise(tp,text,argument,list,Options){
+async function getUserChoise(tp,text,list,Options){
 
+    const noti = new Notice(`${text}`,99999999)
     console.log(`choosing from menu :`)
     
     const {isExpanding,isMultiple,isOptional} = Options
     
     
-    let optionList = JSON.parse(JSON.stringify(list));
+    let optionList = JSON.parse(JSON.stringify(list.toString().split(",")));
     console.log(optionList)
     // store error messages
     let errormsg =``;
@@ -1989,50 +2099,73 @@ async function getUserChoise(tp,text,argument,list,Options){
     let UserChoise
     let choises = 0
 
+    const isList = await (list.length > 0)
+    if(!isList)
+    {
+
+        if(isExpanding)
+        {
+            text += `\nAdd Item/s if you could not find them`; 
+            noti.setMessage(text)
     
-    const noti = new Notice(`${text}`,99999999)
+            UserChoise =  await getUserEntry(tp,text,isMultiple,isOptional)
+    
+            return UserChoise
+        }
+        return null
+    }
 
-
-    while(isChoosing){
+    while(isChoosing)
+    {
         console.log('is choosing')
 
 
         // display a dialog using templater
         // let Choise = await tp.system.prompt(text+MenuList+`\n`+errormsg,"",true)
 
-        let Choise = await tp.system.suggester(optionList,optionList,true,text)
+        let Choise = await tp.system.suggester(optionList,optionList,false,text)
         errormsg =""
 
-        console.log(`Choise : ${Choise}`)
-        if(list.length - 1 - choises == 0)
+        console.log(`Choise dis thing : ${Choise}`)
+        if(list.length - 1 - choises < 0)
         {
             console.log(`No more options, exiting the loop`)
             // change loop boolean to false
             isChoosing =  false;
+
+           
+
             continue;
         }
 
-        if(Choise == undefined)
+        if(!Choise)
         {
+            if(isExpanding)
+            {
+                console.log(`Choise is expanding`)
+                text += `\nAdd Item/s if you could not find them`; 
+                noti.setMessage(text)
+
+                UserChoise =  await getUserEntry(tp,text,isMultiple,isOptional)
+
+                
+            }
+
             // checks the input is mandatory.
-            // if the input is optional, and exist on empty entry
+            // return null, which will stop the whole script
             if(!isOptional)
             {
                 errormsg ="Choise is required"
-                noti.setMessage(`${text}\n${errormsg}`);
+                new Notice(`${errormsg}`);
 
-                continue;
             }
 
-            if(isExpanding)
-            {
-                await getUserEntry(tp,text,argument,isMultiple,isOptional)
-            }
             // change loop boolean to false
             console.log(`user exiting the loop`)
 
 
             isChoosing =  false;
+            continue
         }
 
         // if the choise is out of bounds re run the loob with a error message
@@ -2051,12 +2184,8 @@ async function getUserChoise(tp,text,argument,list,Options){
             isChoosing =  false;
             // Store choise in argument key
             UserChoise= Choise
-            console.log(`choise : ${Choise} => ${Choise}`)
+            console.log(`choise :`)
             console.log(Choise)
-            console.log(`=>`)
-            console.log(Choise)
-            console.log(`=> in a variable called `)
-            console.log(argument)
 
             continue;
         }
@@ -2069,7 +2198,7 @@ async function getUserChoise(tp,text,argument,list,Options){
         UserChoise.push(Choise);
         choises++;
         // Store choise in argument key
-        console.log(`choise : ${Choise} => ${Choise} added to `);
+        console.log(`choise : ${Choise}`);
         console.log(`Chosen options `);
         console.log(UserChoise);
 
@@ -2088,13 +2217,6 @@ async function getUserChoise(tp,text,argument,list,Options){
     console.log(`User choise is :`)
     console.log(UserChoise)
 
-    console.log(`Stored in key/virable called : ${argument}`)
-
-    if(argument)
-    {
-        Meta[argument] = UserChoise;
-    }
-
     setTimeout(noti.hide(),TimeLimit)
 
     return UserChoise
@@ -2108,12 +2230,11 @@ async function getUserChoise(tp,text,argument,list,Options){
  * @async
  * @param {object} tp - templater object to display dialog, and take user input.
  * @param {string} text - text for the dialog
- * @param {string} argument - key to store user choises in meta.
  * @param {boolean} isMultiple - allow user to choose muliple options.
  * @param {boolean} isOptional - allow user to not choise any option.
  * @returns {Promise<string|string[]|null>}
  */
-async function getUserEntry(tp,text,argument,isMultiple,isOptional){
+async function getUserEntry(tp,text,isMultiple,isOptional){
 
     console.log(`Making a list of items`)
 
@@ -2183,13 +2304,9 @@ async function getUserEntry(tp,text,argument,isMultiple,isOptional){
 
     console.log(`Entrie is :  `)
     console.log(UserEntries)
-    console.log(`Stored in key/virables called : ${argument}`)
 
 
-    if(argument)
-    {
-        Meta[argument]= UserEntries;
-    }
+
 
     return  UserEntries
 }
@@ -2473,7 +2590,35 @@ const Commands = {
             isExpanding: false,
         }
 
-        await getUserChoise(tp,dialog,Argument,menu,Options)
+        let choise = await getUserChoise(tp,dialog,menu,Options)
+
+        Meta[Argument] = choise;
+
+
+        if(!choise || Array.isArray(choise))
+        {
+            return
+        }
+        // await Select(Argument,tp)
+    },
+    SelectAdd : async (Argument,tp)=>{
+        Argument = await ReplaceValues(Argument)
+
+        const Options= {
+            isMultiple: false,
+            isOptional: false,
+            isExpanding: true,
+        }
+
+        let choise = await getUserChoise(tp,dialog,menu,Options)
+
+        
+        
+        if(!choise || Array.isArray(choise))
+        {
+            return
+        }
+        Meta[Argument] = choise;
         // await Select(Argument,tp)
     },
     SelectLayer : async(Argument,tp)=>{
@@ -2485,12 +2630,16 @@ const Commands = {
             isExpanding: false,
         }
 
-        let choise = await getUserChoise(tp,dialog,Argument,menu,Options)
+        let choise = await getUserChoise(tp,dialog,menu,Options);
 
-        if(!choise || Array.isArray(choise))
+        
+        if(!choise  || Array.isArray(choise))
         {
+            BreakScript = true;
             return
         }
+
+        Meta[Argument] = choise;
         layers.push(choise);
 
     },
@@ -2507,10 +2656,28 @@ const Commands = {
         const Options= {
             isMultiple: true,
             isOptional: true,
+            isExpanding: false,
+        }
+
+        let choise = await getUserChoise(tp,dialog,[menu],Options);
+
+        Meta[Argument] = choise;
+
+        // await Options(Argument,tp)
+    },
+    OptionsAdd: async(Argument,tp)=>{
+
+        Argument = await ReplaceValues(Argument);
+        const Options= {
+            isMultiple: true,
+            isOptional: true,
             isExpanding: true,
         }
 
-        await getUserChoise(tp,dialog,Argument,menu,Options)
+        let choise = await getUserChoise(tp,dialog,[menu],Options);
+
+        Meta[Argument] = choise;
+
         // await Options(Argument,tp)
     },
     Check : async(Argument,tp)=>{
@@ -2522,17 +2689,28 @@ const Commands = {
             isExpanding: false,
         }
 
-        await getUserChoise(tp,dialog,Argument,[false,true],Options);
+        let choise = await getUserChoise(tp,dialog,[false,true],Options);;
+        
+
+        if(choise === null)
+        {
+            Meta[Argument] = false
+        }
+        else
+        {
+            Meta[Argument] = choise;
+        }
+
         // await Check(Argument,tp)
     },
     Input : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
-        await getUserEntry(tp,dialog,Argument,false,false);
+        Meta[Argument] = await getUserEntry(tp,dialog,false,false);
         // await Input(Argument,tp)
     },
     List : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
-        await getUserEntry(tp,dialog,Argument,true,true);
+        Meta[Argument] = await getUserEntry(tp,dialog,true,true);
         // await List(Argument,tp)
     },
     SetDate : async(Argument,tp)=>{
@@ -2551,11 +2729,22 @@ const Commands = {
         Argument = await ReplaceValues(Argument);
         await StoreFormattedDate(Argument,tp);
     },
+    SetSearchQuery : async(Argument,tp)=>{
+        Argument = await ReplaceValues(Argument);
+        SearchQuery = Argument;
+    },
+    SetSearchKey : async(Argument,tp)=>{
+        Argument = await ReplaceValues(Argument);
+        SearchKey = Argument;
+    },
+    GetQueryList : async(Argument,tp)=>{
+        Argument = await ReplaceValues(Argument);
+        Meta[Argument] = await GetQueryList(SearchQuery,SearchKey);
+        console.log(Meta[Argument])
+    },
     GetValue : async (Argument, tp) =>{
         Argument = await ReplaceValues(Argument);
-        await GetValue(Argument,tp)
-        
-        
+        await GetValue(Argument,tp);
     },
     SetValue : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
@@ -2669,7 +2858,7 @@ const Commands = {
 function TimeoutAfter(CallBack,TimeLimit){
     return new Promise(async(resolve,reject)=>{
         
-        console.log(`starting function timer`)
+        // console.log(`starting function timer`)
         const Exec = setTimeout(()=>{
             console.log(`Function timed out`)
             clearTimeout(Exec)

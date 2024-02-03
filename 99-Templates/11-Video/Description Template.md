@@ -15,10 +15,10 @@
 🎯: 1
 banner: "![[Banner/descriptionbanner.png]]"
 tags:
- - Video
- - Activities
- - Description
-alias: 
+  - Video
+  - Activities
+  - Description
+aliases:
 ---
 
 # Title

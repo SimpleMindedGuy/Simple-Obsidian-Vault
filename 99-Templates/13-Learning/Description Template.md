@@ -13,12 +13,11 @@
 🏁: 
 🏹: 0
 🎯: 1
-tags: 
- - Learning
- - Activities
- - Description
-alias: 
-
+tags:
+  - Learning
+  - Activities
+  - Description
+aliases: 
 banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
 ---
 

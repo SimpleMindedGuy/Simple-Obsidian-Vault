@@ -61,19 +61,19 @@ Did you read the Quran today ?
 Check :=> 📖
 
 Dialog :=> {
-how many reading hours  hours ?
+how many reading hours ?
 }
 
 Input :=> 📕
 
 Dialog :=> {
-how many work hours
+how many work hours ?
 }
 
 Input :=> 💼
 
 Dialog :=> {
-How many projects work hours
+How many projects work hours ?
 }
 
 Input :=> 💻
@@ -91,7 +91,7 @@ How many bad things done today ?
 Input :=> ⛔
 
 Dialog :=> {
-How many meals did you eat today
+How many meals did you eat today ?
 }
 Input :=> 🍱
 
@@ -102,39 +102,45 @@ how much candy/sweets did you eat today ?
 Input :=> 🍩
 
 Dialog :=> {
-how much tea did you drink today (cups)
+how much tea did you drink today (cups) ?
 }
 
 Input :=> 🍵
 
 Dialog :=> {
-Money Gained today?
+Money Gained today ?
 }
 
 Input :=> 💰
 
 Dialog :=> {
-Money Spent
+Money Spent ?
 }
 Input :=> 💵
 
 Dialog :=> {
-Items bought
+How many items you bought today ?
 }
 
 Input :=> 💳
 
 Dialog :=> {
-Enter Today's Title
+Enter Today's Title ?
 }
 
 Input :=> 🏷️
 
 Dialog :=> {
-Tags
+What tags you want to use ?
 }
 
-List :=> tags
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
 
 Dialog :=> {
 Aliases
@@ -144,7 +150,7 @@ List :=> aliases
 
 Menu :=> ['😡 rage','😒 bitter','😭 sad','😫 frustrated','😨 scared','😶 lonely','😖 Guilty','😞 disappointed','😓 hopeless','😟 worried','😮‍💨 exhausted','😖 anxious','🤢 sick','😄 happy','😆 satisfied','😲 surprised','😂 joyful','😐 ok']
 
-Select :=> 😶
+Option :=> 😶
 
 BuildInFile :=>
 

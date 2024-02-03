@@ -14,10 +14,10 @@
 🏹: 0
 🎯: 1
 tags:
- - Project
- - Activities
- - Description
-alias: 
+  - Project
+  - Activities
+  - Description
+aliases: 
 banner: "![[Gallery/Banner/descriptionbanner.png]]"
 ---
 

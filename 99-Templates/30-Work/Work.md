@@ -1,18 +1,23 @@
 {{{:::
 Dialog :=> {
-Choose what company you're doing the work for
+Choose/Add what company you're doing the work for
+
 }
 
-GetDocumentsFrom :=> !(🎫)
-SetValue :=> menu
+SetSearchQuery :=> #Work and #Description
+SetSearchKey :=> 🏷️
+GetQueryList :=> menu
 
-Menu :=> !(menu)
-SelectLayer :=> 🎟️
+Menu :=> [!(menu)]
+
+SelectAdd :=> 🎟️
+
+AddLayer :=> !(🎟️)
 
 SetOverviewLayer :=> !(🎫)
 
 Dialog :=> {
-What Type of work Are you doing. 
+What Type of work are you doing. 
 }
 
 Menu :=>[Front-End,Back-End,Full-Stack,Design,Integrated-System]
@@ -42,7 +47,15 @@ Dialog :=> {
 Tags :
 }
 
-List :=> tags
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
 
 BuildDocument :=>
 :::}}}
+
+

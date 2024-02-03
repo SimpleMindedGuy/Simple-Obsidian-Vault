@@ -13,11 +13,11 @@
 🏁: 
 🏹: 0
 🎯: 1
-tags: 
- - Progress
- - University
- - Activities
-alias: 
+tags:
+  - Progress
+  - University
+  - Activities
+aliases: 
 banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
 ---
 

@@ -14,12 +14,11 @@
 🏹: 0
 🎯: 1
 banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
-alias: 
-tags: 
- - Book
- - Description
- - Activity
-
+aliases: 
+tags:
+  - Book
+  - Description
+  - Activities
 ---
 
 #  Title

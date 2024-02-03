@@ -16,11 +16,12 @@
 🎯: 1
 banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
- - Wrok
- - Activities
- - Description
-alias: 
-
+  - Activities
+  - Description
+  - Work
+aliases:
 ---
 # Title
+
+## Description
 

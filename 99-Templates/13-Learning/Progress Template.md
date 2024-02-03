@@ -13,11 +13,11 @@
 🏁: 
 🏹: 0
 🎯: 1
-tags : 
- - Personal
- - Problem
- - Progress
-alias: 
+tags:
+  - Personal
+  - Problem
+  - Progress
+aliases:
 ---
 
 
