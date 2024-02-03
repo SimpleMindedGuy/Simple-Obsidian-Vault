@@ -43,41 +43,6 @@ banner_icon: 🗓️
 
 # Title 
 
-Input :=> 🏷️
-
-Dialog :=> {
-Books to refer to if any
-}
-
-SetSearchQuery :=> ("/")
-SetSearchKey :=> 📚
-GetQueryList :=> menu
-
-
-SetSearchQuery :=> (" #Book And #Description ")
-SetSearchKey :=> 🏷️
-GetQueryList :=> menu2
-
-Menu :=> [!(menu),!(menu2)]
-
-OptionsAdd :=> 📚
-
-Dialog :=> {
-Names to refer to the document
-Alias : 
-}
-
-List :=> aliases
-
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-OptionsAdd :=> tags
-
-
 
 
 [[/02-Monthly/{{date: YYYY}}/<%moment("{{date: YYYY}}-01").format("YYYY-MM")%>|<%moment("{{date: YYYY}}-01").format("MMMM")%>]]
@@ -129,3 +94,41 @@ customJS.DvMonthlyCharts.renderYear({
 
 
 
+{{{:::
+<%* tp.user.NewDocument(tp,true) %>
+Input :=> 🏷️
+
+Dialog :=> {
+Books to refer to if any
+}
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> 📚
+GetQueryList :=> menu
+
+
+SetSearchQuery :=> (" #Book And #Description ")
+SetSearchKey :=> 🏷️
+GetQueryList :=> menu2
+
+Menu :=> [!(menu),!(menu2)]
+
+OptionsAdd :=> 📚
+
+Dialog :=> {
+Names to refer to the document
+Alias : 
+}
+
+List :=> aliases
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
+
+
+:::}}}

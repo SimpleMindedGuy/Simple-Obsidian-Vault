@@ -1,5 +1,6 @@
-<%* tp.user.NewDocument(tp,true) %>
 
 {{{:::
 MoveMedia :=> 
 :::}}}
+
+<%* tp.user.NewDocument(tp,true) %>

@@ -1,6 +1,6 @@
 
 
-<%* tp.user.NewDocument(tp,true) %>
+
 
 {{{:::
 
@@ -24,3 +24,4 @@ BuildSubNote :=>
 
 
 :::}}}
+<%* tp.user.NewDocument(tp,true) %>

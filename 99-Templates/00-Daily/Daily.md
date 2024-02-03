@@ -37,6 +37,50 @@ banner_icon: 📆
 # Title
 {{date: dddd - [W]ww}} - {{date: MM - MMMM}} - {{date: DD/MM/YYYY - hh:mm a}}
 
+talk about your day and thoughts in the moment
+
+## What happened today 
+
+## What I learned today
+### What I thought about it then
+
+### what I thought about it what
+
+### Did I act well 
+
+## Did I think about anything 
+### What's my initial thought 
+
+### Did I change my mind
+
+## Final thoughts
+
+### Things I want to change
+
+### Talk about future
+
+## Today's Taks
+- [ ] tidy up the room. 
+- [ ] Pray Fajhr
+- [ ] Eat breakfast
+- [ ] 20 Pages of the Qur'an
+- [ ] Pray Duhr
+- [ ] 1 Hour Math
+- [ ] 1 Hour Reading
+- [ ] Pray Asr
+- [ ] 2-4 Hours Project
+- [ ] Pray Maghrib
+- [ ] Pray Isha
+
+
+```button
+name Diary Media
+type append template
+action Commands/MoveDiaryMedia
+templater true
+```
+^DiaryMedia
+
 
 {{{:::
 <%* tp.user.NewDocument(tp,true) %>
@@ -149,51 +193,8 @@ List :=> aliases
 
 Menu :=> ['😡 rage','😒 bitter','😭 sad','😫 frustrated','😨 scared','😶 lonely','😖 Guilty','😞 disappointed','😓 hopeless','😟 worried','😮‍💨 exhausted','😖 anxious','🤢 sick','😄 happy','😆 satisfied','😲 surprised','😂 joyful','😐 ok']
 
-Option :=> 😶
+Options :=> 😶
 
 BuildInFile :=>
 
 :::}}}
-talk about your day and thoughts in the moment
-
-## What happened today 
-
-## What I learned today
-### What I thought about it then
-
-### what I thought about it what
-
-### Did I act well 
-
-## Did I think about anything 
-### What's my initial thought 
-
-### Did I change my mind
-
-## Final thoughts
-
-### Things I want to change
-
-### Talk about future
-
-## Today's Taks
-- [ ] tidy up the room. 
-- [ ] Pray Fajhr
-- [ ] Eat breakfast
-- [ ] 20 Pages of the Qur'an
-- [ ] Pray Duhr
-- [ ] 1 Hour Math
-- [ ] 1 Hour Reading
-- [ ] Pray Asr
-- [ ] 2-4 Hours Project
-- [ ] Pray Maghrib
-- [ ] Pray Isha
-
-
-```button
-name Diary Media
-type append template
-action Commands/MoveDiaryMedia
-templater true
-```
-^DiaryMedia

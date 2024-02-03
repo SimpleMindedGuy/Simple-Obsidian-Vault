@@ -14,7 +14,8 @@ tags:
 aliases:
 ---
 
-# {{date: ( DDDD ) YYYY-MM-DD }}
+# 
+!(🗓️)
 
 ## Clocked in at {{date: hh:mm a}}
 

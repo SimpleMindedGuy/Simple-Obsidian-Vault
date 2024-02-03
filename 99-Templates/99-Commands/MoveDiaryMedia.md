@@ -1,4 +1,3 @@
-<%* tp.user.NewDocument(tp,true) %>
 
 {{{:::
 
@@ -19,3 +18,5 @@ StoreFormattedDate :=> Y
 MoveMedia :=> 81-DailyFiles/Year-!(Y)/Month-!(M)/Day-!(D)
 
 :::}}}
+
+<%* tp.user.NewDocument(tp,true) %>

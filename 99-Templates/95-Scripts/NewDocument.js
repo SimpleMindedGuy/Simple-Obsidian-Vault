@@ -243,17 +243,20 @@ async function main(tp,Active){
         return
     }
 
-    currentFile = await app.workspace.getActiveFile()
+    setTimeout(async ()=>{
+        currentFile = await app.workspace.getActiveFile()
 
-    console.warn(`Reading active file `)
-    console.log(currentFile)
-
-
-    await RunFileCommands(currentFile,tp)
-    console.warn(`Meta`);
-    console.warn(Meta);
-
-    await RemoveCommandBlock(currentFile)
+        console.warn(`Reading active file `)
+        console.log(currentFile)
+    
+    
+        await RunFileCommands(currentFile,tp)
+        console.warn(`Meta`);
+        console.warn(Meta);
+    
+        await RemoveCommandBlock(currentFile)
+    },100)
+    
 
 }
 
@@ -275,7 +278,7 @@ async function RunFileCommands(File,tp)
 
     
     const FileText = await app.vault.read(File)
-
+    console.log(FileText)
     console.log(`/////////////////////\nReading file CommandBlock`)
     
     const FileCommandsBlock = await getCommandsBlock(FileText)
@@ -308,7 +311,7 @@ async function RunFileCommands(File,tp)
  */
 async function RemoveCommandBlock(file){
 
-    const CommandBlockRegExp = new RegExp(/(?<=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)^\n*{{3}:{3}(.*?)\:{3}}{3}\n*?(?=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)/smgi);
+    const CommandBlockRegExp = new RegExp(/(?<=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)^\n*{{3}:{3}(.*?)\:{3}}{3}\n*(?=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)/smgi);
 
     let Text = await app.vault.read(file)
 
@@ -2250,7 +2253,7 @@ async function getUserEntry(tp,text,isMultiple,isOptional){
         console.log('is Entering')
         // display a dialog using templater
 
-        let Entry = await tp.system.prompt(text+MenuText+`\n`+errormsg,"",true)
+        let Entry = await tp.system.prompt(text+MenuText+`\n`+errormsg,"",false)
         // re-setting, menu choises.
 
         console.log(Entry)
