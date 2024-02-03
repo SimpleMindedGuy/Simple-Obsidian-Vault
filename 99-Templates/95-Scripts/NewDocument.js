@@ -670,7 +670,7 @@ async function Dialog(Argument,tp){
  * @async
  * @param {string|undefined} Argument
  * @param {object|null} tp
- * @returns {Promise<String[]|null>}
+ * @returns {Promise<String[]|[]>}
  */
 async function Menu(Argument,tp){
     console.log(`Setting new Menu to`);
@@ -698,11 +698,11 @@ async function Menu(Argument,tp){
         console.warn(`No menu items found `)
         console.warn(`Seeting menu to an empty menu`)
         console.log(menu)
-        return  null
+        return  menu
     }
     // prevent duplicates
     console.log(menu);
-    return [...new Set(isMatch[0].split(","))]
+    return [isMatch[0].split(",")]
 }
 
 
@@ -2579,7 +2579,7 @@ const Commands = {
     },
     Menu : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument)
-        await Menu(Argument,tp)
+        menu = await Menu(Argument,tp)
     },
     Select : async (Argument,tp)=>{
         Argument = await ReplaceValues(Argument)

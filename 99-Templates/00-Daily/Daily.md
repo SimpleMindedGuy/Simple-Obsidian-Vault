@@ -27,8 +27,7 @@ dayName: "{{date: dddd}}"
 day: {{ date: DD }}
 
 monthNmber: "{{date: MMMM}}"
-month: {{ date: MM }} 
-
+month: "{{ date: MM }}"
 week: {{ date: ww }}
 year: {{ date: YYYY }}
 
