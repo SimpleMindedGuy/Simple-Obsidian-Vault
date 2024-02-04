@@ -2102,22 +2102,6 @@ async function getUserChoise(tp,text,list,Options){
     let UserChoise
     let choises = 0
 
-    const isList = await (list.length > 0)
-    if(!isList)
-    {
-
-        if(isExpanding)
-        {
-            text += `\nAdd Item/s if you could not find them`; 
-            noti.setMessage(text)
-    
-            UserChoise =  await getUserEntry(tp,text,isMultiple,isOptional)
-    
-            return UserChoise
-        }
-        return null
-    }
-
     while(isChoosing)
     {
         console.log('is choosing')
@@ -2145,16 +2129,7 @@ async function getUserChoise(tp,text,list,Options){
 
         if(!Choise)
         {
-            if(isExpanding)
-            {
-                console.log(`Choise is expanding`)
-                text += `\nAdd Item/s if you could not find them`; 
-                noti.setMessage(text)
-
-                UserChoise =  await getUserEntry(tp,text,isMultiple,isOptional)
-
-                
-            }
+            
 
             // checks the input is mandatory.
             // return null, which will stop the whole script
@@ -2210,6 +2185,17 @@ async function getUserChoise(tp,text,list,Options){
 
     }
 
+    if(isExpanding)
+    {
+        console.log(`Choise is expanding`)
+        text += `\nAdd Item/s if you could not find them`; 
+        noti.setMessage(text)
+
+        UserChoise =  await getUserEntry(tp,text,isMultiple,isOptional)
+
+        
+    }
+
     console.log(`User choise is :`)
     console.log(UserChoise)
 
@@ -2255,7 +2241,7 @@ async function getUserEntry(tp,text,isMultiple,isOptional){
         let isWhiteSpace = whiteSpaceRegExp.test(Entry)
 
         // if entry is empty or just white space, set error message and continue the loop.
-        if(isWhiteSpace )
+        if(isWhiteSpace || Entry === null )
         {
             console.log(`Entry is white space, invalid input`)
             
@@ -2292,6 +2278,7 @@ async function getUserEntry(tp,text,isMultiple,isOptional){
             errormsg =`Entry already enlested`
             continue
         }
+
         // push entry to global layer variable 
         UserEntries.push(Entry);
         MenuText +=`\n${Entry}`
@@ -2300,9 +2287,6 @@ async function getUserEntry(tp,text,isMultiple,isOptional){
 
     console.log(`Entrie is :  `)
     console.log(UserEntries)
-
-
-
 
     return  UserEntries
 }
