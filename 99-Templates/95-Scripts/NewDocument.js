@@ -2126,11 +2126,7 @@ async function getUserChoise(tp,text,list,Options){
         // display a dialog using templater
         // let Choise = await tp.system.prompt(text+MenuList+`\n`+errormsg,"",true)
 
-        let Choise = await tp.system.suggester(optionList,optionList,false,text)
-        errormsg =""
-
-        console.log(`Choise dis thing : ${Choise}`)
-        if(list.length - 1 - choises < 0)
+        if(optionList.length <= 0)
         {
             console.log(`No more options, exiting the loop`)
             // change loop boolean to false
@@ -2140,6 +2136,12 @@ async function getUserChoise(tp,text,list,Options){
 
             continue;
         }
+
+        let Choise = await tp.system.suggester(optionList,optionList,false,text)
+        errormsg =""
+
+        console.log(`Choise dis thing : ${Choise}`)
+        
 
         if(!Choise)
         {
@@ -2171,15 +2173,6 @@ async function getUserChoise(tp,text,list,Options){
             continue
         }
 
-        // if the choise is out of bounds re run the loob with a error message
-        if(Choise < 0 || Choise > list.length - choises - 1)
-        {
-            console.warn(`choise  is out of bound`)
-            errormsg = "input cannot be lower than 0 or greater than the number of options"
-            noti.setMessage(`${text}\n${errormsg}`);
-
-            continue
-        }
 
         if(!isMultiple)
         {
@@ -2662,7 +2655,7 @@ const Commands = {
             isExpanding: false,
         }
 
-        let choise = await getUserChoise(tp,dialog,[menu],Options);
+        let choise = await getUserChoise(tp,dialog,menu,Options);
 
         Meta[Argument] = choise;
 
@@ -2677,7 +2670,7 @@ const Commands = {
             isExpanding: true,
         }
 
-        let choise = await getUserChoise(tp,dialog,[menu],Options);
+        let choise = await getUserChoise(tp,dialog,menu,Options);
 
         Meta[Argument] = choise;
 
