@@ -33,10 +33,16 @@ OptionsAdd :=> 📚
 
 Dialog :=> {
 Names to refer to the document
-Alias : 
+Aliases : 
 }
 
 List :=> aliases
+
+Dialog :=> {
+Document's Tags
+Alias : 
+}
+
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags

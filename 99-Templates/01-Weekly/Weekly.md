@@ -27,15 +27,11 @@ tags:
 aliases:
   - "{{date: YYYY-[W]ww}}"
 dayName: "{{date: dddd}}"
-day:
-  "{ date: DD }": 
+day: "{{ date: DD }}"
 monthNmber: "{{date: MMMM}}"
-month:
-  "{ date: MM }": 
-week:
-  "{ date: ww }": 
-year:
-  "{ date: YYYY }": 
+month: "{{ date: MM }}"
+week: "{{ date: ww }}"
+year: "{{ date: YYYY }}"
 banner: "![[80-Gallery/Banner/youtube banner.png]]"
 banner_icon: 📊
 ---
@@ -117,9 +113,14 @@ templater true
 ```
 ^MoveProjectMedia
 
+<%* tp.user.NewDocument(tp,true) %>
+
 {{{:::
 
-<%* tp.user.NewDocument(tp,true) %>
+
+Dialog :=> {
+Week's title
+}
 
 Input :=> 🏷️
 
@@ -127,16 +128,16 @@ Dialog :=> {
 Books to refer to if any
 }
 
-SetSearchQuery :=> ("/")
+SetSearchQuery :=>  ("/")
 SetSearchKey :=> 📚
 GetQueryList :=> menu
 
 
-SetSearchQuery :=> (" #Book And #Description ")
+SetSearchQuery :=> #Book and #Description 
 SetSearchKey :=> 🏷️
 GetQueryList :=> menu2
 
-Menu :=> [!(menu),!(menu2)]
+Menu :=> [!(menu) , !(menu2)]
 
 OptionsAdd :=> 📚
 
@@ -154,6 +155,8 @@ GetQueryList :=> menu
 Menu :=> [!(menu)]
 
 OptionsAdd :=> tags
+
+BuildInFile :=>
 
 :::}}}
 

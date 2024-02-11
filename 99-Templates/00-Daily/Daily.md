@@ -59,7 +59,7 @@ talk about your day and thoughts in the moment
 
 ### Talk about future
 
-## Today's Taks
+## Today's Tasks
 - [ ] tidy up the room. 
 - [ ] Pray Fajhr
 - [ ] Eat breakfast
@@ -81,9 +81,9 @@ templater true
 ```
 ^DiaryMedia
 
+<%* tp.user.NewDocument(tp,true) %>
 
 {{{:::
-<%* tp.user.NewDocument(tp,true) %>
 
 Dialog :=> {
 how much did you weight today

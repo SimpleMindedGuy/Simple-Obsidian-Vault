@@ -255,7 +255,7 @@ async function main(tp,Active){
         console.warn(Meta);
     
         await RemoveCommandBlock(currentFile)
-    },100)
+    },0)
     
 
 }
@@ -311,7 +311,7 @@ async function RunFileCommands(File,tp)
  */
 async function RemoveCommandBlock(file){
 
-    const CommandBlockRegExp = new RegExp(/(?<=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)^\n*{{3}:{3}(.*?)\:{3}}{3}\n*(?=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)/smgi);
+    const CommandBlockRegExp = new RegExp(/(?<=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]+)^\n*{{3}:{3}(.*?)\:{3}}{3}\n*(?=[^!:;()'"`.*^#@=/<>,\[\]~\{\}\|\\\-+]*)/smgi);
 
     let Text = await app.vault.read(file)
 
@@ -329,24 +329,20 @@ async function RemoveCommandBlock(file){
     Text = await TimeoutAfter(func,TimeLimit)
 
 
-    func =  async ()=>
-    { 
-        return app.vault.modify(
-        file,
-        Text
-        )
-        .then(()=>{
-            console.log(`removed Command Block`)
-            return true
-        })
-        .catch(()=>{
-            console.warn(`failed faild to remove comand block`)
-            return false
-        })
-    }
 
     
-    await TimeoutAfter(func,TimeLimit)
+    return await app.vault.modify(
+    file,
+    Text
+    )
+    .then(()=>{
+        console.log(`removed Command Block`)
+        return true
+    })
+    .catch(()=>{
+        console.warn(`failed faild to remove comand block`)
+        return false
+    })
     // Text = await 
 }
 
@@ -704,8 +700,17 @@ async function Menu(Argument,tp){
         return  menu
     }
     // prevent duplicates
-    console.log(menu);
-    return [isMatch[0].split(",")]
+    let newList = isMatch[0].split(",")
+
+    
+    for (const item in newList)
+    {
+        newList[item] = newList[item].trim()
+        if(newList[item] == undefined){
+            newList = newList.splice(item,1);
+        }
+    }
+    return newList
 }
 
 
@@ -958,7 +963,7 @@ async function StoreValue(Argument,tp){
  * @returns {Promise<string|null>}
  */
 async function ReplaceValues(Argument){
-    console.log(`replacing any variables/keys if any with their corresponding values `)
+    
 
     if(!Argument)
     {
@@ -978,8 +983,6 @@ async function ReplaceValues(Argument){
     const isKeys = await TimeoutAfter(func,TimeLimit)
     if(!isKeys)
     {
-        console.warn(`no keys found in argument => `)
-        console.warn(Argument)
         return Argument
     }
     
@@ -1905,11 +1908,6 @@ async function GetQueryList(SearchQuery,SearchKey)
     let List = [];
     let Dataview =  await app.plugins.plugins["dataview"].api;
 
-    console.log(`Starting a Search Query `)
-    console.log(`SearchQuery is : `)
-    console.log(SearchQuery)
-    console.log(`SearchKey is : `)
-    console.log(SearchKey)
 
     if(!Dataview)
     {
@@ -1934,14 +1932,20 @@ async function GetQueryList(SearchQuery,SearchKey)
         return null
     }
 
+    console.log(`Starting a Search Query `)
+    console.log(`SearchQuery is : `)
+    console.log(SearchQuery)
+    console.log(`SearchKey is : `)
+    console.log(SearchKey)
+
+
     let Pages = await Dataview
     .pages(`${SearchQuery}`)
     // .where(p => p[`🗓️`] > `2022/09/19`)
 
     for (const page of Pages)
     {
-        console.log(page[`${SearchKey}`])
-        console.log(page.file.link)
+        // console.log(page[`${SearchKey}`])
         
         if(!page[`${SearchKey}`])
         {
@@ -2124,8 +2128,11 @@ async function getUserChoise(tp,text,list,Options){
         let Choise = await tp.system.suggester(optionList,optionList,false,text)
         errormsg =""
 
+
+        
         console.log(`Choise dis thing : ${Choise}`)
         
+
 
         if(!Choise)
         {
@@ -2174,7 +2181,8 @@ async function getUserChoise(tp,text,list,Options){
         console.log(UserChoise);
 
         console.log(`removing choise from menu`);
-        optionList.splice(Choise,1);
+        let Index = optionList.indexOf(Choise);
+        optionList.splice(Index,1);
 
         console.log(`new menu `);
         console.log(optionList);
@@ -2191,8 +2199,26 @@ async function getUserChoise(tp,text,list,Options){
         text += `\nAdd Item/s if you could not find them`; 
         noti.setMessage(text)
 
-        UserChoise =  await getUserEntry(tp,text,isMultiple,isOptional)
+        let Expanding = await getUserEntry(tp,text,isMultiple,isOptional)
 
+        if(Expanding == undefined)
+        {
+            Expanding =[]
+        }
+        if(UserChoise == undefined)
+        {
+            UserChoise =[]
+        }
+        
+        if(!Array.isArray(Expanding)){
+            Expanding = [Expanding]
+        }
+
+        if(!Array.isArray(UserChoise))
+        {
+            UserChoise = [UserChoise]
+        }
+        UserChoise =  [...UserChoise, ...Expanding]
         
     }
 
@@ -2559,6 +2585,8 @@ const Commands = {
     },
     Menu : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument)
+
+        
         menu = await Menu(Argument,tp)
     },
     Select : async (Argument,tp)=>{
@@ -2711,10 +2739,12 @@ const Commands = {
     },
     SetSearchQuery : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
-        SearchQuery = Argument;
+        console.info(`Search query was set to ${Argument}`)
+        SearchQuery = Argument.trim();
     },
     SetSearchKey : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
+        console.info(`Search key was set to ${Argument}`)
         SearchKey = Argument;
     },
     GetQueryList : async(Argument,tp)=>{
@@ -2815,6 +2845,7 @@ const Commands = {
     BuildInFile : async(Argument,tp)=>{
         await ReplaceYmlWithMetaIntoFile(currentFile);
         await ReplaceInlineValueWithMetaIntoFile(currentFile);
+        
     },
     MoveMedia : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument)
