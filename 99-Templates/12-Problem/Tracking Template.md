@@ -9,9 +9,9 @@ kanban-plugin: basic
 🎟️: 
 🔖: 
 tags:
-  - Traking
-  - Personal
-  - Problem
+ - Traking
+ - Personal
+ - Problem
 ---
 
 ## To-Do

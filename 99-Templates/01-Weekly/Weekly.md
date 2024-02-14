@@ -23,9 +23,9 @@
 🖋️: 
 🏷️: 
 tags:
-  - Weekly
+ - Weekly
 aliases:
-  - "{{date: YYYY-[W]ww}}"
+ - "{{date: YYYY-[W]ww}}"
 dayName: "{{date: dddd}}"
 day: "{{ date: DD }}"
 monthNmber: "{{date: MMMM}}"

@@ -8,8 +8,8 @@ kanban-plugin: basic
 🎟️: 
 🔖: 
 tags:
-  - Tracking
-  - People
+ - Tracking
+ - People
 aliases:
 ---
 

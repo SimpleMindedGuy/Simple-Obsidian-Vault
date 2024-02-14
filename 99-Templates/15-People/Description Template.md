@@ -15,9 +15,9 @@
 🎯: 1
 banner: "![[Banner/typewriter.jpg]]"
 tags:
-  - People
-  - Personal
-  - Description
+ - People
+ - Personal
+ - Description
 aliases:
 ---
 # Title

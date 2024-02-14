@@ -15,9 +15,9 @@
 🎯: 1
 banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
-  - Blog
-  - Activities
-  - Description
+ - Blog
+ - Activities
+ - Description
 aliases:
 ---
 # Title

@@ -22,19 +22,15 @@
 🖋️: 
 🏷️: ""
 tags:
-  - Monthly
+ - Monthly
 aliases:
-  - <%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY-MM") %>
+ - <%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY-MM") %>
 dayName: "{{date: dddd}}"
-day:
-  "{ date: DD }": 
+day: "{ date: DD }": 
 monthNmber: "{{date: MMMM}}"
-month:
-  "{ date: MM }": 
-week:
-  "{ date: ww }": 
-year:
-  "{ date: YYYY }": 
+month: "{ date: MM }": 
+week: "{ date: ww }": 
+year: "{ date: YYYY }": 
 banner: "![[80-Gallery/Banner/youtube banner.png]]"
 banner_icon: 🗓️
 ---

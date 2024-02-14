@@ -14,9 +14,9 @@
 🏹: 0
 🎯: 1
 tags:
-  - University
-  - Activities
-  - Description
+ - University
+ - Activities
+ - Description
 aliases: 
 banner: "![[Gallery/Banner/descriptionbanner.png]]"
 ---

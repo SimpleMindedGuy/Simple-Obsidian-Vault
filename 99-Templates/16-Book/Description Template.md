@@ -16,9 +16,9 @@
 banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
 aliases: 
 tags:
-  - Book
-  - Description
-  - Activities
+ - Book
+ - Description
+ - Activities
 ---
 
 #  Title

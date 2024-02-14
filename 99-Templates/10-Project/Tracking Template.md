@@ -15,9 +15,9 @@ kanban-plugin: basic
 🏹: 0
 🎯: 1
 tags:
-  - Tracking
-  - Progress
-  - Project
+ - Tracking
+ - Progress
+ - Project
 aliases:
 ---
 

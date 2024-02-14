@@ -22,7 +22,6 @@ tags:
  - "diary"
 aliases:
  - "{{date: YYYY-MM-DD}}"
-
 dayName: "{{date: dddd}}"
 day: {{ date: DD }}
 

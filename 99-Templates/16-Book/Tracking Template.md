@@ -15,9 +15,9 @@ kanban-plugin: basic
 🏹: 0
 🎯: 1
 tags:
-  - Tracking
-  - Book
-  - Activities
+ - Tracking
+ - Book
+ - Activities
 aliases:
 ---
 

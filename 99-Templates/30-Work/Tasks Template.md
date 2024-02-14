@@ -16,9 +16,9 @@
 🎯: 1
 banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
-  - Wrok
-  - Activities
-  - Description
+ - Wrok
+ - Activities
+ - Description
 aliases: 
 kanban-plugin: advanced
 ---

@@ -14,9 +14,9 @@
 🏹: 0
 🎯: 1
 tags:
-  - Personal
-  - Problem
-  - Progress
+ - Personal
+ - Problem
+ - Progress
 aliases:
 ---
 

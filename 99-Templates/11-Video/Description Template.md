@@ -15,9 +15,9 @@
 🎯: 1
 banner: "![[Banner/descriptionbanner.png]]"
 tags:
-  - Video
-  - Activities
-  - Description
+ - Video
+ - Activities
+ - Description
 aliases:
 ---
 

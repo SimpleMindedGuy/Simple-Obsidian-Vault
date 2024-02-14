@@ -14,9 +14,9 @@
 🏹: 0
 🎯: 1
 tags:
-  - Learning
-  - Activities
-  - Description
+ - Learning
+ - Activities
+ - Description
 aliases: 
 banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
 ---

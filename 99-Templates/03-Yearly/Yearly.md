@@ -23,19 +23,15 @@
 🖋️: 2023-12-26T18:21:40+03:00
 🏷️: 
 tags:
-  - Yearly
+ - Yearly
 aliases:
-  - "{{date: YYYY}}"
+ - "{{date: YYYY}}"
 dayName: "{{date: dddd}}"
-day:
-  "{ date: DD }": 
+day: "{ date: DD }": 
 monthNmber: "{{date: MMMM}}"
-month:
-  "{ date: MM }": 
-week:
-  "{ date: ww }": 
-year:
-  "{ date: YYYY }": 
+month: "{ date: MM }": 
+week: "{ date: ww }": 
+year: "{ date: YYYY }": 
 banner: "![[80-Gallery/Banner/youtube banner5.png]]"
 banner_icon: 🗓️
 ---

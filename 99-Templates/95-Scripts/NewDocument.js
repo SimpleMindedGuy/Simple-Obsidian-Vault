@@ -243,19 +243,17 @@ async function main(tp,Active){
         return
     }
 
-    setTimeout(async ()=>{
-        currentFile = await app.workspace.getActiveFile()
+    currentFile = await app.workspace.getActiveFile()
 
-        console.warn(`Reading active file `)
-        console.log(currentFile)
-    
-    
-        await RunFileCommands(currentFile,tp)
-        console.warn(`Meta`);
-        console.warn(Meta);
-    
-        await RemoveCommandBlock(currentFile)
-    },0)
+    console.warn(`Reading active file `)
+    console.log(currentFile)
+
+
+    await RunFileCommands(currentFile,tp)
+    console.warn(`Meta`);
+    console.warn(Meta);
+
+    await RemoveCommandBlock(currentFile)
     
 
 }
@@ -3449,7 +3447,7 @@ async function GetMediaFileLinks(file)
 
     const Text = await app.vault.read(file)
 
-    const MediaLink = RegExp(/(?<=\!\[\[)(?!.*(Banner|Media|icon|Daily|Files|Media|Attachments)).*(?:\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|acc|flac|kmv|pdf))(?=\]\])/igm);
+    const MediaLink = RegExp(/(?<=\!\[\[)(?!.*(Banner|Media|icon|Daily|Files|Media|Attachments)).*(?:\.(gif|png|jpeg|mp4|jpg|jpeg|webm|mpeg|acc|flac|mkv|flv|pdf))(?=\]\])/igm);
 
     let func = async ()=>{
         return Text.match(MediaLink)
