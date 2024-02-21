@@ -17,7 +17,7 @@ This is a Script that reads a file, and looks for specific commands within it, t
 
 It is meant to simplify scripts that do useful things, like where to create files, what kind of Data is expected for those files and how to group them together based on Options that are provided for the user.
 
-Look up the [Utility documentation](./99-Templates/Utility%20documentation) for the Script for more information on what commands do, If you have any suggestions for commands, please create an issue ticket for it, preferably with an `enhancement` label.
+Look up the [Utility documentation](https://github.com/SimpleMindedGuy/Simple-Obsidian-Vault/blob/364aa007abe94613493f7ec953dad6178fb60997/99-Templates/Utility%20documentation.md) for the Script for more information on what commands do, If you have any suggestions for commands, please create an issue ticket for it, preferably with an `enhancement` label.
 
 ### Habit tracking
 
