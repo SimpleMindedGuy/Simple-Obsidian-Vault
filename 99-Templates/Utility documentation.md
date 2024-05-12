@@ -5,11 +5,14 @@
 
 > [!Important]
 > To be able to use the commands, you need to have a templater command 
-> - `<%* tp.user.NewDocument(tp,true) %>` 
+> - `<%* tp.user.main(true) %>` 
 > 	if you are trying to read the commands in the current file 
-> - `<%* tp.user.NewDocument(tp,false) %>`
+> - `<%* tp.user.main(false) %>`
 > 	if you are trying to read the commands in the 'NewDocument' File
-> 	the script it self is located at [./95-Scripts/NewDocument.js](./95-Scripts/NewDocument.js)
+> 	the script it self used to be  located at [./95-Scripts/NewDocument.js](./95-Scripts/NewDocument.js)
+> 	Now is split into multiple functions, those functions are called starting from `main` function located at [./95-Scripts/00-Basic-Functions/main.js](./95-Scripts/00-Basic-Functions/main.js).
+> 	 Those functions can be used on their own with the exception for the functions in the folders (06-Utility Specific and 01-Commands) because they rely on global values that would be set through some of other functions. 
+> 	 However, with a little bit of reading of reading, you should be able to understand how to use All the functions in the utility, **Assuming that you have a little knowledge in coding and javascript**. 
 
 # Keywords/Terminology
 
