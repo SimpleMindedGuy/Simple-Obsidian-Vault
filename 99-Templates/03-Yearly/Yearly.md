@@ -25,19 +25,16 @@
 tags:
  - Yearly
 aliases:
- - "{{date: YYYY}}"
-dayName: "{{date: dddd}}"
-day: "{ date: DD }": 
-monthNmber: "{{date: MMMM}}"
-month: "{ date: MM }": 
-week: "{ date: ww }": 
-year: "{ date: YYYY }": 
-banner: "![[80-Gallery/Banner/youtube banner5.png]]"
-banner_icon: 🗓️
----
-{{date: YYYY }}
+ - "<% tp.date.now("YYYY",0,tp.file.title, "YYYY")%>"
 
-# Title 
+year: <% tp.date.now("YYYY",0,tp.file.title, "YYYY")%>
+
+banner: "![[80-Gallery/Banner/Writing-beginners.png]]"
+banner_icon: 📆
+---
+# !(🏷️)
+<% tp.date.now("YYYY  - hh:mm a",0,tp.file.title, "YYYY")%>
+
 
 
 
@@ -89,10 +86,9 @@ customJS.DvMonthlyCharts.renderYear({
 
 
 
+<%* tp.user.NewDocument(tp,true) %>
 
 {{{:::
-<%* tp.user.NewDocument(tp,true) %>
-Input :=> 🏷️
 
 Dialog :=> {
 Books to refer to if any
@@ -102,8 +98,7 @@ SetSearchQuery :=> ("/")
 SetSearchKey :=> 📚
 GetQueryList :=> menu
 
-
-SetSearchQuery :=> (" #Book And #Description ")
+SetSearchQuery :=> #Book And #Description
 SetSearchKey :=> 🏷️
 GetQueryList :=> menu2
 
@@ -113,10 +108,15 @@ OptionsAdd :=> 📚
 
 Dialog :=> {
 Names to refer to the document
-Alias : 
+Alias :
 }
 
 List :=> aliases
+
+Dialog :=> {
+Names to refer to the document
+Tags :
+}
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
@@ -126,5 +126,13 @@ Menu :=> [!(menu)]
 
 OptionsAdd :=> tags
 
+List :=> tags
+
+Dialog :=>{
+Enter year's title
+}
+Input :=> 🏷️
+
+BuildInFile :=>
 
 :::}}}

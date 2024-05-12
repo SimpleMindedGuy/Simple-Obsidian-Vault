@@ -1,10 +1,9 @@
-
 {{{:::
 
 GetValue => 🗓️
 StoreValue => DocDate
 
-SetDate : !(DocDate)
+SetDate :=> !(DocDate)
 
 SetDateFormat :=> WW
 StoreFormattedDate :=> W
@@ -19,4 +18,4 @@ MoveMedia :=> 82-WeeklyFiles/Year-!(Y)/Month-!(M)/Week-!(W)
 
 :::}}}
 
-<%* tp.user.NewDocument(tp,true) %>
+<%* tp.user.main(true) %>

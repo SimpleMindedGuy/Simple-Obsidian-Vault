@@ -21,7 +21,7 @@ tags:
 aliases:
 ---
 
-# Title
+# !(🏷️)
 
 Quick introduction
 
@@ -30,6 +30,9 @@ Quick introduction
 ## Resources
 
 ## Credits
+
+
+## Video 
 
 ```button
 name Sub Note

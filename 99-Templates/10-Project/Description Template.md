@@ -21,7 +21,7 @@ aliases:
 banner: "![[Gallery/Banner/descriptionbanner.png]]"
 ---
 
-# Title
+# !(🏷️)
 
 ## Introduction
 

@@ -25,19 +25,21 @@
 tags:
  - Weekly
 aliases:
- - "{{date: YYYY-[W]ww}}"
-dayName: "{{date: dddd}}"
-day: "{{ date: DD }}"
-monthNmber: "{{date: MMMM}}"
-month: "{{ date: MM }}"
-week: "{{ date: ww }}"
-year: "{{ date: YYYY }}"
+ - "<% tp.date.now("YYYY-[W]ww",0,tp.file.title, "YYYY-[W]ww")%>"
+
+monthName: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-[W]ww")%>"
+
+month: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-[W]ww")%>"
+week: "<% tp.date.now("ww",0,tp.file.title, "YYYY-[W]ww")%>"
+year: "<% tp.date.now("YYYY",0,tp.file.title, "YYYY-[W]ww")%>"
+
 banner: "![[80-Gallery/Banner/youtube banner.png]]"
 banner_icon: 📊
 ---
-# Title
+# !(🏷️)
 Week :{{date: ww}} - {{date: MM - MMMM}} - {{date: DD/MM/YYYY - hh:mm a}}
 
+<% tp.date.now("[W]ww / MM - MMMM / YYYY  - hh:mm a",0,tp.file.title, "YYYY-[W]ww")%>
 
 
 
@@ -89,7 +91,7 @@ customJS.DvDailyCharts.renderWeek({
 	labelFormat:"dddd",
 
 
-	group: "#diary",
+	group: "#Daily",
 	types: {
 		"line" : {
 			stacked : false,
@@ -119,34 +121,25 @@ templater true
 
 
 Dialog :=> {
-Week's title
-}
-
-Input :=> 🏷️
-
-Dialog :=> {
 Books to refer to if any
 }
 
-SetSearchQuery :=>  ("/")
+SetSearchQuery :=> ("/")
 SetSearchKey :=> 📚
 GetQueryList :=> menu
 
-
-SetSearchQuery :=> #Book and #Description 
+SetSearchQuery :=> #Book And #Description
 SetSearchKey :=> 🏷️
 GetQueryList :=> menu2
 
-Menu :=> [!(menu) , !(menu2)]
+Menu :=> [!(menu),!(menu2)]
 
 OptionsAdd :=> 📚
 
 Dialog :=> {
-Names to refer to the document
-Alias : 
+What tags you want to use ?
 }
 
-List :=> aliases
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
@@ -155,6 +148,25 @@ GetQueryList :=> menu
 Menu :=> [!(menu)]
 
 OptionsAdd :=> tags
+
+Dialog :=> {
+What Aliases you want to use ?
+}
+
+List :=> aliases
+
+
+Menu :=> [!(menu)]
+
+OptionsAdd :=> tags
+
+List :=> tags
+
+Dialog :=> {
+Week's title
+}
+
+Input :=> 🏷️
 
 BuildInFile :=>
 

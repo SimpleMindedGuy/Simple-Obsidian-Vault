@@ -32,17 +32,10 @@ Menu :=> [!(menu),!(menu2)]
 OptionsAdd :=> 📚
 
 Dialog :=> {
-Names to refer to the document
-Aliases : 
+Add Document's Aliases
 }
 
 List :=> aliases
-
-Dialog :=> {
-Document's Tags
-Alias : 
-}
-
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
@@ -50,7 +43,13 @@ GetQueryList :=> menu
 
 Menu :=> [!(menu)]
 
+Dialog :=> {
+Add Tags to Document
+Alias : 
+}
+
 OptionsAdd :=> tags
+
 
 BuildDocument :=>
 

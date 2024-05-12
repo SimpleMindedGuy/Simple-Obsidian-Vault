@@ -21,7 +21,7 @@ aliases:
 banner: "![[Banner/typewriter.jpg]]"
 ---
 
-# Title
+# !(🏷️)
 
 ## When did the problem start
 

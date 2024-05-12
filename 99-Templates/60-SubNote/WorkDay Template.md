@@ -14,14 +14,11 @@ tags:
 aliases:
 ---
 
-# 
+# !(🏷️)
 !(🗓️)
 
 ## Clocked in at {{date: hh:mm a}}
 
-
-- [ ] test tsask
-- [ ] andther test
 ## Details
 
 ## Notes

@@ -21,7 +21,7 @@ aliases:
 banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
 ---
 
-# Title
+# !(🏷️)
 
 ## Introduction
 

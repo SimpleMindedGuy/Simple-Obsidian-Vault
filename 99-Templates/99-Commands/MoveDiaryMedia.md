@@ -1,10 +1,9 @@
-
 {{{:::
 
 GetValue => 🗓️
 StoreValue => DocDate
 
-SetDate : !(DocDate)
+SetDate :=> !(DocDate)
 
 SetDateFormat :=> DD
 StoreFormattedDate :=> D
@@ -19,4 +18,4 @@ MoveMedia :=> 81-DailyFiles/Year-!(Y)/Month-!(M)/Day-!(D)
 
 :::}}}
 
-<%* tp.user.NewDocument(tp,true) %>
+<%* tp.user.main(true) %>

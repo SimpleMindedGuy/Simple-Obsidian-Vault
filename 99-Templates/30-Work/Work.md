@@ -37,15 +37,10 @@ Books to refer to if any
 List :=> 📚
 
 Dialog :=> {
-Names to refer to the document
-Alias :
+Add Document's Aliases
 }
 
 List :=> aliases
-
-Dialog :=> {
-Tags :
-}
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
@@ -53,7 +48,13 @@ GetQueryList :=> menu
 
 Menu :=> [!(menu)]
 
+Dialog :=> {
+Add Tags to Document
+Alias : 
+}
+
 OptionsAdd :=> tags
+
 
 BuildDocument :=>
 :::}}}

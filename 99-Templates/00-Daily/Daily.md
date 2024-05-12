@@ -19,22 +19,24 @@
 🖋️: 
 🏷️: ""
 tags:
- - "diary"
+ - Daily
 aliases:
- - "{{date: YYYY-MM-DD}}"
-dayName: "{{date: dddd}}"
-day: {{ date: DD }}
+ - "<% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>"
+dayName: "<% tp.date.now("dddd",0,tp.file.title, "YYYY-MM-DD")%>"
+monthName: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-MM-DD")%>"
+day: <% tp.date.now("DD",0,tp.file.title, "YYYY-MM-DD")%>
 
-monthNmber: "{{date: MMMM}}"
-month: "{{ date: MM }}"
-week: {{ date: ww }}
-year: {{ date: YYYY }}
+month: <% tp.date.now("MM",0,tp.file.title, "YYYY-MM-DD")%>
+week: <% tp.date.now("ww",0,tp.file.title, "YYYY-MM-DD")%>
+year: <% tp.date.now("YYYY",0,tp.file.title, "YYYY-MM-DD" )%>
+
 
 banner: "![[80-Gallery/Banner/Writing-beginners.png]]"
 banner_icon: 📆
 ---
-# Title
-{{date: dddd - [W]ww}} - {{date: MM - MMMM}} - {{date: DD/MM/YYYY - hh:mm a}}
+# !(🏷️)
+<% tp.date.now("[W]ww / DD - dddd / MM - MMMM / YYYY",0,tp.file.title, "YYYY-MM-DD")%> - <% tp.date.now("hh:mm a") %>
+
 
 talk about your day and thoughts in the moment
 
@@ -59,17 +61,19 @@ talk about your day and thoughts in the moment
 ### Talk about future
 
 ## Today's Tasks
-- [ ] tidy up the room. 
-- [ ] Pray Fajhr
-- [ ] Eat breakfast
-- [ ] 20 Pages of the Qur'an
-- [ ] Pray Duhr
-- [ ] 1 Hour Math
-- [ ] 1 Hour Reading
-- [ ] Pray Asr
-- [ ] 2-4 Hours Project
-- [ ] Pray Maghrib
-- [ ] Pray Isha
+
+
+- [ ] tidy up the room.  📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Pray Fajhr 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Eat breakfast 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] 20 Pages of the Qur'an 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Pray Duhr 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] 1 Hour Math 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] 1 Hour Reading 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Pray Asr 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] 2-4 Hours Project 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Pray Maghrib 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Pray Isha 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
 
 
 ```button
@@ -166,15 +170,11 @@ How many items you bought today ?
 
 Input :=> 💳
 
-Dialog :=> {
-Enter Today's Title ?
-}
-
-Input :=> 🏷️
 
 Dialog :=> {
 What tags you want to use ?
 }
+
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
@@ -185,14 +185,29 @@ Menu :=> [!(menu)]
 OptionsAdd :=> tags
 
 Dialog :=> {
-Aliases
+What Aliases you want to use ?
 }
 
 List :=> aliases
 
-Menu :=> ['😡 rage','😒 bitter','😭 sad','😫 frustrated','😨 scared','😶 lonely','😖 Guilty','😞 disappointed','😓 hopeless','😟 worried','😮‍💨 exhausted','😖 anxious','🤢 sick','😄 happy','😆 satisfied','😲 surprised','😂 joyful','😐 ok']
+Dialog :=> {
+General mood of the day
+}
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> 😶
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
 
 Options :=> 😶
+
+Dialog :=> {
+Enter Today's Title ?
+}
+
+Input :=> 🏷️
+
 
 BuildInFile :=>
 

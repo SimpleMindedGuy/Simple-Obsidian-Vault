@@ -1,7 +1,13 @@
 .iconize-title-icon {
   max-width: var(--max-width);
-  width: var(--line-width);
-  margin-inline: var(--content-margin) !important;
+  margin-right: var(--size-4-2);
+  transform: translateY(13%);
+}
+
+.iconize-icon-in-link {
+  margin-right: var(--size-2-2);
+  display: inline-flex;
+  transform: translateY(13%);
 }
 
 .iconize-icon {
@@ -61,8 +67,7 @@
   line-height: 1.3;
 }
 
-.iconize-modal.prompt-results
-  .suggestion-item.suggestion-item__center {
+.iconize-modal.prompt-results .suggestion-item.suggestion-item__center {
   justify-content: center;
 }
 

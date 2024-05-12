@@ -1,3 +1,5 @@
+# In The Name of Allah, The Most Beneficent, The Most Merciful
+
 # Simple-Obsidian-Vault
 
 ## Introduction
@@ -49,12 +51,7 @@ This script would be basically impossible for me due to my limited knowledge.
 	For presenting and visualizing data, and some custom functionality in the future.
 - [buttons](https://github.com/shabegom/buttons)
 	Fort executing Templater  commands.
+- [ obsidian-pkvs](https://github.com/iamrecursion/obsidian-pkvs)
+	For  global state/dependency injection (getting and setting values), to be used across different scripts
 
-# License
-The script (all files in the [99-Templater](./99-Templater), [90-CustomJS](./90-CustomJS), [DataView](./98-DataView) ) is licenced under the  MIT License
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

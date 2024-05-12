@@ -16,7 +16,7 @@
 🎯: 1
 banner: "![[Gallery/Banner/typewriter.jpg]]"
 tags:
- - Wrok
+ - Work
  - Activities
  - Description
 aliases: 

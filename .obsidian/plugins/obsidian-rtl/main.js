@@ -33,7 +33,7 @@ var import_obsidian3 = require("obsidian");
 var import_view = require("@codemirror/view");
 var import_state = require("@codemirror/state");
 
-// globals.ts
+// direction.util.ts
 var RTL_CLASS = "is-rtl";
 var AUTO_CLASS = "is-auto";
 var STRONG_DIR_REGEX = /(?:([\p{sc=Arabic}\p{sc=Hebrew}\p{sc=Syriac}\p{sc=Thaana}])|([\p{sc=Armenian}\p{sc=Bengali}\p{sc=Bopomofo}\p{sc=Braille}\p{sc=Buhid}\p{sc=Canadian_Aboriginal}\p{sc=Cherokee}\p{sc=Cyrillic}\p{sc=Devanagari}\p{sc=Ethiopic}\p{sc=Georgian}\p{sc=Greek}\p{sc=Gujarati}\p{sc=Gurmukhi}\p{sc=Han}\p{sc=Hangul}\p{sc=Hanunoo}\p{sc=Hiragana}\p{sc=Inherited}\p{sc=Kannada}\p{sc=Katakana}\p{sc=Khmer}\p{sc=Lao}\p{sc=Latin}\p{sc=Limbu}\p{sc=Malayalam}\p{sc=Mongolian}\p{sc=Myanmar}\p{sc=Ogham}\p{sc=Oriya}\p{sc=Runic}\p{sc=Sinhala}\p{sc=Tagalog}\p{sc=Tagbanwa}\p{sc=Tamil}\p{sc=Telugu}\p{sc=Thai}\p{sc=Tibetan}\p{sc=Yi}]))/u;
@@ -45,6 +45,11 @@ var detectDirection = (s) => {
     return "ltr";
   }
   return null;
+};
+var NAMED_LINK_REGEX = /\[\[[^\]]*\|([^\]]*)\]\]/;
+var removeNoneMeaningfullText = (s) => {
+  s = s.replace(NAMED_LINK_REGEX, "$1");
+  return s.replace("- [x]", "");
 };
 
 // AutoDirPlugin.ts
@@ -156,7 +161,8 @@ function getAutoDirectionPlugin(rtlPlugin) {
       }
     }
     detectDecoration(s) {
-      const direction = detectDirection(s.replace("- [x]", ""));
+      s = removeNoneMeaningfullText(s);
+      const direction = detectDirection(s);
       switch (direction) {
         case "rtl":
           return this.rtlDec;
@@ -210,8 +216,8 @@ function breaksToDivs(el) {
       breaksToDivs(el.children[i]);
   }
 }
-function detectCanvasElement(el, ctx, setPreviewDirection) {
-  const container = ctx.containerEl;
+function detectCanvasElement(ctx, setPreviewDirection) {
+  const container = ctx ? ctx.containerEl : null;
   if (container && container.closest) {
     const possibleCanvas = container.closest(".canvas-node-content");
     if (possibleCanvas) {
@@ -224,7 +230,7 @@ function detectCanvasElement(el, ctx, setPreviewDirection) {
 }
 var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
   let shouldAddDir = false, addedDir = false;
-  detectCanvasElement(el, ctx, setPreviewDirection);
+  detectCanvasElement(ctx, setPreviewDirection);
   breaksToDivs(el);
   for (let i = 0; i < el.childNodes.length; i++) {
     const n = el.childNodes[i];
@@ -233,15 +239,15 @@ var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
       if (dir) {
         addedDir = true;
         lastDetectedDir = dir;
-        if (specialNodes.contains(el.nodeName) && el.parentElement) {
+        if (specialNodes.includes(el.nodeName) && el.parentElement) {
           let target = nonSpecialParent(el.parentElement);
-          if (target != null) {
-            addDirClassIfNotAddedBefore(target, dirClass(dir));
+          if (target && !(target.childNodes.length !== 0 && target.childNodes[0].nodeValue && detectDirection(target.childNodes[0].nodeValue))) {
+            addDirClass(target, dirClass(dir));
           }
         } else {
-          addDirClassIfNotAddedBefore(el, dirClass(dir));
+          addDirClass(el, dirClass(dir));
           if (el.parentElement && el.parentElement.nodeName === "LI") {
-            addDirClassIfNotAddedBefore(el.parentElement, dirClass(dir));
+            addDirClass(el.parentElement, dirClass(dir));
           }
         }
       }
@@ -250,13 +256,13 @@ var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
     }
     autoDirectionPostProcessor(n, ctx, setPreviewDirection);
     if (i === el.childNodes.length - 1 && shouldAddDir && !addedDir) {
-      el.addClass(dirClass(lastDetectedDir));
+      el.classList.add(dirClass(lastDetectedDir));
     }
   }
   if (el.nodeName === "UL") {
     const lis = el.querySelectorAll("li");
-    if (lis.length > 0 && lis[0].hasClass("esm-rtl")) {
-      el.addClass(dirClass("rtl"));
+    if (lis.length > 0 && lis[0].classList.contains("esm-rtl")) {
+      el.classList.add(dirClass("rtl"));
     }
   }
 };
@@ -267,14 +273,15 @@ function dirClass(dir) {
     return "esm-ltr";
   }
 }
-function addDirClassIfNotAddedBefore(el, cls) {
-  if (el.hasClass("esm-rtl") || el.hasClass("esm-ltr")) {
+function addDirClass(el, cls) {
+  if (el.classList.contains(cls)) {
     return;
   }
-  el.addClass(cls);
+  el.classList.remove("esm-rtl", "esm-ltr");
+  el.classList.add(cls);
 }
 function nonSpecialParent(el) {
-  while (specialNodes.contains(el.nodeName)) {
+  while (specialNodes.includes(el.nodeName)) {
     el = el.parentElement;
   }
   return el;
@@ -287,7 +294,7 @@ var import_view2 = require("@codemirror/view");
 var import_obsidian2 = require("obsidian");
 var DEFAULT_SETTINGS = {
   fileDirections: {},
-  defaultDirection: "ltr",
+  defaultDirection: "auto",
   rememberPerFile: true,
   setNoteTitleDirection: true,
   setYamlDirection: false,
@@ -363,7 +370,7 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
     this.registerEditorExtension(this.autoDirectionPlugin);
     this.registerEditorExtension(import_view2.EditorView.perLineTextDirection.of(true));
     this.registerMarkdownPostProcessor((el, ctx) => {
-      autoDirectionPostProcessor(el, ctx, (path, markdownPreviewElement) => this.setCanvasPreviewDirection(path, markdownPreviewElement));
+      autoDirectionPostProcessor(el, ctx, (path, markdownPreviewElement) => this.setPreviewDirectionByFileSettings(path, markdownPreviewElement));
     });
     await this.convertLegacySettings();
     await this.loadSettings();
@@ -559,7 +566,7 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
     if (newDirection !== "auto" && this.settings.setYamlDirection)
       readingDiv.classList.add("rtl-yaml");
   }
-  setCanvasPreviewDirection(path, markdownPreviewElement) {
+  setPreviewDirectionByFileSettings(path, markdownPreviewElement) {
     const file = this.app.vault.getAbstractFileByPath(path);
     const [requiredDirection, _] = this.getRequiredFileDirection(file);
     this.setDocumentDirectionForReadingDiv(markdownPreviewElement, requiredDirection);

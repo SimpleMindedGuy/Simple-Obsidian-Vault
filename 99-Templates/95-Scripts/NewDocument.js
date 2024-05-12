@@ -190,12 +190,12 @@ let currentDateFormat="YYYY-MM-DDTHH:mm:ssZ",
  * @typedef {string} ConfigPath
  * - File where config file is stored
  * - config file will always be read first
- * - used to set values to some form of default that the usuer prefers
+ * - used to set values to some form of default that the user prefers
  * @typedef {string} NewDocumentPath 
- * - Utilty default Command file
- * - mostly used generaate a new document that is not -necceraly- related to any other document.
+ * - Utility default Command file
+ * - mostly used generate a new document that is not - necessary - related to any other document.
  * @typedef {string} SubNotePath
- * - Utility Default SubnNote Templates Folder
+ * - Utility Default SubNote Templates Folder
  * - May be removed later on.
  */
 let TemplatePath = `99-Templates`,
@@ -216,6 +216,7 @@ let TemplatePath = `99-Templates`,
 async function main(tp,Active){
 
     
+    // console.log(tp)
 
     console.log(`reading the Config File`)
     currentFile = await app.vault.getAbstractFileByPath(ConfigPath)
@@ -346,7 +347,7 @@ async function RemoveCommandBlock(file){
 
 /**
  * Takes a text from a file and returns the Commands block if any 
- * if it there is no commad block it returns null
+ * if it there is no command block it returns null
  * @date 16/12/2023
  *
  * @async
@@ -389,7 +390,7 @@ async function getCommandsBlock(Text)
 
 
 /**
- * Takes a text {@link commandBlock} and looks for comands lines in it. and returns the command lines.
+ * Takes a text {@link commandBlock} and looks for commands lines in it. and returns the command lines.
  * 
  * @date 16/12/2023
  *
@@ -845,6 +846,7 @@ async function StoreFormattedDate(Argument,tp){
 
 }
 
+
 /**
  * Reads the {@link CurrentFile} and looks for a key that matches the value of {@link Argument} and then it takes its value if any, and assigns it to the variable {@link currentValue}.
  * 
@@ -948,7 +950,7 @@ async function StoreValue(Argument,tp){
 
 /**
  * Replaces expressions that hold the a keyname in the provided Text {@link Arguemnt}
- * with corresopnding values in of those keys in {@link Meta}
+ * with corresponding values in of those keys in {@link Meta}
  * 
  * - the expression would look something like > !(keyname)
  * 
@@ -1406,74 +1408,48 @@ async function ReplaceYmlWithMetaIntoFile(file)
         console.warn(Text)
         return file
     }
+
     console.log(`Looking for Yml (MetaData) block in File `)
     console.log(file)
-
-    const YmlBlockRegExp = new RegExp(/(?<=\-{3}\n)(.|\n)+(?=\n\-{3}\n)/gm)
-
-    console.log(`Looking for Yml Block`)
-
-    let func = async()=>
-    { 
-        return Text.match(YmlBlockRegExp)
-    }
-    const isYmlBlock = await TimeoutAfter(func,TimeLimit)
-
+    
+    const isYmlBlock = await GetYmlBlock(Text)
     
     if(!isYmlBlock)
     {
-        console.warn(`Could cound not find Yml block (Meta Data)\n in Text : \n`)
-        console.warn(`Text`)
-        return file
+        console.log(`yml block was not found in file`)
+        console.log(isYmlBlock)
+        return null
     }
 
-    console.log(`Yml Block : `)
-    console.log(isYmlBlock)
-
-    const keyLineRegExp = new RegExp(/^(?<=\n*)[\u0021-\uffff]+\:\ *.*\n/gmi)
+    const isYmlKeys = await GetKeysFromYmlBlock(isYmlBlock)
     
+    if(!isYmlKeys)
+    {
+        console.log(`no keys where found in Yaml Block`)
+        console.log(isYmlKeys)
+        return null
+    }
+
+
     
-    console.log(`Looking for Keys in Yml Block`)
 
+    let newBlock = isYmlBlock;
 
-    func = async()=>
-    { 
-        return isYmlBlock[0].match(keyLineRegExp)
-    }
-
-    let isYmlKeys = await TimeoutAfter(func,TimeLimit)
-
-    if(!isYmlKeys){
-        console.warn(`Could not find keys in Yml Block`)
-        console.warn(Text)
-        return file
-    }
-
-    console.log(`keys`)
-    console.log(isYmlKeys)
-
-    console.log(`Loop through keys.`)
-
-
-    const KeyRegExp = new RegExp (/^(?<=\n*)[\u0021-\uffff]+(?=\:\ *.*\n|\:\ *\n$)/gmi)
-
-    let newBlock = isYmlBlock[0];
-    for (const keyline of isYmlKeys)
+    for (const key of isYmlKeys)
     {
 
-        func = async()=>
-    { 
-        return keyline.match(KeyRegExp)
-        }
-
-        const key = await TimeoutAfter(func,TimeLimit)
 
 
+
+        console.warn(`key`)
+        console.warn(key)
+
+        const KeyRegExp = new RegExp (`^(?<=\\n*)[${key}]+(\\:\\ *.*\\n|\\:\\ *\\n$)`,`gmi`)
 
         if(!key)
         {
             console.warn(`could not find Yml key `)
-            console.warn(keyline)
+            console.log(key)
             continue
         }
         // console.log(`Line : ${keyline}`)
@@ -1481,31 +1457,31 @@ async function ReplaceYmlWithMetaIntoFile(file)
         // console.log(`Val  : ${Meta[key[0]]}`)
         // console.log(`\n//////////////\n\n`)
 
-        if(!Meta[key[0]])
+        if(!Meta[key])
         {
             console.log(`Key dose not exist, skipping key`)
             continue
         }
 
-        if(Array.isArray(Meta[key[0]]))
+        if(Array.isArray(Meta[key]))
         {
 
             let text =""
-            for(const entry of Meta[key[0]])
+            for(const entry of Meta[key])
             {
                 text +=` - ${entry}\n`
             }
-            newBlock = newBlock.replace(keyline,`${key[0]}: \n${text}`)
+            newBlock = newBlock.replace(KeyRegExp,`${key}: \n${text}`)
 
             continue
         }
-        newBlock = newBlock.replace(keyline,`${key[0]}: ${Meta[key[0]]}\n`)
+        newBlock = newBlock.replace(KeyRegExp,`${key}: ${Meta[key]}\n`)
 
     }
 
     const TitleRegExp = new RegExp (/^\#{1}\ [\u0020-\uffff]+$/gmi)
 
-    const newText = Text.replace(isYmlBlock[0],newBlock).replace(TitleRegExp,`# ${Meta[titleKey]}`)
+    const newText = Text.replace(isYmlBlock,newBlock).replace(TitleRegExp,`# ${Meta[titleKey]}`)
 
     console.log(newText)
 
@@ -1549,7 +1525,7 @@ async function ReplaceInlineValueWithMetaIntoFile(file)
     console.log(file)
 
     // (?<=\n*?)([\u0010-\uffff]+)\ {0}\:\: .*\n
-    const inLineKeyValueRegExp = new RegExp (/(?<=\n*?)([\u0010-\uffff]+)\ {0}\:\: .*\n/gm)
+    const inLineKeyValueRegExp = new RegExp (/(?<=\n*?)([\u0010-\uffff]+)\ {0}\:{2} .*\n/gm)
     const KeyRegExp = new RegExp(/^(?<=\n*?)([\u0021-\uffff]+)(?=\:{2}.*\n?$)/gm)
 
     let func =  async ()=>
@@ -1679,7 +1655,7 @@ async function MakeBuildPath(tp,BuildRoot,BuildList,isNumbered,MakeOverview){
         BuildFolder = NextDirectory
         
         
-        // ignore instrictions and start with the next directory, if we dont want to make Overview. 
+        // ignore instructions and start with the next directory, if we don't want to make Overview. 
         if(!MakeOverview)
         {
             continue
@@ -1696,7 +1672,7 @@ async function MakeBuildPath(tp,BuildRoot,BuildList,isNumbered,MakeOverview){
         
             
 
-        /// If oveview folder make it
+        /// If overview folder make it
         if(!Overview)
         {
             // getting the template for the overview folder 
@@ -1945,22 +1921,23 @@ async function GetQueryList(SearchQuery,SearchKey)
     {
         // console.log(page[`${SearchKey}`])
         
-        if(!page[`${SearchKey}`])
+        if(!page || !page[`${SearchKey}`] || page[`${SearchKey}`] == '')
         {
             continue
         }
         if(Array.isArray(page[`${SearchKey}`]))
         {
-            List = [ ...List , ...page[`${SearchKey}`] ]
+            List = new Set([ ...List , ...page[`${SearchKey}`] ])
             continue
         }
 
         List.push(page[`${SearchKey}`]);
 
     }
+    List = [...List].filter((item) => item!== undefined && item!== null && item!== '')
     console.log(`Query List is : `)
     console.log(List)
-    List = [...new Set([...List])]
+    
     return List
 }
 
@@ -2087,7 +2064,7 @@ async function AddDocuemntToOverview(file){
  * @param {boolean} Options.isExpanding - allows uer to add an option if the option dose not exist, in the list. 
  * @returns {Promise<string|string[]|null>}
  */
-async function getUserChoise(tp,text,list,Options){
+async function GetUserChoise(tp,text,list,Options){
 
     const noti = new Notice(`${text}`,99999999)
     console.log(`choosing from menu :`)
@@ -2268,7 +2245,7 @@ async function getUserEntry(tp,text,isMultiple,isOptional){
         if(isWhiteSpace || Entry === null )
         {
             console.log(`Entry is white space, invalid input`)
-            
+
             // exit if entry is optional.
             if(isOptional )
             {
@@ -2278,7 +2255,8 @@ async function getUserEntry(tp,text,isMultiple,isOptional){
                 IsEntering =  false;
             }
             errormsg ="Entry cannot be white space"
-            continue
+            return null
+            
         }
 
         if(!isMultiple)
@@ -2533,6 +2511,7 @@ async function MakeDocumentFiles(tp,Template,DocumentDirectory,MakeDefault,isNum
     
 }
 
+
 /**
  * Compares too file names to sort them in an array. 
  * @date 25/12/2023
@@ -2596,16 +2575,14 @@ const Commands = {
             isExpanding: false,
         }
 
-        let choise = await getUserChoise(tp,dialog,menu,Options)
+        let choise = await GetUserChoise(tp,dialog,menu,Options)
 
         Meta[Argument] = choise;
-
 
         if(!choise || Array.isArray(choise))
         {
             return
         }
-        // await Select(Argument,tp)
     },
     SelectAdd : async (Argument,tp)=>{
         Argument = await ReplaceValues(Argument)
@@ -2616,10 +2593,8 @@ const Commands = {
             isExpanding: true,
         }
 
-        let choise = await getUserChoise(tp,dialog,menu,Options)
+        let choise = await GetUserChoise(tp,dialog,menu,Options)
 
-        
-        
         if(!choise || Array.isArray(choise))
         {
             return
@@ -2636,9 +2611,8 @@ const Commands = {
             isExpanding: false,
         }
 
-        let choise = await getUserChoise(tp,dialog,menu,Options);
+        let choise = await GetUserChoise(tp,dialog,menu,Options);
 
-        
         if(!choise  || Array.isArray(choise))
         {
             BreakScript = true;
@@ -2647,7 +2621,6 @@ const Commands = {
 
         Meta[Argument] = choise;
         layers.push(choise);
-
     },
     AddLayer : async(Argument,tp) =>{
         Argument = await ReplaceValues(Argument);
@@ -2665,11 +2638,9 @@ const Commands = {
             isExpanding: false,
         }
 
-        let choise = await getUserChoise(tp,dialog,menu,Options);
+        let choise = await GetUserChoise(tp,dialog,menu,Options);
 
         Meta[Argument] = choise;
-
-        // await Options(Argument,tp)
     },
     OptionsAdd: async(Argument,tp)=>{
 
@@ -2680,11 +2651,10 @@ const Commands = {
             isExpanding: true,
         }
 
-        let choise = await getUserChoise(tp,dialog,menu,Options);
+        let choise = await GetUserChoise(tp,dialog,menu,Options);
 
         Meta[Argument] = choise;
 
-        // await Options(Argument,tp)
     },
     Check : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
@@ -2695,7 +2665,7 @@ const Commands = {
             isExpanding: false,
         }
 
-        let choise = await getUserChoise(tp,dialog,[false,true],Options);;
+        let choise = await GetUserChoise(tp,dialog,[false,true],Options);;
         
 
         if(choise === null)
@@ -2706,18 +2676,14 @@ const Commands = {
         {
             Meta[Argument] = choise;
         }
-
-        // await Check(Argument,tp)
     },
     Input : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
         Meta[Argument] = await getUserEntry(tp,dialog,false,false);
-        // await Input(Argument,tp)
     },
     List : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
         Meta[Argument] = await getUserEntry(tp,dialog,true,true);
-        // await List(Argument,tp)
     },
     SetDate : async(Argument,tp)=>{
         Argument = await ReplaceValues(Argument);
@@ -2892,7 +2858,6 @@ function TimeoutAfter(CallBack,TimeLimit){
 
 
 
-
 /**
  * Reads the provided {@link Text} and looks if there is a Yaml Block encased in between suffex and prefex (---).
  * If the Yaml Block was not found it returns null.
@@ -2905,19 +2870,25 @@ function TimeoutAfter(CallBack,TimeLimit){
 async function GetYmlBlock(Text)
 {
     console.log(`Looking for Yml (MetaData) block in File `)
-    console.log(currentFile)
+    
+    
 
     const YmlBlockRegExp = new RegExp(/(?<=\-{3}\n)(.|\n)+(?=\n\-{3}\n)/gm)
 
-    console.log(`Looking for Yml Block`)
 
     let func = async()=>
     { 
         return Text.match(YmlBlockRegExp)
     }
-    return await TimeoutAfter(func,TimeLimit)
+    const Matches =  await TimeoutAfter(func,TimeLimit)
+    if(!Matches)
+    {
+        return null
+    }
+    
+    
+    return Matches[0] 
 }
-
 
 /**
  * Takes a text {@link YmlBlock} similar to  Yaml format, and returns the top level keys inside the the provided YmlBlock.
@@ -2950,6 +2921,7 @@ async function GetKeysFromYmlBlock(YmlBlock)
     
 }
 
+
 /**
  * Searches for the provided {@link key} in the provided {@link YamlBlock}.
  * @date 28/12/2023
@@ -2961,22 +2933,31 @@ async function GetKeysFromYmlBlock(YmlBlock)
  */
 async function GetKeyBlockInYmlBlock(YmlBlock,key){
 
-
-    // (?:^banner\:\ *)((\n+\ +\-\ +[\u0021-\uffff][\u0020-\uffff]*)|(\n+\ +[\u0021-\uffff]+\:\ ?)+|([\u0021-\uffff][\u0020-\uffff]*)?)+
+    // (?:^${key}\:\ *)((\n*\ +\-\ +[\u0021-\uffff][\u0020-\uffff]*)|(\n*\ +[\u0021-\uffff]+\:\ ?)+|([\u0021-\uffff][\u0020-\uffff]*)?)+
+    // Regular Expression to the Block of values for the given key inside the given  YmlBlock
     const keyLineRegExp = new RegExp(`(?:^${key}\\:\\ *)((\\n*\\ +\\-\\ +[\\u0021-\\uffff][\\u0020-\\uffff]*)|(\\n*\\ +[\\u0021-\\uffff]+\\:\\ ?)+|([\\u0021-\\uffff][\\u0020-\\uffff]*)?)+`,`gmi`)
 
-    console.log(`Looking for Keys in Yml Block`)
 
+
+    // matching function rapper to be used in the TimeoutAfter function, for them 
     let func = async()=>
     { 
-        return YmlBlock[0].match(keyLineRegExp)
+        return YmlBlock.match(keyLineRegExp)
     }
 
+    // getting the key block from the YmlBlock using the timeout function to avoid problems.
     let KeyBlock = await TimeoutAfter(func,TimeLimit)
-
-    console.log(`keyblock`)
+    console.log(`KeyBlock`)
     console.log(KeyBlock)
-    return KeyBlock
+
+    // return null if the KeyBlock does not exit.
+    if(!KeyBlock)
+    {
+        return null
+    }
+    
+    // return the first match.
+    return KeyBlock[0] 
 }
 
 
@@ -2992,91 +2973,123 @@ async function GetKeyBlockInYmlBlock(YmlBlock,key){
  *
  * @async
  * @param {String} KeyBlock - The Complete block fo text of one Yml property.
- * @param {String} key - The of the KeyBlock (only used for logging purposes)
  * @returns {Promise<null|object|string|string[]>}
  */
-async function GetKeyProperties(KeyBlock,key){
+async function GetKeyProperties(KeyBlock){
 
+    // Regular Expression to the Block of values for the given keyBlock
     const KeyPropetiesRegExp = new RegExp(/((?<=^[\u0021-\uffff]+\:\ *\n*)((\n+\ +[\u0021-\uffff]+\:\ *)+((\n*\ +\-\ +[\u0021-\uffff][\u0020-\uffff]+)+|([\u0021-\uffff][\u0020-\uffff]*)+)+)+)|((?<=^[\u0021-\uffff]+\:\ *)[\u0021-\uffff][\u0020-\uffff]*)|((?<=\- \ *)[\u0021-\uffff][\u0020-\uffff]*)/gim)
 
+    // Wrapper function to get key properties to be used in the TimeOut function. 
     let func = async()=>
     { 
         return KeyBlock.match(KeyPropetiesRegExp)
     }
 
-    console.log(`looking for propertues for ${key}`)
+    // console.log(`looking for Properties for ${key}`)
     const Props = await TimeoutAfter(func,TimeLimit)
 
+    // return null if the block have no properties
     if(!Props)
     {
         return null
     }
 
-    const spacingRegexp = new RegExp(/(?<=^[\u0021-\uffff]+:\ ?\n+)\ +(?=\w.+)/mg)
+    
+    // regular expression to check if the block is an array or not, returns the values.
+    const ArrayPatternRegexp = new RegExp(/(?<=^[\u0021-\uffff]+:\ ?\n+)(\n?\ +(?=\-\ ((\w|(?<emoji>(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])))|\"(\w|\k<emoji>)|\'\w)).+)+/g)
 
+    // Wrapper function to get array values to be used in the TimeOut function.
+    func = async()=>{
+        return KeyBlock.match(ArrayPatternRegexp)
+    }
+
+    let isArray = await TimeoutAfter(func,TimeLimit)
+
+    // if the regular expression returns any values, then return values of the array.
+    if(isArray)
+    {
+        // console.log(`is an array`)
+        // convert values of the array from string, to appropriate values.
+        return await ConvertValue(Props)
+    }
+
+    // Regular expression to check if the key is an object with nested values.
+    // if key have any spaces on the line below it, and there is no values next to it.
+    const spacingRegexp = new RegExp(/(?<=^[\u0021-\uffff]+:\ ?\n+)\ +(?=\w.+)/mg)
     func = async()=>
     { 
         return KeyBlock.match(spacingRegexp)
     }
 
-    console.log(`checking if ${key} is an object or not`)
-    let space = await TimeoutAfter(func,TimeLimit)
-    if(!space)
+    // console.log(`checking if ${key} is an object or not`)
+    let isNested = await TimeoutAfter(func,TimeLimit)
+    if(!isNested)
     {
-        console.log(`spaces are not found, key dose not have any properties. (key is not a object)`)
-        return await ConvertValue(Props)
+        // console.log(`spaces are not found, key dose not have any properties. (key is not a object)`)
+        return await ConvertValue(Props[0])
     }
     
-    let spacing = space[0].length;
+    // getting after the spaces of nested keys
+    let spacing = isNested[0].length;
 
+    // regular expression to read the nested key values as a Yaml Block.
     const SpaceRegExp = new RegExp(`^\ {${spacing}}(?=.+|\n$)`,`gm`);
 
+    // Wrapper function to get nested key values to be used in the TimeOut function.
     func = async()=>
     {
         return KeyBlock.replace(SpaceRegExp,"");
     }
 
-    console.log(`removeing spacing from ${key}'s properties`)
-    let newYmlBlock = await TimeoutAfter(func,TimeLimit);
+    // console.log(`removeing spacing from ${key}'s properties`)
+    // getting the nested keys as a yaml block.
+    let nestedYmlBlock = await TimeoutAfter(func,TimeLimit);
     
-    if(!newYmlBlock)
+    // if there is no yamlBlock return null
+    if(!nestedYmlBlock)
     {
         return null;
     }
 
-    // return newYmlBlock;
+    
+    // getting keys from nested Yaml Block 
+    const isYmlKeys = await GetKeysFromYmlBlock(nestedYmlBlock)
 
-    const isYmlKeys = await GetKeysFromYmlBlock(newYmlBlock[0])
-    console.log(`looking for nested keys in ${key}`)
-
+    // console.log(`looking for nested keys in ${key}`)
+    // return null if no keys were found.
     if(!isYmlKeys)
     {
-        console.log(`no nested keys where found in ${key}`)
-        console.log(isYmlKeys)
+        // console.log(`no nested keys where found in ${key}`)
+        // console.log(isYmlKeys)
         return null
     }
 
 
-    console.log(`looping through nested keys of ${key}`)
+    // console.log(`looping through nested keys of ${key}`)
 
     const Properties = {} 
+    // loop over keys in nested yamlBlock as if it is a normal Yaml Block. 
+    // return ing the value as a JS object. 
     for (const Key of isYmlKeys)
     {
-        const KeyBlock = GetKeyBlockInYmlBlock(newYmlBlock,Key)
+        
+        const nestedKeyBlock = GetKeyBlockInYmlBlock(nestedYmlBlock,Key)
 
-        if(!KeyBlock)
+        if(!nestedKeyBlock)
         {
-            console.log(`nested key block was not found`)
-            console.log(KeyBlock)
+            // console.log(`nested key block was not found`)
+            // console.log(KeyBlock)
             Properties[Key] = null
             continue
         }
-        Properties[Key] = GetKeyProperties(KeyBlock[0],Key);
+        Properties[Key] = await GetKeyProperties(nestedKeyBlock,Key);
     }
 
     return  Properties
     
 }
+
 
 
 /**
@@ -3089,8 +3102,6 @@ async function GetKeyProperties(KeyBlock,key){
  */
 async function GetFileYamlProperties(file)
 {
-    // console.log(`reading the current value if a virable/key with the name\n${Argument}\nfrom teh currente file \n@${currentFile.path}`)
-    
     
     // Getting value using Regexp the none bitch way
     const Text = await app.vault.read(file);
@@ -3112,7 +3123,7 @@ async function GetFileYamlProperties(file)
         console.log(isYmlBlock)
         return null
     }
-    const isYmlKeys = await GetKeysFromYmlBlock(isYmlBlock[0])
+    const isYmlKeys = await GetKeysFromYmlBlock(isYmlBlock)
     
     if(!isYmlKeys)
     {
@@ -3136,8 +3147,8 @@ async function GetFileYamlProperties(file)
             Properties[key] = null
             continue
         }
-        console.log(KeyBlock[0])
-        Properties[key] = await GetKeyProperties(KeyBlock[0],key);
+        console.log(KeyBlock)
+        Properties[key] = await GetKeyProperties(KeyBlock,key);
     }
     
     return Properties
@@ -3250,12 +3261,14 @@ async function getInlineValues(Text,key){
  * @date 28/12/2023 - 23:30:19
  * 
  * @async
- * @param {String} Value - the provided value to convert 
+ * @param {String[]|String} Value - the provided value to convert 
  * @returns {Promise<*>} - Could be anything.
  */
 async function ConvertValue(Value)
 {
 
+    // console.log(`converting value`)
+    // console.log(Value)
     if(!Value)
     {
         return null
@@ -3263,9 +3276,9 @@ async function ConvertValue(Value)
 
     let trueRegxep = RegExp(/true/i)
     let falseRegxep = RegExp(/false/i)
-    if(Value.length > 1)
+    if(Array.isArray(Value))
     {
-        console.log(`value is an array`)
+        // console.log(`value is an array`)
         let Arr =[]
 
         for(const val of Value)
@@ -3293,59 +3306,60 @@ async function ConvertValue(Value)
                 continue
             }
 
-            let datt = await moment(Value[0]).isValid()
+            let datt = await moment(val).isValid()
             if(datt)
             {
-                Arr.push(await moment(Value[0]).format("YYYY-MM-DDTHH:mm:ssZ"))
+                Arr.push(await moment(val).format("YYYY-MM-DDTHH:mm:ssZ"))
             }
                     
             Arr.push(val)
         }
-        console.log(`Val`)
-        console.log(Arr)
+        // console.log(`Val`)
+        // console.log(Arr)
         return Arr
     }
 
-    let val = Value[0]
+    let val = Value
 
-    console.log(`Val`)
-    console.log(Value)
-    let istrue = Value[0].match(trueRegxep);
+    // console.log(`not an array `)
+    // console.log(`Val`)
+    // console.log(Value)
+    let istrue = Value.match(trueRegxep);
     if(istrue)
     {
-        console.log(`is bool`)
+        // console.log(`is bool`)
         return true
     }
-    let isfalse = Value[0].match(falseRegxep);
+    let isfalse = Value.match(falseRegxep);
     if(isfalse)
     {
-        console.log(`is bool`)
+        // console.log(`is bool`)
         return false
     }
 
-    let parse = parseFloat(Value[0])
+    let parse = parseFloat(Value)
 
     const whiteSpaceRegExp= RegExp(/\ */gm);
 
     
-    if(!isNaN(parse) && parse.toString().replace(whiteSpaceRegExp,"").length == Value[0].replace(whiteSpaceRegExp,"").length)
+    if(!isNaN(parse) && parse.toString().replace(whiteSpaceRegExp,"").length == Value.replace(whiteSpaceRegExp,"").length)
     {
         console.log(`is number`)
         console.log(parse)
         return parse
     }
 
-    let datt = await moment(Value[0]).isValid()
+    let datt = await moment(Value).isValid()
     if(datt)
     {
-        console.log(`is Date`);
-        console.log(await moment(Value[0]).format("YYYY-MM-DDTHH:mm:ssZ"));
+        // console.log(`is Date`);
+        // console.log(await moment(Value).format("YYYY-MM-DDTHH:mm:ssZ"));
 
-        return await moment(Value[0]).format("YYYY-MM-DDTHH:mm:ssZ");
+        return await moment(Value).format("YYYY-MM-DDTHH:mm:ssZ");
     }
 
-    console.log(`string`);
-    console.log(val);
+    // console.log(`string`);
+    // console.log(val);
     return val
 }
 

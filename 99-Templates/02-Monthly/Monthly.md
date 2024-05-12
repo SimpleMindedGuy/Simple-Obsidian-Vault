@@ -25,16 +25,18 @@ tags:
  - Monthly
 aliases:
  - <%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY-MM") %>
-dayName: "{{date: dddd}}"
-day: "{ date: DD }": 
-monthNmber: "{{date: MMMM}}"
-month: "{ date: MM }": 
-week: "{ date: ww }": 
-year: "{ date: YYYY }": 
-banner: "![[80-Gallery/Banner/youtube banner.png]]"
-banner_icon: 🗓️
+aliases:
+ - "<% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM")%>"
+
+monthName: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-MM")%>"
+month: <% tp.date.now("MM",0,tp.file.title, "YYYY-MM")%>
+year: <% tp.date.now("YYYY",0,tp.file.title, "YYYY-MM")%>
+
+banner: "![[80-Gallery/Banner/Writing-beginners.png]]"
+banner_icon: 📆
 ---
-# Title
+# !(🏷️)
+<% tp.date.now("MM - MMMM / YYYY  - hh:mm a",0,tp.file.title, "YYYY-MM")%>
 
 
 ## Days
@@ -46,7 +48,6 @@ banner_icon: 🗓️
 [[/01-Weekly/<%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY") %>/<%moment(tp.file.title,"YYYY-MM").add(3,'weeks').format("YYYY-[W]ww") %>|<%moment(tp.file.title,"YYYY-MM").add(3,'weeks').format("YYYY-[W]ww") %>]]
 [[/01-Weekly/<%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY") %>/<%moment(tp.file.title,"YYYY-MM").add(4,'weeks').format("YYYY-[W]ww") %>|<%moment(tp.file.title,"YYYY-MM").add(4,'weeks').format("YYYY-[W]ww") %>]]
 [[/01-Weekly/<%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY") %>/<%moment(tp.file.title,"YYYY-MM").add(5,'weeks').format("YYYY-[W]ww") %>|<%moment(tp.file.title,"YYYY-MM").add(5,'weeks').format("YYYY-[W]ww") %>]]
-
 
 
 
@@ -86,7 +87,6 @@ customJS.DvWeeklyCharts.renderMonth({
 {{{:::
 
 <%* tp.user.NewDocument(tp,true) %>
-Input :=> 🏷️
 
 Dialog :=> {
 Books to refer to if any
@@ -97,7 +97,7 @@ SetSearchKey :=> 📚
 GetQueryList :=> menu
 
 
-SetSearchQuery :=> (" #Book And #Description ")
+SetSearchQuery :=> #Book And #Description
 SetSearchKey :=> 🏷️
 GetQueryList :=> menu2
 
@@ -112,6 +112,11 @@ Alias :
 
 List :=> aliases
 
+Dialog :=> {
+Names to refer to the document
+Tags : 
+}
+
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
 GetQueryList :=> menu
@@ -121,4 +126,12 @@ Menu :=> [!(menu)]
 OptionsAdd :=> tags
 
 List :=> tags
+
+Dialog :=>{
+Month's title
+}
+Input :=> 🏷️
+
+BuildInFile :=>
+
 :::}}}
