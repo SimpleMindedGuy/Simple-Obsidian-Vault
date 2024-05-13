@@ -214,25 +214,42 @@ example of how to get All the `tags` in the whole vault.
 
 > [!note]
 > SetSearchQuery :=> ("/")
+> 
 > SetSearchKey :=> tags
+> 
 > GetQueryList :=> menu
+> 
 > Menu :=> \[!(menu)\]
+> 
 > in this example,  we specify that we want all the files that are children or nested children of the "root" folder of the current vault.
+> 
 > we then store all the values of tags for each file, and store them in a list
+>
+> 
 > then it is stored in a `meta` `key` with the name menu.
+> 
 > Then uses the `key`(menu) to make the next List/Menu for the user to chsoe from
+> 
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd) , [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
 > [!note]
 > SetSearchQuery :=>  #Activities and #Description
+> 
 > SetSearchKey :=> 🏷️
+> 
 > GetQueryList :=> menu
+> 
 > Menu :=> \[!(menu)\]
+> 
 > in this example,  we specify that we want all the files that have the tag `#Activities` and also have the tag `Description` in the whole vault
+> 
 > we then store all the values of 🏷️ for each file, and store them in a list
+> 
 > then it is stored in a `meta` `key` with the name menu.
+> 
 > Then uses the `key`(menu) to make the next List/Menu for the user to chsoe from
+> 
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd) , [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
