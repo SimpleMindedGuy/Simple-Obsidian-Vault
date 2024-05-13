@@ -1,5 +1,6 @@
-> [!danger]
+> [!warning]
 > Things Will change in the future.
+> 
 > the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
 
 # Introduction
