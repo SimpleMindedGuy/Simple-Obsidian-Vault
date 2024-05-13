@@ -212,7 +212,7 @@ example of how to get All the `tags` in the whole vault.
 
 
 
-> [!example] 
+> [!example]
 > SetSearchQuery :=> ("/")
 > SetSearchKey :=> tags
 > GetQueryList :=> menu
@@ -224,7 +224,7 @@ example of how to get All the `tags` in the whole vault.
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd) , [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
-> [!example] 
+> [!example]
 > SetSearchQuery :=>  #Activities and #Description
 > SetSearchKey :=> 🏷️
 > GetQueryList :=> menu
