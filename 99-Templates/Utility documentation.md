@@ -212,7 +212,7 @@ example of how to get All the `tags` in the whole vault.
 
 
 
-> [!example]
+> [!note]
 > SetSearchQuery :=> ("/")
 > SetSearchKey :=> tags
 > GetQueryList :=> menu
@@ -224,7 +224,7 @@ example of how to get All the `tags` in the whole vault.
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd) , [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
-> [!example]
+> [!note]
 > SetSearchQuery :=>  #Activities and #Description
 > SetSearchKey :=> 🏷️
 > GetQueryList :=> menu
@@ -345,7 +345,7 @@ Tells the script to move to the next file in the `layers` list.
 
 the script will look for the next file, in the template folder 
 
-> [!Example]
+> [!note]
 > if layers have the values \[project,type\]
 > when reading the `NextFile:=>` command, it then looks in the Template file (`99-Template`, in the default configuration.)
 > for a folder called `porject`, then it looks for a note with the name `project`.
@@ -412,7 +412,7 @@ MoveMedia :=>  `path`
 
 Moves attachments from where ever they are, to the specified path.
 
-> [!example]
+> [!note]
 > when using a "fixed" path 
 > just type the path as normal : path/to/folder
 > when using variables  use the current format :  !(`key`)/!(`key`)/!(`key`)
@@ -465,7 +465,7 @@ By default the parent document key is called `parent`, but in the current config
 
 And it only starts building document folders using the `layers` list, starting for the current document's file.
 
-> [!example] 
+> [!note] 
 > the default command for making subnote, uses the command 
 > `AddLayer :=> SubNote`
 > so that the utility looks for SubNote Templates. 
