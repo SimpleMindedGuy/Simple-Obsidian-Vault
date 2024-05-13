@@ -73,11 +73,13 @@ The values in the `Meta` variable are then used to write those values to the cor
 
 ## currentValue 
 A variable that contains some value that can be taken from the current file that is being read.
+
 Or directly from the script itself. 
 
 Then used later on to be stored in `Meta` values that can be then written into the files. 
 ## currentDate
 A variable that contains some Date value to be set directly from the script. 
+
 Or directly from the script itself. 
 
 Then used later on to be stored in `Meta` values that can be then written into the files. 
@@ -210,6 +212,7 @@ the values will be set at the last stage (when building the document or file), t
 SetSearchQuery :=> `Text`
 
 Sets a value for a variable in the script with the name `SearchQuery` to the provided `Text`.
+
 This is used in the command [GetQueryList](#GetQueryList), to get information from all functions that fulfil the query specifications.
 
 
@@ -218,6 +221,7 @@ This is used in the command [GetQueryList](#GetQueryList), to get information fr
 SetSearchKey :=> `key`
 
 Sets a value for a variable in the script with the name `SearchKey` to the provided `Text`.
+
 This is used in the command [GetQueryList](#GetQueryList), to get A list of all the values of `key` in all the files that fulfil the query specifications.
 
 ## GetQueryList
@@ -231,6 +235,7 @@ GetQueryList :=> `key`
 Performs a Query search, using the `SearchQuey`, and returns a List of all the values of the `SearchKey`, in all the files that fulfil the query specifications. 
 
 This is useful for getting a list of any value in the whole, vault or in a specific folder in the vault, or for all the files that have a specific `tag/s`
+
 example of how to get All the `tags` in the whole vault.
 
 
@@ -375,6 +380,7 @@ The value/s is then stored in `Meta` using the variable with the name `Key`
 Check :=> `key`
 
 Shows an input dialogue for the user with options for True/False values.
+
 The value/s is then stored in `Meta` using the variable with the name `Key`.
 
 ## NextFile
@@ -388,8 +394,11 @@ the script will look for the next file, in the template folder
 > [!note]
 > if layers have the values \[project,type\]
 > when reading the `NextFile:=>` command, it then looks in the Template file (`99-Template`, in the default configuration.)
+> 
 > for a folder called `porject`, then it looks for a note with the name `project`.
-> then it tries to look for a command block in that note. 
+> 
+> then it tries to look for a command block in that note.
+> 
 > ```dirtree
 > - / template folder
 > 	- / project
@@ -398,6 +407,7 @@ the script will look for the next file, in the template folder
 
 > [!note] 
 > When looking for templates, the script, will look again for folders with the names of values inside the `layers` list.
+> 
 > when cannot find a folder, it stops at the last folder it finds, and uses it to look for templates later. 
 
 
@@ -484,6 +494,7 @@ BuildDocument :=>
 
 > [!Note]
 > Template files MUST include the suffix Template in their file name.
+> 
 > and any "default" metadata should be written into the file it self.
 
 
@@ -535,6 +546,7 @@ Used only to Take input from the user, and then use it to write metadata in the 
 The button's plugin, allows us to refer to a note in the Template folder, and when clicking on the button it then appends the note it is referred to, then executes any Templater commands it contains in that note 
 
 We can take advantages of this functionality, by making multiple notes that have sets of commands in them.
+
 To make this work we have to tell the Script that I needs to read the current file. 
 
 What happens then is that the button embeds the commands inside the current file, then the script, reads and "executes" all the commands, will stop and remove all commands from the current file.
