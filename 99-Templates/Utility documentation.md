@@ -412,7 +412,7 @@ MoveMedia :=>  `path`
 
 Moves attachments from where ever they are, to the specified path.
 
-> [!example] 
+> [!example]
 > when using a "fixed" path 
 > just type the path as normal : path/to/folder
 > when using variables  use the current format :  !(`key`)/!(`key`)/!(`key`)
