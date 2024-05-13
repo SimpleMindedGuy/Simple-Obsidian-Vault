@@ -1,9 +1,9 @@
-> [!Important]
+> [!note]
 > This part of the script is in "maintenance mode", later on, I might look in to turning this functionality, into some sort of a plugin later on, but that's far in the future. 
 > I don't intend to add features anytime soon, but feel free to request them. 
 
 
-> [!Important]
+> [!note]
 > To be able to use the commands, you need to have a templater command 
 > - `<%* tp.user.main(true) %>` 
 > 	if you are trying to read the commands in the current file 
@@ -356,7 +356,7 @@ the script will look for the next file, in the template folder
 > 		- project 
 > ```
 
-> [!important] 
+> [!note] 
 > When looking for templates, the script, will look again for folders with the names of values inside the `layers` list.
 > when cannot find a folder, it stops at the last folder it finds, and uses it to look for templates later. 
 
@@ -420,7 +420,7 @@ Moves attachments from where ever they are, to the specified path.
 > MoveMedia :=> ExampleFolder/nested
 
 
-> [!important]
+> [!note]
 > using the character \$ might end up rendering the as latex, but that won't affect how the script functions. 
 
 
