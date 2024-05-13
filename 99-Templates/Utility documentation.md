@@ -1,17 +1,22 @@
 > [!note]
-> This part of the script is in "maintenance mode", later on, I might look in to turning this functionality, into some sort of a plugin later on, but that's far in the future. 
+> This part of the script is in "maintenance mode", later on, I might look in to turning this functionality, into some sort of a plugin later on, but that's far in the future.
+> 
 > I don't intend to add features anytime soon, but feel free to request them. 
 
 
 > [!note]
 > To be able to use the commands, you need to have a templater command 
-> - `<%* tp.user.main(true) %>` 
-> 	if you are trying to read the commands in the current file 
+> - `<%* tp.user.main(true) %>`
+>   
+> 	if you are trying to read the commands in the current file
+>
 > - `<%* tp.user.main(false) %>`
 > 	if you are trying to read the commands in the 'NewDocument' File
 > 	the script it self used to be  located at [./95-Scripts/NewDocument.js](./95-Scripts/NewDocument.js)
+>
 > 	Now is split into multiple functions, those functions are called starting from `main` function located at [./95-Scripts/00-Basic-Functions/main.js](./95-Scripts/00-Basic-Functions/main.js).
-> 	 Those functions can be used on their own with the exception for the functions in the folders (06-Utility Specific and 01-Commands) because they rely on global values that would be set through some of other functions. 
+> 	Those functions can be used on their own with the exception for the functions in the folders (06-Utility Specific and 01-Commands) because they rely on global values that would be set through some of other functions.
+> 
 > 	 However, with a little bit of reading of reading, you should be able to understand how to use All the functions in the utility, **Assuming that you have a little knowledge in coding and javascript**. 
 
 # Keywords/Terminology
@@ -51,12 +56,16 @@ Is a variable the script will store all input data, as long as there is a `key` 
 
 > [!note]
 > Input :=> number
+> 
 > will result in a value/variable called `number` with the chosen value
-> it should look like this 
+> 
+> it should look like this
+> 
 > `number:one`
 
 > [!note]
 > GetValue :=> 🗓️ // gets a property in the current file with the name 🗓️, and stores is in a specific variable called `currenValue`.
+> 
 > StoreValue :=> createdDate // Stores the current value of the `currentValue` variable, and stores it in a `Key` inside the `Meta` variable.
 
 The values in the `Meta` variable are then used to write those values to the corresponding key inside the template of the generated document.
@@ -108,13 +117,21 @@ Sets a value or a list of values in a global variable called `value`, that value
 
 >[!note]
 >SetValue:=> hello world
+>
 >sets the value of `value` to 'hello world'
->StoreValue :=> hello   
+>
+>StoreValue :=> hello
+>
 >stores the value of `value` in the variable `sayHello`
+>
 >SetValue :=> [1,2,3,4]
+>
 >set the value of `value`
+>
 >StoreValue :=> Numbers
+>
 >Stores array [1,2,3,4] in the variable `Numbers`
+>
 
 
 ## Command Block
@@ -145,9 +162,14 @@ Those are mostly set in the [config](./Config) file, which will be read and “e
 
 >[!note]
 > SetCreatedKey :=> 🗓️
-> stead of storing the created date in a 
-> `Created: 21/1/2020` 
-> it stores it like this 
+>
+> stead of storing the created date in a
+>
+> `Created: 21/1/2020`
+>
+>
+> it stores it like this
+>
 > `🗓️: 21/1/2020`
 
 
@@ -430,10 +452,14 @@ MoveMedia :=>  `path`
 Moves attachments from where ever they are, to the specified path.
 
 > [!note]
-> when using a "fixed" path 
+> when using a "fixed" path
+> 
 > just type the path as normal : path/to/folder
+> 
 > when using variables  use the current format :  !(`key`)/!(`key`)/!(`key`)
+> 
 > MoveMedia :=> !(`key`)/!(`key`)/!(`key`)
+> 
 > MoveMedia :=> ExampleFolder/nested
 
 
@@ -483,11 +509,17 @@ By default the parent document key is called `parent`, but in the current config
 And it only starts building document folders using the `layers` list, starting for the current document's file.
 
 > [!note] 
-> the default command for making subnote, uses the command 
+> the default command for making subnote, uses the command
+> 
 > `AddLayer :=> SubNote`
-> so that the utility looks for SubNote Templates. 
+> 
+> so that the utility looks for SubNote Templates.
+>  
 > within the folder called SubNote.
-> then also builds a folder Called SubNote, inside the Current Document's Folder. 
+>
+> 
+> then also builds a folder Called SubNote, inside the Current Document's Folder.
+> 
 > and then it makes a Numbered file, using the Chosen Template, in the SubNote Folder.
 
 
