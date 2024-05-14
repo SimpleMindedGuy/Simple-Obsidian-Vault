@@ -75,9 +75,7 @@ async function RunFileCommands(File)
         console.log(`\n///////////////////`)
         const Command = await tp.user.ReadCommand(Line);
         const Argument =  await tp.user.ReadArgument(Line);
-        console.log(`01-Commands: RunFileCommands:\nLine:\n${Line}`)
-        console.log(`01-Commands: RunFileCommands:\nCommand:\n${Command}`)
-        console.log(`01-Commands: RunFileCommands:\nArgument:\n${Argument}`)
+        console.log(`01-Commands: RunFileCommands:\nLine : ${Line}\nCommand : ${Command}\nArgument : ${Argument}`)
         await Commands[Command](Argument,tp)
         let BreakScript = await window?.pkvs?.load("BreakScript");
         
@@ -492,7 +490,7 @@ const Commands = {
 
         const FileExtensionRegExp = new RegExp(/(?<=^.*)\..+$/gm)
 
-        let currentFilePath = window?.pkvs?.load("currentFilePath");
+        let currentFilePath = await window?.pkvs?.load("currentFilePath");
         let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
 
         let parentKey = await window?.pkvs?.load("parentKey");
@@ -506,6 +504,9 @@ const Commands = {
         Meta[parentKey] = `\"[[${filePath}|${fileName}]]\"`;
         console.log(`01-Commands: RunFileCommands: Commands.BuildSubDocument():\nBuilding Sub Document`);
         console.log(Meta[parentKey]);
+        
+
+
 
         let BuildOptions =  {
             BuildRoot : `/`,
@@ -525,8 +526,9 @@ const Commands = {
         const FileExtensionRegExp = new RegExp(/(?<=^.*)\..+$/gm)
 
 
-        let currentFilePath = window?.pkvs?.load("currentFilePath");
-    let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
+        let currentFilePath = await window?.pkvs?.load("currentFilePath");
+        let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
+
         let parentKey = await window?.pkvs?.load("parentKey");
         let Meta = await window?.pkvs?.load("Meta");
 
@@ -538,6 +540,8 @@ const Commands = {
         Meta[parentKey] = `\"[[${filePath}|${fileName}]]\"`;
         console.log(`01-Commands: RunFileCommands: Commands.BuildSubNote():\nBuilding Sub Note`);
         console.log(Meta[parentKey]);
+
+        await window?.pkvs?.store("Meta",Meta);
 
         let BuildOptions =  {
             BuildRoot : `${currentFile.parent.path}`,
@@ -553,19 +557,29 @@ const Commands = {
 
     },
     BuildInFile : async(Argument)=>{
-        let currentFilePath = window?.pkvs?.load("currentFilePath");
+        let currentFilePath = await window?.pkvs?.load("currentFilePath");
         let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
+
+        let Meta = await window?.pkvs?.load("Meta");
+
+        await window?.pkvs?.store("Meta",Meta);
+
         await tp.user.ReplaceYmlWithMetaIntoFile(currentFile);
         await tp.user.ReplaceInlineValueWithMetaIntoFile(currentFile);
         
     },
     MoveMedia : async(Argument)=>{
-        let currentFilePath = window?.pkvs?.load("currentFilePath");
+        let currentFilePath = await window?.pkvs?.load("currentFilePath");
         let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
+
+        let Meta = await window?.pkvs?.load("Meta");
+
 
         let padding = await window?.pkvs?.load("Padding");
         Argument = await tp.user.ReplaceValues(Argument)
         console.log(`Moving Media Files`)
+
+        await window?.pkvs?.store("Meta",Meta);
 
         await tp.user.MoveMedia(currentFile,Argument,true,padding)
     }

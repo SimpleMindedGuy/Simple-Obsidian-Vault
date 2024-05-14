@@ -9,6 +9,9 @@ StoreValue :=> 🎫
 GetValue :=> 🎟️
 StoreValue :=> 🎟️
 
+GetValue :=> tags
+StoreValue :=> tags
+
 AddLayer :=> SubNote
 
 Dialog :=> {
@@ -20,4 +23,5 @@ BuildSubNote :=>
 
 
 :::}}}
-<%* tp.user.main(true) %>
+
+<%* tp.user.main(true) -%>

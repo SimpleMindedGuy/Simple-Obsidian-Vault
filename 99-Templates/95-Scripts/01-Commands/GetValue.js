@@ -15,12 +15,14 @@
  */
 async function GetValue(Argument){
     
-    let currentFilePath = window?.pkvs?.load("currentFilePath");
+    let currentFilePath = await window?.pkvs?.load("currentFilePath");
+    console.log(`01-Commands: GetValue:\nreading the current value of a variable/key with the\nname : ${Argument}\nfrom teh current file \n@ ${currentFilePath}`)
+
+    let currentFileProperties = await window?.pkvs?.load("currentFileProperties");
+
     let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
-    console.log(`01-Commands: GetValue:\nreading the current value of a variable/key with the name\n${Argument}\nfrom teh current file \n@${currentFile.path}`)
     
     
-    let currentFileProperties = window?.pkvs?.load("currentFileProperties");
     
     if(!currentFileProperties)
     {

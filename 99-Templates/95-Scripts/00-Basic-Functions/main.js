@@ -173,28 +173,28 @@ let currentDateFormat="YYYY-MM-DDTHH:mm:ss.SSSZ",
     
 
 
-// /**
-//  * Folder paths 
-//  * - important for the utility to  know where to read commands from 
-//  * @date 16/12/2023 
-//  *
-//  * @typedef {string} TemplatePath 
-//  * - Folder where templates are stored.
-//  * @typedef {string} ConfigPath
-//  * - File where config file is stored
-//  * - config file will always be read first
-//  * - used to set values to some form of default that the user prefers
-//  * @typedef {string} NewDocumentPath 
-//  * - Utility default Command file
-//  * - mostly used generate a new document that is not - necessary - related to any other document.
-//  * @typedef {string} SubNotePath
-//  * - Utility Default SubNote Templates Folder
-//  * - May be removed later on.
-//  */
-// let TemplatePath = `99-Templates`,
-//     ConfigPath = '99-Templates/Config.md',
-//     NewDocumentPath = '99-Templates/NewDocument.md',
-//     SubNotePath = '99-Templates/60-SubNote';
+/**
+ * Folder paths 
+ * - important for the utility to  know where to read commands from 
+ * @date 16/12/2023 
+ *
+ * @typedef {string} TemplatePath 
+ * - Folder where templates are stored.
+ * @typedef {string} ConfigPath
+ * - File where config file is stored
+ * - config file will always be read first
+ * - used to set values to some form of default that the user prefers
+ * @typedef {string} NewDocumentPath 
+ * - Utility default Command file
+ * - mostly used generate a new document that is not - necessary - related to any other document.
+ * @typedef {string} SubNotePath
+ * - Utility Default SubNote Templates Folder
+ * - May be removed later on.
+ */
+let TemplatePath = `99-Templates`,
+    ConfigPath = '99-Templates/Config.md',
+    NewDocumentPath = '99-Templates/NewDocument.md',
+    SubNotePath = '99-Templates/60-SubNote';
 
 /**
  * @date 24/12/2023
@@ -224,7 +224,7 @@ async function main(Active){
     
     // Get the default config path
     const ConfigPath =  await window.pkvs.load("ConfigPath");
-    let Meta = await window.pkvs.load("Meta");
+    let Meta = await window?.pkvs?.load("Meta") ?? {};
     
     // Read the Config file
     console.log(`00-Basic-Functions: main: \nGetting Config File `);
@@ -237,8 +237,11 @@ async function main(Active){
     console.log(`00-Basic-Functions: main: \nRunning config file commands `);
     await tp.user.RunFileCommands(currentFile)
     
-    Meta[createdKey]  = tp.date.now ("");
-    Meta[modifiedKey] = tp.date.now ("");
+    createdKey = await window?.pkvs?.load("createdKey");
+    
+    
+
+    Meta[createdKey]  = await new moment().toISOString();
 
     await window.pkvs.store("Meta" , Meta);
 
@@ -282,7 +285,7 @@ async function main(Active){
     await tp.user.RemoveCommandBlock(currentFile)
 
     // Remove all global keys set by the script.
-    // RemoveDefaultsForGlobalValues()
+    await RemoveDefaultsForGlobalValues()
 
 }
 module.exports = main
@@ -389,7 +392,7 @@ async function SetDefaultsForGlobalValues(){
 
 
     // default files paths.
-    let TemplatePath = await app.plugins.getPlugin('templater-obsidian').settings.templates_folder
+    TemplatePath = await app.plugins.getPlugin('templater-obsidian').settings.templates_folder
     window.pkvs.store("TemplatePath", TemplatePath)
     window.pkvs.store("ConfigPath", `${TemplatePath}/Config.md`)
     window.pkvs.store("NewDocumentPath", `${TemplatePath}/NewDocument.md`)

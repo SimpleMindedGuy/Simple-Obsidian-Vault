@@ -19,8 +19,22 @@
                 "source": true
               }
             }
+          },
+          {
+            "id": "ba54beebb079eaf8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Home.md",
+                "mode": "preview",
+                "backlinks": true,
+                "source": true
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -137,7 +151,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "99-Templates/Utility documentation.md"
+                "file": "Home.md"
               }
             }
           },
@@ -147,7 +161,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "Home.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -159,7 +173,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "Home.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -176,7 +190,7 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "99-Templates/Utility documentation.md"
+                "file": "Home.md"
               }
             }
           },
@@ -214,18 +228,18 @@
       "dbfolder:Create a new database table": false,
       "obsidian-gallery:Gallery": false,
       "table-editor-obsidian:Advanced Tables Toolbar": false,
-      "periodic-notes:Open today": false,
       "templater-obsidian:Templater": false,
       "obsidian-excalidraw-plugin:Create new drawing": false,
-      "homepage:Open homepage": false
+      "homepage:Open homepage": false,
+      "periodic-notes:Open today": false
     }
   },
-  "active": "ccfa9f300fd13d9c",
+  "active": "ba54beebb079eaf8",
   "lastOpenFiles": [
+    "99-Templates/Utility documentation.md",
     "README.md",
     "99-Templates/30-Work/Work.md",
     "Home.md",
-    "99-Templates/Utility documentation.md",
     "99-Templates/Habit Tracking Documentation.md",
     "99-Templates/\".md",
     "00-Daily/2024/2024-02-02.md",

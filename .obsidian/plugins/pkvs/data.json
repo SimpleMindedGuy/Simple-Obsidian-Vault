@@ -1,0 +1,18 @@
+{
+  "lazyPersistence": false,
+  "persistedData": "{}",
+  "enableDomTab": false,
+  "enableInfoTab": false,
+  "enableNetworkTab": false,
+  "enableResourcesTab": false,
+  "enableSnippetsTab": false,
+  "enableSourcesTab": false,
+  "enableBenchmarkingToolkit": false,
+  "enableCodeTab": false,
+  "enableFeaturesTab": false,
+  "enableGeolocationTab": false,
+  "enableMonitorTab": false,
+  "enableOrientationTab": false,
+  "enableTimingTab": false,
+  "enableTouchesTab": false
+}
