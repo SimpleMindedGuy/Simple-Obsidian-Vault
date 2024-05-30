@@ -18,6 +18,7 @@ tags:
  - Problem
  - Progress
 aliases:
+banner: "[[80-Gallery/Banner/Progress.png]]"
 ---
 
 

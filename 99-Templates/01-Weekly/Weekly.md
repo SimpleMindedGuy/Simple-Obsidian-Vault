@@ -33,7 +33,7 @@ month: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-[W]ww")%>"
 week: "<% tp.date.now("ww",0,tp.file.title, "YYYY-[W]ww")%>"
 year: "<% tp.date.now("YYYY",0,tp.file.title, "YYYY-[W]ww")%>"
 
-banner: "![[80-Gallery/Banner/youtube banner.png]]"
+banner: "[[80-Gallery/Banner/Progress.png]]"
 banner_icon: 📊
 ---
 # !(🏷️)

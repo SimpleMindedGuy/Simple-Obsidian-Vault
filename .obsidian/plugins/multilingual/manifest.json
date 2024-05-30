@@ -1,0 +1,11 @@
+{
+	"id": "multilingual",
+	"name": "Multilingual",
+	"version": "1.0.0",
+	"minAppVersion": "1.0.0",
+	"description": "Simplify linking notes across multiple languages by automatically adding translations of note names into aliases. Designed for multilingual users.",
+	"author": "leolazou",
+	"authorUrl": "leolazou.com",
+	"fundingUrl": "ko-fi.com/leolazou",
+	"isDesktopOnly": false
+}

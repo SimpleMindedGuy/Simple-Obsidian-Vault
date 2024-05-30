@@ -13,7 +13,7 @@
 🏁: 
 🏹: 0
 🎯: 1
-banner: "![[Banner/typewriter.jpg]]"
+banner: "[[Banner/typewriter.jpg]]"
 tags:
  - People
  - Personal

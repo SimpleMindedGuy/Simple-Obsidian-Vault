@@ -18,7 +18,7 @@ tags:
  - Activities
  - Description
 aliases: 
-banner: "![[Gallery/Banner/descriptionbanner.png]]"
+banner: "[[80-Gallery/Banner/Description.png]]"
 ---
 
 # !(🏷️)

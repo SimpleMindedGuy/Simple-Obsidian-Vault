@@ -51,7 +51,7 @@ let dialog;
  *
  * @type {Array<string>}
  */
-let menu =[];
+let menu = [];
 
 
 /**
@@ -81,20 +81,20 @@ let currentFileProperties = null;
  * - Document directory will be built on the last layer
  * - Build Path starts from root Directory of the vault by default
 */
-let layers=[];
+let layers = [];
 
 /**
  * @type {number} 
  * - the Index of the current layer working in, based on the values stored in the {@link layers} array
 */
-let layerIndex=0;
+let layerIndex = 0;
 
 /**
  * @type {String|null} 
  * - The overview file path if any.
 */
-let OverviewPath=null;
-    
+let OverviewPath = null;
+
 /** 
  * 
  * @date 16/12/2023 
@@ -110,10 +110,10 @@ let OverviewPath=null;
  * - Stores The alias for the document.
  * @property {?*} [otherprops] - other properties may be added to be written to the document
  */
-let Meta={
-    tags:[],
-    aliases:[],
-    
+let Meta = {
+  tags: [],
+  aliases: [],
+
 };
 
 
@@ -130,12 +130,12 @@ let Meta={
  * @typedef {string|null} OverviewKey - Stores the Name of variable/key that will be used to specify which key is used to link the Overview File, with the documents associated with that overview file.
  * @typedef {string|null} OverviewLayer - Stores the Name of layer of which the overview file will be made at.
  */
-let createdKey="Created",
-    modifiedKey="Modified",
-    titleKey = "Title",
-    parentKey= "Parent",
-    OverviewKey= null,
-    OverviewLayer= null
+let createdKey = "Created",
+  modifiedKey = "Modified",
+  titleKey = "Title",
+  parentKey = "Parent",
+  OverviewKey = null,
+  OverviewLayer = null
 
 
 
@@ -146,9 +146,9 @@ let createdKey="Created",
  * @typedef {string} SearchKey - The key that holds the returned value. 
  * @typedef {string[]|number[]} SearchData - A list of all values matching the query.
  */
-let SearchQuery ="",
-    SearchKey = "",
-    SearchData;
+let SearchQuery = "",
+  SearchKey = "",
+  SearchData;
 
 
 
@@ -166,11 +166,11 @@ let SearchQuery ="",
  * @typedef {Date} currentDate - Stores the value for date as a date object.
  * @typedef {*} value - Stores any value given using the command {@link SetValue} 
  */
-let currentDateFormat="YYYY-MM-DDTHH:mm:ss.SSSZ",
-    currentDate, 
-    currentValue ;
+let currentDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ",
+  currentDate,
+  currentValue;
 
-    
+
 
 
 /**
@@ -192,9 +192,9 @@ let currentDateFormat="YYYY-MM-DDTHH:mm:ss.SSSZ",
  * - May be removed later on.
  */
 let TemplatePath = `99-Templates`,
-    ConfigPath = '99-Templates/Config.md',
-    NewDocumentPath = '99-Templates/NewDocument.md',
-    SubNotePath = '99-Templates/60-SubNote';
+  ConfigPath = '99-Templates/Config.md',
+  NewDocumentPath = '99-Templates/NewDocument.md',
+  SubNotePath = '99-Templates/60-SubNote';
 
 /**
  * @date 24/12/2023
@@ -205,7 +205,7 @@ let TemplatePath = `99-Templates`,
 let TemplateFolder
 
 
-    
+
 /**
  * @async 
  * 
@@ -213,79 +213,78 @@ let TemplateFolder
  * - {true} : read the active file, and ignore the NewDocument File
  * - {false} : read the newDocument File
  */
-async function main(Active){
-    
-    // setting default values for global keys
-    await SetDefaultsForGlobalValues();
+async function main(Active) {
 
-    // Getting Templater object for running functions
-    const tp = await window.pkvs.load("tp")
+  // setting default values for global keys
+  await SetDefaultsForGlobalValues();
 
-    
-    // Get the default config path
-    const ConfigPath =  await window.pkvs.load("ConfigPath");
-    let Meta = await window?.pkvs?.load("Meta") ?? {};
-    
-    // Read the Config file
-    console.log(`00-Basic-Functions: main: \nGetting Config File `);
-    let currentFile = await app.vault.getAbstractFileByPath(ConfigPath);
-    
-    await window.pkvs.store("currentFilePath" , currentFile.path);
-    
+  // Getting Templater object for running functions
+  const tp = await window.pkvs?.load("tp")
 
-    // use the function from the user Functions to run commands
-    console.log(`00-Basic-Functions: main: \nRunning config file commands `);
-    await tp.user.RunFileCommands(currentFile)
-    
-    createdKey = await window?.pkvs?.load("createdKey");
-    
-    
 
-    Meta[createdKey]  = await new moment().toISOString();
+  // Get the default config path
+  const ConfigPath = await window.pkvs?.load("ConfigPath");
+  let Meta = await window?.pkvs?.load("Meta") ?? {};
 
-    await window.pkvs.store("Meta" , Meta);
+  // Read the Config file
+  console.log(`00-Basic-Functions: main: \nGetting Config File `);
+  let currentFile = await app.vault.getAbstractFileByPath(ConfigPath);
 
-    if(!Active)
-    {
-        // getting the path for new document
-        let NewDocumentPath = await window.pkvs.load("NewDocumentPath")
-        // Reading the NewDocument file
-        console.log(`00-Basic-Functions: main: \nreading the New Document file`)
-        currentFile = await app.vault.getAbstractFileByPath(NewDocumentPath)
-        
-        // run Commands for the current file.
-        await window.pkvs.store("currentFilePath" , currentFile.path);
-        await tp.user.RunFileCommands(currentFile,tp)
+  await window.pkvs?.store("currentFilePath", currentFile.path);
 
-        // Make sure that the Meta value is synced.
-        Meta = await window.pkvs.load("Meta");
-        console.warn("00-Basic-Functions: main: \nMeta")
-        console.warn(Meta)
 
-        return
-    }
+  // use the function from the user Functions to run commands
+  console.log(`00-Basic-Functions: main: \nRunning config file commands `);
+  await tp.user.RunFileCommands(currentFile)
 
-    // Reading the current active file, and storing the value in global key ( for other scripts to access it later on.)
-    currentFile = await app.workspace.getActiveFile()
-    await window.pkvs.store("currentFilePath" , currentFile.path);
+  createdKey = await window?.pkvs?.load("createdKey");
 
-    console.warn(`00-Basic-Functions: main: \nReading active file `)
-    
 
-    // Run Commands for the current file.
-    await tp.user.RunFileCommands(currentFile)
+
+  Meta[createdKey] = await new moment().toISOString();
+
+  await window.pkvs?.store("Meta", Meta);
+
+  if (!Active) {
+    // getting the path for new document
+    let NewDocumentPath = await window.pkvs?.load("NewDocumentPath")
+    // Reading the NewDocument file
+    console.log(`00-Basic-Functions: main: \nreading the New Document file`)
+    currentFile = await app.vault.getAbstractFileByPath(NewDocumentPath)
+
+    // run Commands for the current file.
+    await window.pkvs?.store("currentFilePath", currentFile.path);
+    await tp.user.RunFileCommands(currentFile, tp)
 
     // Make sure that the Meta value is synced.
-    Meta = await window.pkvs.load("Meta");
-    console.warn(`00-Basic-Functions: main: \nMeta`);
-    console.warn(Meta);
+    Meta = await window.pkvs?.load("Meta");
+    console.warn("00-Basic-Functions: main: \nMeta")
+    console.warn(Meta)
+
+    return
+  }
+
+  // Reading the current active file, and storing the value in global key ( for other scripts to access it later on.)
+  currentFile = await app.workspace.getActiveFile()
+  await window.pkvs?.store("currentFilePath", currentFile.path);
+
+  console.warn(`00-Basic-Functions: main: \nReading active file `)
 
 
-    // Remove the Command Block form the current file
-    await tp.user.RemoveCommandBlock(currentFile)
+  // Run Commands for the current file.
+  await tp.user.RunFileCommands(currentFile)
 
-    // Remove all global keys set by the script.
-    await RemoveDefaultsForGlobalValues()
+  // Make sure that the Meta value is synced.
+  Meta = await window.pkvs?.load("Meta");
+  console.warn(`00-Basic-Functions: main: \nMeta`);
+  console.warn(Meta);
+
+
+  // Remove the Command Block form the current file
+  await tp.user.RemoveCommandBlock(currentFile)
+
+  // Remove all global keys set by the script.
+  await RemoveDefaultsForGlobalValues()
 
 }
 module.exports = main
@@ -299,105 +298,104 @@ module.exports = main
  * @async
  * @returns {void}
  */
-async function SetDefaultsForGlobalValues(){
+async function SetDefaultsForGlobalValues() {
 
 
-    // Getting Templater object for running functions
-    const tp = {}
-    const tpInternalFunctions = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.internal_functions.modules_array
+  // Getting Templater object for running functions
+  const tp = {}
+  const tpInternalFunctions = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.internal_functions.modules_array
 
-    for (const fun of tpInternalFunctions) {
-        tp[fun.name] = fun.static_object;  
-    }
-    
-    tp['user'] = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.user_functions.user_script_functions.generate_object();
-    
-    if(!tp)
-    {
-        console.log(`00-Basic-Functions: main: \nTemplater Object not found, please make sure the Templater plugin is enabled`);
-        return;
-    }
+  for (const fun of tpInternalFunctions) {
+    tp[fun.name] = fun.static_object;
+  }
 
-    // Templater Object for accessing functions in multiple places so i don't have to re-write this everywhere i use it
-    window.pkvs.store("tp" , tp);
+  tp['user'] = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.user_functions.user_script_functions.generate_object();
 
-    // default value for breaking the script.
-    window.pkvs.store("BreakScript" , BreakScript);
-    
-    
-    // default time limit for timing out functions 
-    window.pkvs.store("TimeLimit" , TimeLimit);
+  if (!tp) {
+    console.log(`00-Basic-Functions: main: \nTemplater Object not found, please make sure the Templater plugin is enabled`);
+    return;
+  }
 
-    // default padding value for numbered files and 
-    window.pkvs.store("Padding" , Padding);
+  // Templater Object for accessing functions in multiple places so i don't have to re-write this everywhere i use it
+  await window.pkvs?.store("tp", tp);
 
-    // default dialog value
-    window.pkvs.store("dialog" , dialog);
-    
-
-    // default menu value 
-    window.pkvs.store("menu" , []);
+  // default value for breaking the script.
+  await window.pkvs?.store("BreakScript", BreakScript);
 
 
+  // default time limit for timing out functions 
+  await window.pkvs?.store("TimeLimit", TimeLimit);
 
-    // default value for the current file.
-    window.pkvs.store("currentFilePath", null)
-    
+  // default padding value for numbered files and 
+  await window.pkvs?.store("Padding", Padding);
 
-    // default value for properties of the current file.
-    window.pkvs.store("currentFileProperties", {})
-
-
-    // default value for the folder of the directory.
-    window.pkvs.store("TemplateFolder", {})
-
-    // default value for layers to build.
-    window.pkvs.store("layers", [])
-    
-
-    // default value for the current layer of the file.
-    window.pkvs.store("layerIndex", 0)
+  // default dialog value
+  await window.pkvs?.store("dialog", dialog);
 
 
-    // default overview file.
-    window.pkvs.store("OverviewPath", null)
-
-    // default meta object value. 
-    window.pkvs.store("TemplatePath", {
-        tags:[],
-        aliases:[],  
-    })
+  // default menu value 
+  await window.pkvs?.store("menu", []);
 
 
 
-    // default time values and formats. 
-    window.pkvs.store("currentDateFormat", "YYYY-MM-DDTHH:mm:ss.SSSZ")
-    window.pkvs.store("currentDate", await moment());
-    window.pkvs.store("currentValue", null)
-    
-
-    // default query search values.
-    window.pkvs.store("SearchQuery", "")
-    window.pkvs.store("SearchKey", "")
-    window.pkvs.store("SearchData", null)
-    
-
-    // default values for file metadata specific keys.
-    window.pkvs.store("createdKey", "Created")
-    window.pkvs.store("modifiedKey", "Modified")
-    window.pkvs.store("titleKey", "Title")
-    window.pkvs.store("parentKey", "Parent")
-    window.pkvs.store("OverviewKey", null)
-    window.pkvs.store("OverviewLayer", null)
+  // default value for the current file.
+  await window.pkvs?.store("currentFilePath", null)
 
 
-    // default files paths.
-    TemplatePath = await app.plugins.getPlugin('templater-obsidian').settings.templates_folder
-    window.pkvs.store("TemplatePath", TemplatePath)
-    window.pkvs.store("ConfigPath", `${TemplatePath}/Config.md`)
-    window.pkvs.store("NewDocumentPath", `${TemplatePath}/NewDocument.md`)
-    window.pkvs.store("SubNotePath", `${TemplatePath}/60-SubNote`)
-    
+  // default value for properties of the current file.
+  await window.pkvs?.store("currentFileProperties", null)
+
+
+  // default value for the folder of the directory.
+  await window.pkvs?.store("TemplateFolder", {})
+
+  // default value for layers to build.
+  await window.pkvs?.store("layers", [])
+
+
+  // default value for the current layer of the file.
+  await window.pkvs?.store("layerIndex", 0)
+
+
+  // default overview file.
+  await window.pkvs?.store("OverviewPath", null)
+
+  // default meta object value. 
+  await window.pkvs?.store("TemplatePath", {
+    tags: [],
+    aliases: [],
+  })
+
+
+
+  // default time values and formats. 
+  await window.pkvs?.store("currentDateFormat", "YYYY-MM-DDTHH:mm:ss.SSSZ")
+  await window.pkvs?.store("currentDate", await moment());
+  await window.pkvs?.store("currentValue", null)
+
+
+  // default query search values.
+  await window.pkvs?.store("SearchQuery", "")
+  await window.pkvs?.store("SearchKey", "")
+  await window.pkvs?.store("SearchData", null)
+
+
+  // default values for file metadata specific keys.
+  await window.pkvs?.store("createdKey", "Created")
+  await window.pkvs?.store("modifiedKey", "Modified")
+  await window.pkvs?.store("titleKey", "Title")
+  await window.pkvs?.store("parentKey", "Parent")
+  await window.pkvs?.store("OverviewKey", null)
+  await window.pkvs?.store("OverviewLayer", null)
+
+
+  // default files paths.
+  TemplatePath = await app.plugins.getPlugin('templater-obsidian').settings.templates_folder
+  await window.pkvs?.store("TemplatePath", TemplatePath)
+  await window.pkvs?.store("ConfigPath", `${TemplatePath}/Config.md`)
+  await window.pkvs?.store("NewDocumentPath", `${TemplatePath}/NewDocument.md`)
+  await window.pkvs?.store("SubNotePath", `${TemplatePath}/60-SubNote`)
+
 
 }
 
@@ -410,130 +408,130 @@ async function SetDefaultsForGlobalValues(){
  * @async
  * @returns {void}
  */
-async function RemoveDefaultsForGlobalValues(){
+async function RemoveDefaultsForGlobalValues() {
 
-    // default value for breaking the script.
-    window.pkvs.delete("tp");
+  // default value for breaking the script.
+  await window.pkvs?.delete("tp");
 
-    // default value for breaking the script.
-    window.pkvs.delete("BreakScript" );
-    
-    
-    // default time limit for timing out functions 
-    window.pkvs.delete("TimeLimit" );
-
-    // default padding value for numbered files and 
-    window.pkvs.delete("Padding" );
-
-    // default dialog value
-    window.pkvs.delete("dialog" );
-    
-
-    // default menu value 
-    window.pkvs.delete("menu" );
+  // default value for breaking the script.
+  await window.pkvs?.delete("BreakScript");
 
 
+  // default time limit for timing out functions 
+  await window.pkvs?.delete("TimeLimit");
 
-    // default value for the current file.
-    window.pkvs.delete("currentFilePath")
-    
+  // default padding value for numbered files and 
+  await window.pkvs?.delete("Padding");
 
-    // default value for properties of the current file.
-    window.pkvs.delete("currentFileProperties")
-
-
-    // default value for the folder of the directory.
-    window.pkvs.delete("TemplateFolder")
-
-    // default value for layers to build.
-    window.pkvs.delete("layers")
-    
-
-    // default value for the current layer of the file.
-    window.pkvs.delete("layerIndex")
+  // default dialog value
+  await window.pkvs?.delete("dialog");
 
 
-    // default overview file.
-    window.pkvs.delete("OverviewPath")
-
-    // default meta object value. 
-    window.pkvs.delete("Meta")
+  // default menu value 
+  await window.pkvs?.delete("menu");
 
 
 
-    // default time values and formats. 
-    window.pkvs.delete("currentDateFormat")
-    window.pkvs.delete("currentDate");
-    window.pkvs.delete("currentValue")
-    
-
-    // default query search values.
-    window.pkvs.delete("SearchQuery", "")
-    window.pkvs.delete("SearchKey", "")
-    window.pkvs.delete("SearchData")
-    
-
-    // default values for file metadata specific keys.
-    window.pkvs.delete("createdKey")
-    window.pkvs.delete("modifiedKey")
-    window.pkvs.delete("titleKey")
-    window.pkvs.delete("parentKey")
-    window.pkvs.delete("OverviewKey")
-    window.pkvs.delete("OverviewLayer")
+  // default value for the current file.
+  await window.pkvs?.delete("currentFilePath")
 
 
-    // default files paths.
-    window.pkvs.delete("TemplatePath")
-    window.pkvs.delete("ConfigPath")
-    window.pkvs.delete("NewDocumentPath")
-    window.pkvs.delete("SubNotePath")
-    
+  // default value for properties of the current file.
+  await window.pkvs?.delete("currentFileProperties")
+
+
+  // default value for the folder of the directory.
+  await window.pkvs?.delete("TemplateFolder")
+
+  // default value for layers to build.
+  await window.pkvs?.delete("layers")
+
+
+  // default value for the current layer of the file.
+  await window.pkvs?.delete("layerIndex")
+
+
+  // default overview file.
+  await window.pkvs?.delete("OverviewPath")
+
+  // default meta object value. 
+  await window.pkvs?.delete("Meta")
+
+
+
+  // default time values and formats. 
+  await window.pkvs?.delete("currentDateFormat")
+  await window.pkvs?.delete("currentDate");
+  await window.pkvs?.delete("currentValue")
+
+
+  // default query search values.
+  await window.pkvs?.delete("SearchQuery", "")
+  await window.pkvs?.delete("SearchKey", "")
+  await window.pkvs?.delete("SearchData")
+
+
+  // default values for file metadata specific keys.
+  await window.pkvs?.delete("createdKey")
+  await window.pkvs?.delete("modifiedKey")
+  await window.pkvs?.delete("titleKey")
+  await window.pkvs?.delete("parentKey")
+  await window.pkvs?.delete("OverviewKey")
+  await window.pkvs?.delete("OverviewLayer")
+
+
+  // default files paths.
+  await window.pkvs?.delete("TemplatePath")
+  await window.pkvs?.delete("ConfigPath")
+  await window.pkvs?.delete("NewDocumentPath")
+  await window.pkvs?.delete("SubNotePath")
+
 
 }
 
 
-    // i forgot why i wrote this but it will probably be useful later
-    // const dirRegExp = new RegExp(/^((\[|\]|[a-z|A-Z]|\-)+\/?)+(?=\/(?:\[|\]|[a-z|A-Z]|\-)+)/gmi)
-
-    
-    // const day_setting_format = app.plugins.plugins['periodic-notes'].settings.daily.format
-    // const day_setting_dir = app.plugins.plugins['periodic-notes'].settings.daily.folder
+// i forgot why i wrote this but it will probably be useful later
+// const dirRegExp = new RegExp(/^((\[|\]|[a-z|A-Z]|\-)+\/?)+(?=\/(?:\[|\]|[a-z|A-Z]|\-)+)/gmi)
 
 
-    // const day_format_dir = day_setting_format.match(dirRegExp)[0] ?? ""  
-
-    // const Day_Format =  day_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
-    // const Day_Folder = day_setting_dir + '/' + day_format_dir 
+// const day_setting_format = app.plugins.plugins['periodic-notes'].settings.daily.format
+// const day_setting_dir = app.plugins.plugins['periodic-notes'].settings.daily.folder
 
 
-    // //////////////////////////////////////////////////////////////////////////////////////
+// const day_format_dir = day_setting_format.match(dirRegExp)[0] ?? ""
 
-    // const week_setting_format = app.plugins.plugins['periodic-notes'].settings.week.format
-    // const week_setting_dir = app.plugins.plugins['periodic-notes'].settings.week.folder
+// const Day_Format =  day_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
+// const Day_Folder = day_setting_dir + '/' + day_format_dir
 
-    // const week_format_dir = week_setting_format.match(dirRegExp)[0] ?? ""  
 
-    // const Week_Format =  week_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
-    // const Week_Folder = week_setting_dir + '/' + week_format_dir 
+// //////////////////////////////////////////////////////////////////////////////////////
 
-    // //////////////////////////////////////////////////////////////////////////////////////
+// const week_setting_format = app.plugins.plugins['periodic-notes'].settings.week.format
+// const week_setting_dir = app.plugins.plugins['periodic-notes'].settings.week.folder
 
-    // const month_setting_format = app.plugins.plugins['periodic-notes'].settings.week.format
-    // const month_setting_dir = app.plugins.plugins['periodic-notes'].settings.week.folder
+// const week_format_dir = week_setting_format.match(dirRegExp)[0] ?? ""
 
-    // const month_format_dir = month_setting_format.match(dirRegExp)[0] ?? ""  
+// const Week_Format =  week_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
+// const Week_Folder = week_setting_dir + '/' + week_format_dir
 
-    // const Month_Format =  month_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
-    // const Month_Folder = month_setting_dir + '/' + month_format_dir 
+// //////////////////////////////////////////////////////////////////////////////////////
 
-    // //////////////////////////////////////////////////////////////////////////////////////
+// const month_setting_format = app.plugins.plugins['periodic-notes'].settings.week.format
+// const month_setting_dir = app.plugins.plugins['periodic-notes'].settings.week.folder
 
-    // const year_setting_format = app.plugins.plugins['periodic-notes'].settings.week.format
-    // const year_setting_dir = app.plugins.plugins['periodic-notes'].settings.week.folder
+// const month_format_dir = month_setting_format.match(dirRegExp)[0] ?? ""
 
-    // const year_format_dir = year_setting_format.match(dirRegExp)[0] ?? ""  
+// const Month_Format =  month_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
+// const Month_Folder = month_setting_dir + '/' + month_format_dir
 
-    // const Year_Format =  year_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
-    // const Year_Folder = year_setting_dir + '/' + year_format_dir 
+// //////////////////////////////////////////////////////////////////////////////////////
 
-    // //////////////////////////////////////////////////////////////////////////////////////
+// const year_setting_format = app.plugins.plugins['periodic-notes'].settings.week.format
+// const year_setting_dir = app.plugins.plugins['periodic-notes'].settings.week.folder
+
+// const year_format_dir = year_setting_format.match(dirRegExp)[0] ?? ""
+
+// const Year_Format =  year_setting_format.replace(dirRegExp,"").replace(/^\//gmi,"")
+// const Year_Folder = year_setting_dir + '/' + year_format_dir
+
+// //////////////////////////////////////////////////////////////////////////////////////

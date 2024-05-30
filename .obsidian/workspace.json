@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "cd961eb2dc3b5892",
+        "id": "e678fa4f26a62092",
         "type": "tabs",
         "children": [
           {
-            "id": "727a57a54d0cdac1",
+            "id": "b0c86647ba9afd98",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "99-Templates/Utility documentation.md",
+                "file": "9999 - Accounts.md",
                 "mode": "source",
                 "backlinks": true,
                 "source": true
@@ -21,20 +21,45 @@
             }
           },
           {
-            "id": "ba54beebb079eaf8",
+            "id": "1a86d58cf9852d4b",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Home.md",
+                "file": "12-Video/03-Clips/0002 - Just doing noita stuff/Just doing noita stuff Description.md",
+                "mode": "preview",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "fed5ab4c82448755",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "12-Video/modify.md",
+                "mode": "source",
+                "backlinks": true,
+                "source": true
+              }
+            }
+          },
+          {
+            "id": "6b8ef96f7c3c7048",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "12-Video/07-Simple Talk/58-Bad Managment/Bad Managment Description .md",
                 "mode": "preview",
                 "backlinks": true,
                 "source": true
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -46,7 +71,6 @@
       {
         "id": "cc9aaa7762441c95",
         "type": "tabs",
-        "dimension": 67.1892497200448,
         "children": [
           {
             "id": "ccfa9f300fd13d9c",
@@ -59,6 +83,14 @@
             }
           },
           {
+            "id": "a9064e1b1ef5af44",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          },
+          {
             "id": "cb0f9e3485236cb9",
             "type": "leaf",
             "state": {
@@ -68,8 +100,8 @@
                 "matchingCase": false,
                 "explainSearch": true,
                 "collapseAll": false,
-                "extraContext": true,
-                "sortOrder": "byModifiedTime"
+                "extraContext": false,
+                "sortOrder": "alphabetical"
               }
             }
           },
@@ -79,31 +111,16 @@
             "state": {
               "type": "tag",
               "state": {
-                "sortOrder": "frequency",
+                "sortOrder": "alphabetical",
                 "useHierarchy": true
               }
-            }
-          }
-        ]
-      },
-      {
-        "id": "434ddfbb5353f396",
-        "type": "tabs",
-        "dimension": 32.81075027995521,
-        "children": [
-          {
-            "id": "a9064e1b1ef5af44",
-            "type": "leaf",
-            "state": {
-              "type": "bookmarks",
-              "state": {}
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 275
+    "width": 379
   },
   "right": {
     "id": "cf0c977f7f90dfd4",
@@ -112,7 +129,7 @@
       {
         "id": "5cc77365d0d8e474",
         "type": "tabs",
-        "dimension": 33.601609657947684,
+        "dimension": 33.400402414486926,
         "children": [
           {
             "id": "206300cfce5ca9b9",
@@ -129,29 +146,39 @@
               "type": "dictionary-view",
               "state": {}
             }
+          },
+          {
+            "id": "9d7c9d1cd769c9e2",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {}
+            }
           }
         ]
       },
       {
         "id": "5c1134142e0ac0a6",
         "type": "tabs",
-        "dimension": 66.39839034205231,
+        "dimension": 66.59959758551308,
         "children": [
-          {
-            "id": "6380d82b8ad9214e",
-            "type": "leaf",
-            "state": {
-              "type": "todo",
-              "state": {}
-            }
-          },
           {
             "id": "6311cc4f6775fc4d",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "Home.md"
+                "file": "9999 - Accounts.md"
+              }
+            }
+          },
+          {
+            "id": "936079224987c447",
+            "type": "leaf",
+            "state": {
+              "type": "file-properties",
+              "state": {
+                "file": "9999 - Accounts.md"
               }
             }
           },
@@ -161,7 +188,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Home.md",
+                "file": "9999 - Accounts.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -173,7 +200,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Home.md",
+                "file": "9999 - Accounts.md",
                 "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -181,16 +208,6 @@
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": false
-              }
-            }
-          },
-          {
-            "id": "40ebe336394d8375",
-            "type": "leaf",
-            "state": {
-              "type": "file-properties",
-              "state": {
-                "file": "Home.md"
               }
             }
           },
@@ -205,13 +222,20 @@
                 "searchQuery": ""
               }
             }
+          },
+          {
+            "id": "dc31c6aa06df1b20",
+            "type": "leaf",
+            "state": {
+              "type": "todo",
+              "state": {}
+            }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 380
+    "width": 394
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -225,63 +249,66 @@
       "markdown-importer:Open format converter": false,
       "zk-prefixer:Create new unique note": true,
       "workspaces:Manage workspace layouts": true,
-      "dbfolder:Create a new database table": false,
       "obsidian-gallery:Gallery": false,
       "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "homepage:Open homepage": false,
+      "webpage-html-export:Export Vault to HTML": false,
       "templater-obsidian:Templater": false,
       "obsidian-excalidraw-plugin:Create new drawing": false,
-      "homepage:Open homepage": false,
+      "3d-graph-new:Global 3D Graph": false,
+      "obsidian-kanban:Create new board": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "ba54beebb079eaf8",
+  "active": "b0c86647ba9afd98",
   "lastOpenFiles": [
-    "99-Templates/Utility documentation.md",
-    "README.md",
-    "99-Templates/30-Work/Work.md",
-    "Home.md",
-    "99-Templates/Habit Tracking Documentation.md",
-    "99-Templates/\".md",
-    "00-Daily/2024/2024-02-02.md",
     "99-Templates/03-Yearly/Yearly.md",
-    "99-Templates/01-Weekly/Weekly.md",
-    "99-Templates/17-Blog/Blog.md",
-    "99-Templates/16-Book/Book.md",
-    "99-Templates/15-People/People.md",
-    "99-Templates/14-University/University.md",
-    "99-Templates/13-Learning/Learning.md",
-    "99-Templates/10-Project/Project.md",
+    "Home.md",
+    "12-Video/03-Clips/0002 - Just doing noita stuff/Just doing noita stuff Description.md",
+    "12-Video/modify.md",
+    "12-Video/07-Simple Talk/58-Bad Managment/Bad Managment Description .md",
+    "12-Video/07-Simple Talk/01 - filterring through people/filterring through people Description.md",
+    "12-Video/07-Simple Talk/58-bless you/bless you Description .md",
+    "12-Video/03-Clips/23-My Sign Now/My Sign Now Description.md",
+    "12-Video/03-Clips/41-Simply too fat/Simply too fat Description .md",
+    "12-Video/03-Clips/42-we are all stupid/we are all stupid Description .md",
+    "12-Video/03-Clips/24-Un Lucky Company/Un Lucky Company Description.md",
+    "12-Video/04-Memories/0004 - i dont like this/i dont like this.mp4",
+    "12-Video/04-Memories/0005 - vibe check/videoplayback.mp4",
+    "12-Video/03-Clips/0003 - Homing Rocks/Homing Rocks Description.md",
+    "12-Video/03-Clips/0003 - Homing Rocks/Media/Homing Rocks.mp4",
+    "00-Daily/2024/2024-05-29.md",
+    "00-Daily/2024/2024-05-28.md",
+    "12-Video/07-Simple Talk/02 - Tom Dream 1/Tom Dream 1 Description.md",
+    "11-Learning/03 - NextJS/NextJS Progress.md",
     "99-Templates/02-Monthly/Monthly.md",
-    "99-Templates/11-Video/Video.md",
-    "99-Templates/12-Problem/Problem.md",
-    "99-Templates/30-Work/Tasks Template.md",
-    "99-Templates/30-Work/Description Template.md",
-    "00-Daily/2024/2024-02-03.md",
+    "99-Templates/01-Weekly/Weekly.md",
     "99-Templates/00-Daily/Daily.md",
-    "00-Daily/2022/2022-07-01.md",
-    "00-Daily/2022/2022-06-30.md",
-    "00-Daily/2022/2022-07-27.md",
-    "12-Video/03-Clips/0003 - Homing Rocks/Homing Rocks Tracking.md",
-    "19-Work/02-Another test/00-testing job",
-    "19-Work/02-Another test",
-    "19-Work/01-DigiSol/00-Hotel App",
-    "19-Work/01-DigiSol",
-    "19-Work",
-    "04-Work/01-Hotel System",
-    "99-Templates/95-Scripts/test.js",
-    "12-Video/01-Simple Rant/02 - Simple rant 2/Simple Rant : 2 - procrastination.mp4",
-    "12-Video/01-Simple Rant/01 - Simple rant 1/Simple Rant 1.mp4",
-    "14-Book/03-The C programming Language/The C Programming Language - 2nd edition.pdf",
-    "80-Gallery/Pasted Image 20221029121616_801.png",
-    "80-Gallery/Pasted Image 20230313214352_482.png",
-    "80-Gallery/Screenshot_20230205_030330.png",
+    "81-DailyFiles/Year-2024/Month-05/Day-28",
+    "81-DailyFiles/Year-2024/Month-05",
+    "81-DailyFiles/Year-2024",
+    "81-DailyFiles/Year-2024/Month-05/Day-28/02-IMG_20240526_163952.jpg",
+    "99-Templates/95-Scripts/03-FileManagement/MoveMedia.js~",
+    "81-DailyFiles/Year-2024/Month-05/Day-28/01-IMG_20240526_164522.jpg",
+    "81-DailyFiles/01-Year-2024/00-Month-05/00-Day-28",
+    "81-DailyFiles/01-Year-2024/00-Month-05",
+    "81-DailyFiles/01-Year-2024",
+    "80-Gallery/Storing data.gif",
+    "80-Gallery/untitled.gif",
+    "80-Gallery/Icons/myicons/Audio31.svg",
+    "80-Gallery/Icons/myicons/Audio43.svg",
+    "80-Gallery/Icons/myicons/Banner.svg",
+    "00-Daily/2024/2024-02-01.md",
+    "80-Gallery/Banner/Library.jpg",
+    "00-Daily/2023/2023-04-11.md",
+    "00-Daily/2023/2023-04-10.md",
+    "00-Daily/2023/2023-04-09.md",
+    "00-Daily/2023/2023-02-08.md",
+    "00-Daily/2023/2023-02-13.md",
+    "00-Daily/2023/2023-04-07.md",
     "80-Gallery/Screenshot_20230204_003109.png",
-    "80-Gallery/Pasted Image 20221118172352_611.png",
-    "80-Gallery/Screenshot_20230520_164944.png",
-    "80-Gallery/Screenshot_20230520_193622.png",
-    "80-Gallery/Screenshot_20230521_224028.png",
-    "80-Gallery/Screenshot_20230521_224053.png",
-    "80-Gallery/Simple Podcast thumpnails.png",
+    "80-Gallery/Pasted image 20240330232035.png",
+    "Untitled.canvas",
     "Templates/Activity/Canvas Subnote.canvas"
   ]
 }

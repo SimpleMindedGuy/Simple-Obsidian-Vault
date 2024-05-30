@@ -52,6 +52,6 @@
     ]
   },
   "UIElements": {
-    "enabled": false
+    "enabled": true
   }
 }

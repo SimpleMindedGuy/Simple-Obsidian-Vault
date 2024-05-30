@@ -18,7 +18,7 @@ tags:
  - Problem
  - Description
 aliases: 
-banner: "![[Banner/typewriter.jpg]]"
+banner: "[[80-Gallery/Banner/typewriter.jpg]]"
 ---
 
 # !(🏷️)

@@ -1,0 +1,28 @@
+{
+  "version": "0.13.0",
+  "data": {
+    "boardConfigs": [],
+    "globalSettings": {
+      "defaultColumnNames": {
+        "today": "",
+        "tomorrow": "",
+        "future": "",
+        "undated": "",
+        "otherTags": "",
+        "untagged": "",
+        "completed": ""
+      },
+      "filters": [
+        {
+          "tag": "pathFilter",
+          "data": "99-Templates"
+        }
+      ],
+      "firstDayOfWeek": "FromLocale",
+      "ignoreFileNameDates": true,
+      "taskCompletionFormat": "ObsidianTasks",
+      "taskCompletionInLocalTime": true,
+      "taskCompletionShowUtcOffset": true
+    }
+  }
+}

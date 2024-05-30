@@ -32,7 +32,7 @@ monthName: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-MM")%>"
 month: <% tp.date.now("MM",0,tp.file.title, "YYYY-MM")%>
 year: <% tp.date.now("YYYY",0,tp.file.title, "YYYY-MM")%>
 
-banner: "![[80-Gallery/Banner/Writing-beginners.png]]"
+banner: "[[80-Gallery/Banner/Writing.png]]"
 banner_icon: 📆
 ---
 # !(🏷️)

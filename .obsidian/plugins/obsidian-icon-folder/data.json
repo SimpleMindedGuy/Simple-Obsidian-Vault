@@ -2,7 +2,7 @@
   "settings": {
     "migrated": 5,
     "iconPacksPath": "80-Gallery/Icons",
-    "fontSize": 24,
+    "fontSize": 20,
     "emojiStyle": "native",
     "iconColor": "#9e9e9e",
     "recentlyUsedIcons": [],
@@ -279,10 +279,16 @@
         "order": 44
       },
       {
+        "rule": ".*(.PDF|.pdf)$",
+        "icon": "MyBook26",
+        "for": "everything",
+        "order": 45
+      },
+      {
         "rule": "Yearly$",
         "icon": "MyBook18",
         "for": "everything",
-        "order": 45
+        "order": 46
       }
     ],
     "extraMargin": {
@@ -293,14 +299,14 @@
     },
     "iconInTabsEnabled": true,
     "iconsBackgroundCheckEnabled": false,
-    "iconInTitleEnabled": false,
+    "iconInTitleEnabled": true,
     "iconInFrontmatterEnabled": false,
     "iconsInNotesEnabled": true,
     "iconIdentifier": ":",
-    "iconInTitlePosition": "above",
+    "iconsInLinksEnabled": true,
+    "debugMode": false,
     "iconInFrontmatterFieldName": "icon",
     "iconColorInFrontmatterFieldName": "iconColor",
-    "iconsInLinksEnabled": true,
-    "debugMode": false
+    "iconInTitlePosition": "above"
   }
 }

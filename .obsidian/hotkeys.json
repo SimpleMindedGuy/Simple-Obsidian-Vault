@@ -16,15 +16,6 @@
       "key": "Tab"
     }
   ],
-  "insert-current-date": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod"
-      ],
-      "key": "D"
-    }
-  ],
   "obsidian-banners:banners:addLocal": [
     {
       "modifiers": [
@@ -177,16 +168,23 @@
   "editor:context-menu": [
     {
       "modifiers": [
-        "Mod"
+        "Alt"
       ],
-      "key": "'"
+      "key": "\\"
     }
   ],
   "various-complements:show-suggestions": [],
   "editor:toggle-checklist-status": [],
   "obsidian-languagetool-plugin:ltclear": [],
   "app:open-help": [],
-  "nldates-obsidian:nlp-today": [],
+  "nldates-obsidian:nlp-today": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "3"
+    }
+  ],
   "nldates-obsidian:nlp-dates": [],
   "nldates-obsidian:nlp-time": [
     {
@@ -234,21 +232,12 @@
       "key": "T"
     }
   ],
-  "editor:focus-left": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "L"
-    }
-  ],
   "workspace:next-tab": [
     {
       "modifiers": [
         "Mod"
       ],
-      "key": "L"
+      "key": "'"
     }
   ],
   "workspace:previous-tab": [
@@ -256,25 +245,7 @@
       "modifiers": [
         "Mod"
       ],
-      "key": "J"
-    }
-  ],
-  "editor:focus-bottom": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "'"
-    }
-  ],
-  "editor:focus-right": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": ";"
+      "key": "L"
     }
   ],
   "obsidian-excalidraw-plugin:insert-link-to-element": [],
@@ -294,15 +265,6 @@
       "key": "O"
     }
   ],
-  "editor:focus-top": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "P"
-    }
-  ],
   "easy-toggle-sidebars:toggle-both-sidebars": [
     {
       "modifiers": [
@@ -311,21 +273,18 @@
       "key": " "
     }
   ],
-  "editor:toggle-numbered-list": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "1"
-    }
-  ],
   "editor:toggle-strikethrough": [
     {
       "modifiers": [
-        "Mod",
-        "Shift"
+        "Mod"
       ],
       "key": "S"
+    },
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "3"
     }
   ],
   "editor:toggle-bullet-list": [
@@ -359,38 +318,6 @@
         "Mod"
       ],
       "key": "]"
-    }
-  ],
-  "editor:toggle-blockquote": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "."
-    }
-  ],
-  "editor:toggle-code": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": ","
-    }
-  ],
-  "editor:insert-callout": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "C"
-    }
-  ],
-  "markdown:add-metadata-property": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": ";"
     }
   ],
   "obsidian-heading-shifter:insert-heading-current": [
@@ -447,6 +374,12 @@
         "Alt"
       ],
       "key": "."
+    },
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "["
     }
   ],
   "obsidian-heading-shifter:decrease-heading": [
@@ -455,6 +388,12 @@
         "Alt"
       ],
       "key": ","
+    },
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "]"
     }
   ],
   "obsidian-heading-shifter:insert-heading-deeper": [
@@ -514,15 +453,6 @@
       "key": "Delete"
     }
   ],
-  "table-editor-obsidian:delete-row": [
-    {
-      "modifiers": [
-        "Mod",
-        "Shift"
-      ],
-      "key": "Backspace"
-    }
-  ],
   "table-editor-obsidian:insert-column": [
     {
       "modifiers": [
@@ -548,6 +478,210 @@
         "Shift"
       ],
       "key": "]"
+    }
+  ],
+  "nldates-obsidian:nlp-now": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "1"
+    }
+  ],
+  "obsidian-rtl:switch-text-direction": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "D"
+    }
+  ],
+  "obsidian-another-quick-switcher:search-command_file-name-fuzzy-search": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "`"
+    }
+  ],
+  "command-palette:open": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "`"
+    }
+  ],
+  "obsidian-another-quick-switcher:search-command_link-search": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "`"
+    }
+  ],
+  "obsidian-another-quick-switcher:move": [],
+  "obsidian-another-quick-switcher:backlink": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "1"
+    }
+  ],
+  "obsidian-another-quick-switcher:link": [],
+  "editor:focus-top": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "P"
+    }
+  ],
+  "editor:focus-bottom": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": ";"
+    }
+  ],
+  "editor:focus-left": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "'"
+    }
+  ],
+  "editor:focus-right": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "L"
+    }
+  ],
+  "workspace:split-horizontal": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "["
+    }
+  ],
+  "file-explorer:new-file": [],
+  "file-explorer:new-file-in-new-pane": [],
+  "markdown:add-metadata-property": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "P"
+    }
+  ],
+  "editor:attach-file": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "A"
+    }
+  ],
+  "editor:insert-link": [],
+  "obsidian-languagetool-plugin:ltjump-to-next-suggestion": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": ","
+    }
+  ],
+  "obsidian-languagetool-plugin:ltjump-to-previous-suggestion": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "."
+    }
+  ],
+  "editor:open-link-in-new-window": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "Enter"
+    }
+  ],
+  "editor:follow-link": [],
+  "app:reload": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "F5"
+    }
+  ],
+  "templater-obsidian:jump-to-next-cursor-location": [],
+  "editor:toggle-bold": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "B"
+    },
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "1"
+    }
+  ],
+  "editor:toggle-italics": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "I"
+    },
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "2"
+    }
+  ],
+  "editor:save-file": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "S"
+    }
+  ],
+  "editor:toggle-highlight": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "H"
+    },
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "4"
     }
   ]
 }

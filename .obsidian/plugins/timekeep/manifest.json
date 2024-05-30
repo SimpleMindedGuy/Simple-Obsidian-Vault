@@ -1,0 +1,11 @@
+{
+	"id": "timekeep",
+	"name": "Timekeep",
+	"version": "1.2.9",
+	"minAppVersion": "1.5.12",
+	"description": "Time tracking",
+	"author": "Jacobtread",
+	"authorUrl": "https://jacobtread.com",
+	"fundingUrl": "https://www.buymeacoffee.com/jacobtread",
+	"isDesktopOnly": true
+}

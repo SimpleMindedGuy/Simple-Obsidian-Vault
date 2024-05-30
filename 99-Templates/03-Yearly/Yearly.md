@@ -29,7 +29,7 @@ aliases:
 
 year: <% tp.date.now("YYYY",0,tp.file.title, "YYYY")%>
 
-banner: "![[80-Gallery/Banner/Writing-beginners.png]]"
+banner: "[[80-Gallery/Banner/Writing.png]]"
 banner_icon: 📆
 ---
 # !(🏷️)

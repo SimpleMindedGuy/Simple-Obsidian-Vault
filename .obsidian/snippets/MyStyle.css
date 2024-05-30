@@ -23,30 +23,64 @@
     /* unicode-bidi: plaintext; */
 }
 
-
+/* 
 ul {
     margin-block-start: 0em;
     margin-block-end: 0em;
 }
 
-table.calendar, tbody.calendar
+ul > li.task-list-item,
+.has-list-bullet .task-list-item  p ,
+.contains-task-list.has-list-bullet .task-list-item
 {
-    table-layout: fixed;
+    display: flex;
+
 }
 
 
 
+.markdown-preview-view .task-list-item-checkbox{
+    top: 0;
+    display: block;
+}
+
+.tree-item-inner{
+    display: flex;
+    place-self: center;
+} 
+
+
+
+.tree-item-self .tree-item-icon{
+    position: relative;
+    margin: 0;
+}
+
+*/
+
+/* 
+table
+{
+    table-layout: unset;
+    min-width: 100%;
+} */
+
+
+
+/* 
 body:is(:not(.css-settings-manager),.toggle-status-bar) .status-bar {
     bottom: 0 !important;
-    width: 100%;
-}
+    min-width: 100%;
+} */
 
+
+/* 
 
 .app-container {
 
     height: calc(100% - 30px) !important;
 
-}
+} */
 
 /* 
 .markdown-source-view:not(.is-live-preview) .HyperMD-header-1 
@@ -62,7 +96,7 @@ body:is(:not(.css-settings-manager),.toggle-status-bar) .status-bar {
     
     flex-wrap: wrap;
 } 
-*/
+
 
 
 h1,
@@ -86,11 +120,7 @@ span.internal-embed.media-embed.image-embed.is-loaded
     margin-right: 0.5rem ;
 }
 
-ul > li.task-list-item {
-    display: flex;
-    align-content: center;
-    align-items: center;
-}
+
 
 
 .markdown-preview-view a
@@ -150,17 +180,17 @@ ul > li.task-list-item {
 .markdown-preview-view.is-readable-line-width .markdown-preview-sizer
 
 {
-    padding:  1% 2.5%  !important;
+    padding: 0.8rem 0.4rem  !important;
 }
 .markdown-source-view.is-readable-line-width .CodeMirror {
     max-width: 100%;
     min-width: fit-content !important;
 }
 
-.markdown-preview-view.is-readable-line-width .markdown-preview-sizer 
+/* .markdown-preview-view.is-readable-line-width .markdown-preview-sizer 
 {
     max-width: 1000px;
-}
+} */
 
 .dataview .table-view-table tbody
 ,.dataview .table-view-table table
@@ -169,12 +199,12 @@ ul > li.task-list-item {
 ,.dataview .table-view-thead table
 ,.markdown-preview-view .dataview 
 {
-    color : white!important;
+    /* color : white!important; */
     border: none !important;
 }
 .markdown-preview-view .dataview .table-view-tbody
 {
-    padding :  5% 2%;
+    padding: 0.8rem 0.4rem;
     border: none !important;
 }
 
@@ -192,7 +222,7 @@ ul > li.task-list-item {
 
 .markdown-preview-view img:not([width]), .markdown-rendered img:not([width]) {
 
-    max-width: 100%;
+    /* max-width: 100%; */
     min-height: 24px !important;
     padding: 0px !important;
     margin: 0px 0.2em 0em 0px;
@@ -201,14 +231,14 @@ ul > li.task-list-item {
 
 .markdown-preview-view tbody tr:nth-child(even)
 {
-    background-color : var(--Table-Row-Color-Even) ;
+    /* background-color : var(--Table-Row-Color-Even) ; */
     transition: 0.3s all;
 
 }
 
 .markdown-preview-view tbody tr:nth-child(odd)
 {
-    background-color: var(--Table-Row-Color-Odd) ;
+    /* background-color: var(--Table-Row-Color-Odd) ; */
     transition: 0.3s all;
 }
 
@@ -218,11 +248,14 @@ ul > li.task-list-item {
 
 .markdown-preview-view thead tr {
 
-    background-color: var(--Color-1) !important;
+    /* background-color: var(--Color-1) !important; */
 }
 
 .markdown-rendered td, .markdown-rendered th {
     width: 2px;
+    padding: 0.8rem;
+    /* display: grid; */
+    /* place-content: center; */
     
 }
 
@@ -234,8 +267,14 @@ table
     border-collapse:separate;
     overflow: auto;
     min-width: 100%;
+    margin: 0;
 }
 
+
+table.calendar, tbody.calendar
+{
+    table-layout: fixed;
+}
 
 .markdown-preview-view table {
     table-layout:  auto !important;
@@ -245,7 +284,7 @@ table
     border-width: 2px; 
     border-collapse:separate;
     overflow: auto;
-    min-width: 100%;
+    
 }
 
 .markdown-preview-view table td,
@@ -256,8 +295,20 @@ table
     min-width:30px;
     max-width: 200px ;
     width: auto !important;
-    padding: 6px 2px !important;
+    padding: 0.6rem 1rem !important;
 }
+
+
+.markdown-preview-view thead tr th,
+.markdown-preview-view tbody tr td
+,.markdown-rendered td
+,.markdown-rendered th
+,.markdown-preview-view tbody tr td:first-child
+{
+    border-radius: 0px !important;
+}
+
+
 
 .MJX-TEX
 {
@@ -273,16 +324,6 @@ table
     word-spacing:pre !important;
     white-space:break-spaces !important;
     place-content: center !important;
-}
-
-
-.markdown-preview-view thead tr th,
-.markdown-preview-view tbody tr td
-,.markdown-rendered td
-,.markdown-rendered th
-,.markdown-preview-view tbody tr td:first-child
-{
-    border-radius: 0px !important;
 }
 
 
@@ -313,6 +354,7 @@ table
 }
 
 
+/*  */
 
 .workspace-tab-header-container
 {
@@ -349,10 +391,20 @@ table
 
 .dvTableCards .table-view-tbody
 {
-   
+/*     
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px,0.5fr));
+ */
+    max-width: 100% !important;
+
+    min-width: none;
+
+    box-sizing: border-box;
+
+    
     display: flex;
     flex-flow: wrap;
-    justify-content: space-evenly;
+    justify-content: space-between;
 
 
     gap: 1rem;
@@ -400,7 +452,7 @@ table
 {
 
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1.2rem calc(100% - 1.2rem * 2);
     
     
     justify-items: start;
@@ -412,7 +464,7 @@ table
 
     font-size: small;
     height: fit-content;
-    padding: 0px 3px;
+    
     
     place-items: center;
 }
@@ -431,11 +483,18 @@ table
     
 }
 
+.dvTableCards.diaryCards .table-view-tbody > tr,
+.dvTableCards.progressCards .table-view-tbody > tr
+{
+    flex-grow: 1;
+}
+
 .dvTableCards.progressCards .table-view-tbody > tr
 {
     grid-template-areas: 
     "Title Title"
-    "Category Status"
+    "Category Category"
+    "Status Status"
     "Progress Progress";
 }
 
@@ -461,11 +520,12 @@ table
 .dvTableCards.diaryCards .table-view-tbody > tr
 {
     grid-template-areas: 
-    "Link Link Link"
-    "Title Title Title"
-    "Weight Gym Fails"
-    "Mood Mood Mosque "
-    "Size Size Size";
+    "Link Link "
+    "Title Title"
+    "Weight Gym"
+    "Fails Mosque"
+    "Mood Mood"
+    "Size Size";
 }
 
 
@@ -602,9 +662,6 @@ tbody.table-view-tbody
     padding: 0 !important;
 } */
 
-table{
-    margin: 0;
-}
 
 
 h1, .markdown-rendered h1,
@@ -673,30 +730,11 @@ body:not(.is-mobile):is(:not(.css-settings-manager),.toggle-scrollbar) ::-webkit
     visibility: visible;
 }
 
-.workspace-split.mod-vertical.mod-root .markdown-preview-view{
-    padding: 0rem 0rem !important;
-}
-
-.markdown-preview-sizer.markdown-preview-section {
-    padding:0rem  1rem;
-    max-width: 1000px;
-    margin: auto;
-}
-
-.tree-item-inner{
-    display: flex;
-    place-self: center;
-}
-.tree-item-self .tree-item-icon{
-    position: relative;
-    margin: 0;
-}
 
 
-.markdown-preview-view .task-list-item-checkbox{
-    top: 0;
-    display: block;
-}
+
+
+
 
 .comment{
     display: unset;
@@ -715,61 +753,42 @@ pre.esm-ltr
 }
 
 
-/* .dvTableCards .table-view-tbody tr td span div img
-{
-    grid-area: image;
+.workspace-split.mod-horizontal.mod-right-split{
+    padding-left: 0;
 }
 
-.table-view-tbody tr td span div
-{
+.nav-files-container{
+
+    padding: 0 !important;
+}
+
+.tree-item.nav-folder.mod-root{
+    padding-block-start: 0.4rem;
+}
+
+
+
+.workspace-split.mod-vertical.mod-root, .workspace-split.mod-vertical.mod-root .workspace-split:not(.mod-horizontal){
+    gap: 0.4rem;
 
 }
 
-.dvTableCards .table-view-tbody td:not(:last-of-type) span
-{
-    border-bottom: 1px dotted  #9b9b9b;
-} */
-
-/* .search-result-file-matched-text
-{
-    background-color: #546874;
-    min-height: 100;
-    height: 115% !important;
-    padding: 0 5px;
-} */
-
-/* .mermaid-toolbar-elements-container path 
-,.mermaid path
-{
-    stroke:  silver !important;
-} */
-
-/* .cm-s-obsidian span.cm-formatting-highlight
-,.cm-s-obsidian span.cm-highlight
-,.markdown-rendered mark
-, mark
-{
-    background-color : #096280 !important;
-    
-} */
-
-/* .mermaid-toolbar-elements-container rect
-,.mermaid rect
-{
-    fill: rgb(65, 80, 107) !important;
-} */
 
 
-/* .markdown-preview-sizer.markdown-preview-section
-{
-    max-width: 1200px !important;
-    margin: auto;
-} */
+:is(.nav-folder, .nav-file) :is(.nav-folder-title, .nav-file-title), .vertical-tab-nav-item, .tree-item-self, button{
+    padding: 0.4rem !important;
+    margin: 0!important;
+}
 
-/* .cm-formatting-link.cm-formatting-link-start
-,.cm-formatting-link.cm-formatting-link-end
-,.cm-s-obsidian .cm-hmd-internal-link
-,.internal-link
-{
-    color : #03afe8 !important;
-} */
+
+
+.right-nav.svelte-1vwr9dd > .arrow{
+position: unset;
+font-size : unset;
+}
+
+
+
+.vertical-tabs-container .pm-grid .installed-plugins-container .setting-item {
+    display: grid;
+}

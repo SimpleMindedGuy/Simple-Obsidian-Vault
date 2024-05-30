@@ -1,5 +1,5 @@
 {
-  "todoPageName": "To-Do",
+  "todoPageName": "TODO",
   "showChecked": false,
   "showAllTodos": true,
   "autoRefresh": true,
@@ -11,7 +11,9 @@
   "includeFiles": "",
   "lookAndFeel": "compact",
   "_collapsedSections": [],
-  "_hiddenTags": [],
+  "_hiddenTags": [
+    "to-do"
+  ],
   "sortDirection": "old->new",
   "ignoreFiles": ""
 }

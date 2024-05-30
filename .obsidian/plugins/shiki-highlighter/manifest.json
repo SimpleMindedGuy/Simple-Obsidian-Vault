@@ -1,0 +1,10 @@
+{
+	"id": "shiki-highlighter",
+	"name": "Shiki Highlighter",
+	"version": "0.3.2",
+	"minAppVersion": "1.5.0",
+	"description": "Highlight code blocks with Shiki.",
+	"author": "Moritz Jung",
+	"authorUrl": "https://www.moritzjung.dev",
+	"isDesktopOnly": false
+}

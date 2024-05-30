@@ -13,7 +13,7 @@
 🏁: 
 🏹: 0
 🎯: 1
-kanban-plugin: basic
+banner: "[[80-Gallery/Banner/Progress.png]]"
 tags: 
  - Video
  - Activities
@@ -21,34 +21,11 @@ tags:
 
 ---
 
-## To-Do
+# !(🏷️)
 
 
+## Topics
 
-## Writing
+## Resources
 
-
-
-## Recording
-
-
-
-## Finished
-
-
-
-## Editing
-
-
-
-## Publishing
-
-
-
-
-
-%% kanban:settings
-```
-{"kanban-plugin":"basic"}
-```
-%%
+## Credit

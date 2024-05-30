@@ -8,47 +8,47 @@
  * @param {Object} file
  * @returns {Promise<Object|null>}
  */
-async function GetFileProperties(file)
-{
+async function GetFileProperties(file) {
+
+  // Getting Templater object for running functions
+  let tp = await window?.pkvs?.load("tp");
+
+
+
+  if (!tp) {
+    console.log(`04-Reading-Text: GetFileProperties:\nGlobal key for templater not found or empty: \nattempting to get templater object obsidian plugins`);
 
     // Getting Templater object for running functions
-    let tp = await window?.pkvs?.load("tp");
+    tp = {}
+    const tpInternalFunctions = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.internal_functions.modules_array
 
-
-
-    if(!tp)
-    {
-        console.log(`04-Reading-Text: GetFileProperties:\nGlobal key for templater not found or empty: \nattempting to get templater object obsidian plugins`);
-
-        // Getting Templater object for running functions
-        tp = {}
-        const tpInternalFunctions = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.internal_functions.modules_array
-
-        for (const fun of tpInternalFunctions) {
-            tp[fun.name] = fun.static_object;  
-        }
-
-        tp['user'] = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.user_functions.user_script_functions.generate_object();
-
-        
-    }
-    
-    // If templater is not provided exist loop
-    if(!tp)
-    {
-        console.warn(`04-Reading-Text: GetFileProperties:\ntemplater is not provided`)
-        console.warn(tp)
-        return
+    for (const fun of tpInternalFunctions) {
+      tp[fun.name] = fun.static_object;
     }
 
-    const YamlProps = await tp.user.GetTextYamlProperties(file)
+    tp['user'] = await app.plugins.getPlugin('templater-obsidian').templater.functions_generator.user_functions.user_script_functions.generate_object();
 
-    const inLineProps= await tp.user.GetTextInlineProps(file)
 
-    console.log(`04-Reading-Text: GetFileProperties:\ninline faggots are`)
-    console.log(inLineProps)
-    return {...inLineProps,...YamlProps}
-    
+  }
+
+  // If templater is not provided exist loop
+  if (!tp) {
+    console.warn(`04-Reading-Text: GetFileProperties:\ntemplater is not provided`)
+    console.warn(tp)
+    return
+  }
+
+
+  const Text = await app.vault.read(file);
+
+  const YamlProps = await tp.user.GetTextYamlProperties(Text)
+
+  const inLineProps = await tp.user.GetTextInlineProps(Text)
+
+  console.log(`04-Reading-Text: GetFileProperties:\ninline faggots are`)
+  console.log(inLineProps)
+  return { ...inLineProps, ...YamlProps }
+
 }
 
 module.exports = GetFileProperties

@@ -6,7 +6,7 @@
   "newLinkFormat": "absolute",
   "foldHeading": true,
   "showLineNumber": true,
-  "readableLineLength": false,
+  "readableLineLength": true,
   "fileSortOrder": "alphabetical",
   "attachmentFolderPath": "80-Gallery",
   "showUnsupportedFiles": true,
@@ -54,7 +54,9 @@
     "precisiona",
     "hh",
     "TextDate",
-    "marka"
+    "marka",
+    "vrchat",
+    "pyrmed"
   ],
   "livePreview": false,
   "defaultViewMode": "preview",

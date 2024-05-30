@@ -13,7 +13,7 @@
 🏁: 
 🏹: 0
 🎯: 1
-banner: "![[Banner/descriptionbanner.png]]"
+banner: "[[80-Gallery/Banner/Description.png]]"
 tags:
  - Video
  - Activities

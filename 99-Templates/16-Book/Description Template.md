@@ -13,7 +13,7 @@
 🏁: 
 🏹: 0
 🎯: 1
-banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
+banner: "[[80-Gallery/Banner/Library.jpg]]"
 aliases: 
 tags:
  - Book

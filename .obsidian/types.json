@@ -33,7 +33,6 @@
     "excalidraw-export-dark": "checkbox",
     "excalidraw-export-padding": "number",
     "excalidraw-export-pngscale": "number",
-    "excalidraw-export-embed-scene": "checkbox",
     "excalidraw-link-prefix": "text",
     "excalidraw-url-prefix": "text",
     "excalidraw-link-brackets": "checkbox",
@@ -46,6 +45,11 @@
     "excalidraw-css": "text",
     "excalidraw-autoexport": "text",
     "excalidraw-iframe-theme": "text",
-    "excalidraw-open-md": "checkbox"
+    "excalidraw-open-md": "checkbox",
+    "excalidraw-export-embed-scene": "checkbox",
+    "✍️": "multitext",
+    "💼": "number",
+    "excalidraw-embeddable-theme": "text",
+    "banner": "text"
   }
 }

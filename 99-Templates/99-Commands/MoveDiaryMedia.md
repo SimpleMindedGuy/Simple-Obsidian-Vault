@@ -1,7 +1,8 @@
 {{{:::
 
-GetValue => 🗓️
-StoreValue => DocDate
+GetValue :=> 🗓️
+
+StoreValue :=> DocDate
 
 SetDate :=> !(DocDate)
 

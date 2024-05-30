@@ -1,0 +1,8 @@
+{
+  "version": "0.6.6",
+  "use_legacy_desmos_api": false,
+  "cache": {
+    "enabled": true,
+    "location": "Memory"
+  }
+}

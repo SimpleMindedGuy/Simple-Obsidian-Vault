@@ -18,7 +18,7 @@ tags:
  - Activities
  - Description
 aliases: 
-banner: "![[Gallery/Banner/fogler-zoom-background5.jpg]]"
+banner: "[[80-Gallery/Banner/Library.jpg]]"
 ---
 
 # !(🏷️)
