@@ -14,11 +14,11 @@
 🏁: 
 🏹: 0
 🎯: 1
-banner: "![[Gallery/Banner/typewriter.jpg]]"
+banner: "[[80-Gallery/Banner/typewriter.jpg]]"
 tags:
- - Work
- - Activities
- - Description
+  - Work
+  - Activities
+  - Description
 aliases: 
 kanban-plugin: advanced
 ---

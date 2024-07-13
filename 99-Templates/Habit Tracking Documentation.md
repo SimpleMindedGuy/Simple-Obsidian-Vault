@@ -1,6 +1,5 @@
-> [!warning]
+> [!danger]
 > Things Will change in the future.
-> 
 > the setup is might change in the future, as I'm still trying to make it more simple, easier to understand and easier to modify.
 
 # Introduction
@@ -12,7 +11,6 @@ IF something is not explained here, please make an issue, and I'll Work on it as
 > [!note]
 > 
 > All files mentioned here are Javascript files
-> 
 > You don't have to have a total understanding of JavavSciprt  but it will make ur life much easier working with this document
 
 ## Graph Display
@@ -23,7 +21,6 @@ To understand how to customize these data you have to check [ChartJS](https://ww
 This also requires that you have the [Obsidian-charts](https://github.com/phibr0/obsidian-charts) plugin installed, and also check the [documentation](https://charts.phibr0.de/Meta/Charts/Obsidian+Charts+Documentation) for better understanding of how it works.
 ### Sections 
 This specifies how to display, or what kind of values does the graph is going to display. 
-
 It contains information much of the whole canvas the chart is going to take, the position of the labels, and if it going to stack on top of other section or not
 There are only 3 options currently : 
 - Y axies options 
@@ -45,10 +42,8 @@ Settings for how to animation the charts, on hide and show conditions
 Information about where to display legend elements, and tool tip functions, and if it allows stacking or not.
 
 ### Colors
-have 2 lists of colors to display the data.
-
+have 2 lists of colors to display the data
 It keeps looping through the list of colors until it apply colors to all the data. 
-
 - background : colors for the background of the data curve.
 - border : colors for the border of the data curve. 
 
@@ -75,8 +70,7 @@ Specifies how many stacks/layers Y  of axes will  be displayed  and what type th
 A list/Array of objects that contain important information about what values to look for, and how to display them.
 
 > [!note]
-> Order Matters.
-> 
+> Order Matters
 > The order of how objects are places, is the order of how the data is going to be displayed, layered or stack on top of each other. 
 
 Each object in the List/ Array have to specify what the variable to look for, whether to store the values as a sum of all values or as the average of the values, what Y/X axes it should be displayed on, what stack it is displayed on, and what is the Target value to measure the actual value against. 
@@ -100,7 +94,6 @@ It is the name of the variable that the script is going to look for in metadata 
 
 #### Target
 measures the real value against the expected value. 
-
 this is used so that the graph display data in a more understandable form, and to avoid the problem of displaying very high values along with very low values. 
 
 The data displayed in the graph, is going to be the percentage of the real value compared to the target value. 
@@ -119,26 +112,19 @@ The data displayed in the graph, is going to be the percentage of the real value
 > }
 > ]
 > ```
-> lets imagine that we have those values
-> 
+> lets imagine that we have those values 
 > weight : 94 , 95 , 95 , 94 , 94
-> 
 > reading : 2 , 2 , 4 , 3 , 1
-> 
 > ![](../80-Gallery/Screenshot_20230521_224028.png)
-> 
 > this makes it harder to understand the graph, so instead we compare those values to the target and display them in the same Y-axies
-> 
 > it is much easier to understand the graph
-> 
 > ![](../80-Gallery/Screenshot_20230521_224053.png)
 
 #### Scatter
 specifies the style it will display data in for more information check [ChartJS](https://www.chartjs.org/).
 
 #### chart
-What type of value to expect from the variable weather its a Numerical or Categorical.
-
+What type of value to expect from the variable weather its a Numerical or Categorical 
 take the values that are found in [The Charts](#Chart) object. 
 
 #### yAxisID
@@ -154,22 +140,20 @@ takes either : `true` or `false` value
 
 ## Displaying charts 
 I already have 3 templates that have the necessary data to track days by weeks, weeks by months, and months by days. 
-
 But I know Not every one is going to use the same setup so here I'll attempt to explain how the code block works.
 
 The raw setup should look something like this.
 
 Currently, for this to work it has to be a `dataviewjs` code block, and you have to call functions with the `customJS` plugin, and you have to call specific functions from specific classes, one for displaying Daily notes information, one for displaying weekly notes information and one for Monthly notes information. 
 
-You can display a year's data either by daily notes, or weekly notes, or monthly notes.
-
+You can display a year's data either by daily notes, or weekly notes, or monthly notes. 
 the reason I made it this way ; is to provide different options, but also to avoid overcrowding the charts with data points and labels. 
 
 - A Year can be display months data, weeks data, or days data.
 - A month can be display weeks data, or days data.
 - A week can only display days data.
 
-And Just to stay safe I'll include a setup example for all those cases with comments in the setup code to explain what  needs to be explained.
+And Just to stay safe I'll include a setup example for all those cases with comments in the setup code to explain what  needs to be explained 
 
 
 
@@ -177,7 +161,6 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 
 ### Displaying Week data
 > [!note]
-> 
 > List/Display data for the week by days
 >
 >```JS
@@ -216,7 +199,7 @@ And Just to stay safe I'll include a setup example for all those cases with comm
 
 ### Displaying Months data
 > [!note]
-> List/Display data for the Month by days.
+> List/Display data for the Month by days
 >
 >```JS
 >/// script should be a dataview block

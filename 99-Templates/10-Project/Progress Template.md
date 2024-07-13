@@ -18,7 +18,7 @@ tags:
   - Activities
   - Project
 aliases: 
-banner: "[[Gallery/Banner/youtube banner.png]]"
+banner: "[[80-Gallery/Banner/Simplicity.png]]"
 ---
 
 

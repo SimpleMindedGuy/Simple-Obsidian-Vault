@@ -8,7 +8,7 @@
 🎫: 
 🎟️: 
 🔖: 
-banner: "![[80-Gallery/Banner/youtube banner.png]]"
+banner: "[[80-Gallery/Banner/Simplicity.png]]"
 tags:
   - SubNote
 aliases:

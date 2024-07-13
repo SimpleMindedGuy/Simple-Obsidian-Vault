@@ -11,7 +11,7 @@
 🔖: 
 📊: 
 tags:
-  - SubNote
+ - SubNote
 aliases:
 ---
 

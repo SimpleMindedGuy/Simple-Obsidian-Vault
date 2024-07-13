@@ -31,7 +31,7 @@ week: <% tp.date.now("ww",0,tp.file.title, "YYYY-MM-DD")%>
 year: <% tp.date.now("YYYY",0,tp.file.title, "YYYY-MM-DD" )%>
 
 
-banner: "[[80-Gallery/Banner/Writing-beginners.png]]"
+banner: "[[80-Gallery/Banner/Writing.png]]"
 banner_icon: 📆
 ---
 # !(🏷️)
@@ -84,7 +84,7 @@ templater true
 ```
 ^DiaryMedia
 
-<%* tp.user.NewDocument(tp,true) %>
+<%* tp.user.main(true) %>
 
 {{{:::
 

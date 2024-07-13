@@ -28,8 +28,7 @@ aliases:
  - "<% tp.date.now("YYYY-[W]ww",0,tp.file.title, "YYYY-[W]ww")%>"
 
 monthName: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-[W]ww")%>"
-
-month: "<% tp.date.now("MMMM",0,tp.file.title, "YYYY-[W]ww")%>"
+month: "<% tp.date.now("MM",0,tp.file.title, "YYYY-[W]ww")%>"
 week: "<% tp.date.now("ww",0,tp.file.title, "YYYY-[W]ww")%>"
 year: "<% tp.date.now("YYYY",0,tp.file.title, "YYYY-[W]ww")%>"
 
@@ -115,7 +114,7 @@ templater true
 ```
 ^MoveProjectMedia
 
-<%* tp.user.NewDocument(tp,true) %>
+<%* tp.user.main(true) %>
 
 {{{:::
 
@@ -153,14 +152,9 @@ Dialog :=> {
 What Aliases you want to use ?
 }
 
+
 List :=> aliases
 
-
-Menu :=> [!(menu)]
-
-OptionsAdd :=> tags
-
-List :=> tags
 
 Dialog :=> {
 Week's title

@@ -13,11 +13,11 @@
 🏁: 
 🏹: 0
 🎯: 1
-banner: "![[Gallery/Banner/typewriter.jpg]]"
+banner: "[[80-Gallery/Banner/typewriter.jpg]]"
 tags:
- - Blog
- - Activities
- - Description
+  - Blog
+  - Activities
+  - Description
 aliases:
 ---
 # !(🏷️)

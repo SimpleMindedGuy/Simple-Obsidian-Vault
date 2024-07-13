@@ -7,8 +7,8 @@
 🎟️: 
 🔖: 
 tags:
-  - Excalidraw
-  - SubNote
+ - Excalidraw
+ - SubNote
 aliases:
 
 excalidraw-plugin: parsed
