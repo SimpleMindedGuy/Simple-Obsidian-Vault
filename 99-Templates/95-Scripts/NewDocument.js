@@ -218,7 +218,7 @@ async function main(tp,Active){
     
     // console.log(tp)
 
-    console.log(`reading the Config File`)
+    console.log(`00-Basic-Functions: main:\nreading the Config File`)
     currentFile = await app.vault.getAbstractFileByPath(ConfigPath)
 
 
@@ -233,12 +233,14 @@ async function main(tp,Active){
 
         
         //  Reading the NewDocuemnt file
-        console.log(`reading the New Document file`)
+        console.log(`00-Basic-Functions: main:\nreading the New Document file`)
         currentFile = await app.vault.getAbstractFileByPath(NewDocumentPath)
         
         await RunFileCommands(currentFile,tp)
     
-        console.warn("Meta")
+        Meta = await window?.pkvs?.load("Meta");
+
+        console.warn("00-Basic-Functions: main:\nMeta")
         console.warn(Meta)
 
         return
@@ -246,12 +248,13 @@ async function main(tp,Active){
 
     currentFile = await app.workspace.getActiveFile()
 
-    console.warn(`Reading active file `)
+    console.warn(`00-Basic-Functions: main:\nReading active file `)
     console.log(currentFile)
 
 
+    Meta = await window?.pkvs?.load("Meta");
     await RunFileCommands(currentFile,tp)
-    console.warn(`Meta`);
+    console.warn(`00-Basic-Functions: main:\nMeta`);
     console.warn(Meta);
 
     await RemoveCommandBlock(currentFile)

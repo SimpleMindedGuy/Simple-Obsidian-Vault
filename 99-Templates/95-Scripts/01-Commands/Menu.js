@@ -66,8 +66,7 @@ async function Menu(Argument){
     // If there the string is not a valid Array string, set the value to an Empty Array
     if(!isMatch)
     {
-        console.warn(`01-Commands: Menu:\nNo menu items found `)
-        console.warn(`01-Commands: Menu:\nSetting menu to an empty menu`)
+        console.warn(`01-Commands: Menu:\nNo menu items found\nSetting menu to an empty menu`)
         console.log(isMatch)
 
         await window?.pkvs?.store("menu" , list);
@@ -79,16 +78,40 @@ async function Menu(Argument){
 
     for (const item in list)
     {
+        if(item == 'toNString')
+        {
+            continue;
+        }
+
+        if(!list[item])
+        {
+            continue;
+        }
+
+        
         // Trim the String values from spaces
-        list[item] = list[item].trim()
+        list[item] = list[item].trim();
         // remove undefined values
         if(list[item] == undefined){
-            list = newList.splice(item,1);
+            list = list.splice(item,1);
         }
     }
+
+    // make sure that directories sorted by name
+    let sortedList  = await list.sort(( a, b )=>{
+        if ( a < b ){
+            return -1;
+        }
+        if ( a > b ){
+            return 1;
+        }
+        return 0;
+    })
+
+
     // store global value
-    await window?.pkvs?.store("menu" , list);
-    return list
+    await window?.pkvs?.store("menu" , sortedList);
+    return sortedList
 }
 
 module.exports = Menu
