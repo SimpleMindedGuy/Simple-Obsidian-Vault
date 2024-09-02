@@ -84,6 +84,7 @@ async function ReplaceValues(text) {
 
 
     newText = await newText.replace(KeyRegExp, Meta[key])
+    newText = newText.trim();
   }
 
 

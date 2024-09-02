@@ -75,10 +75,15 @@ async function RunFileCommands(File) {
   for (const Line of CommandLines) {
     console.log(`\n///////////////////`);
     const Command = await tp.user.ReadCommand(Line);
-    const Argument = await tp.user.ReadArgument(Line);
+    let Argument = await tp.user.ReadArgument(Line);
     console.log(
       `01-Commands: RunFileCommands:\nLine : ${Line}\nCommand : ${Command}\nArgument : ${Argument}`
     );
+
+    if (Argument) {
+      Argument = Argument.trim();
+    }
+
     await Commands[Command](Argument, tp);
     let BreakScript = await window?.pkvs?.load("BreakScript");
 
@@ -98,48 +103,57 @@ const Commands = {
   SetCreatedKey: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.SetCreatedKey(Argument);
   },
   SetModifiedKey: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.SetModifiedKey(Argument);
   },
   SetTitleKey: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.SetTitleKey(Argument);
   },
   SetParentKey: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.SetParentKey(Argument);
   },
   SetOverviewKey: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.SetOverviewKey(Argument);
   },
   SetOverviewLayer: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.SetOverviewLayer(Argument);
   },
   Dialog: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     const dialog = await tp.user.Dialog(Argument);
     return dialog;
   },
   Menu: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     const menu = await tp.user.Menu(Argument);
     return menu;
   },
   Select: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     // setting options for Dialog
     const Options = {
       isMultiple: false,
@@ -172,6 +186,7 @@ const Commands = {
   SelectAdd: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     const Options = {
       isMultiple: false,
       isOptional: false,
@@ -201,6 +216,7 @@ const Commands = {
   SelectLayer: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     const Options = {
       isMultiple: false,
       isOptional: false,
@@ -242,6 +258,7 @@ const Commands = {
   AddLayer: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     // get layers meta global value
     let layers = await window?.pkvs?.load("layers");
     // add layer to global value
@@ -275,6 +292,7 @@ const Commands = {
   },
   OptionsAdd: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     const Options = {
       isMultiple: true,
       isOptional: true,
@@ -302,6 +320,7 @@ const Commands = {
   Check: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     const Options = {
       isMultiple: false,
       isOptional: false,
@@ -331,6 +350,7 @@ const Commands = {
   },
   Input: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     // get meta global value
     let Meta = (await window?.pkvs?.load("Meta")) ?? {};
 
@@ -343,6 +363,7 @@ const Commands = {
   },
   List: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     // get meta global value
     let Meta = (await window?.pkvs?.load("Meta")) ?? {};
 
@@ -357,6 +378,7 @@ const Commands = {
   SetDate: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     let currentDate = await tp.user.SetDate(Argument);
 
     if (!currentDate) {
@@ -368,6 +390,7 @@ const Commands = {
   SetDateFormat: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     let currentDateFormat = await tp.user.SetDateFormat(Argument);
 
     // set meta global value
@@ -376,6 +399,7 @@ const Commands = {
   StoreDate: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     await tp.user.StoreDate(Argument);
   },
   StoreFormattedDate: async (Argument) => {
@@ -385,6 +409,7 @@ const Commands = {
   },
   SetSearchQuery: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     console.info(`Search query was set to ${Argument}`);
 
     let SearchQuery = Argument.trim();
@@ -401,6 +426,7 @@ const Commands = {
   GetQueryList: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
 
+    Argument = Argument.trim();
     let Meta = await window?.pkvs?.load("Meta");
 
     let SearchQuery = await window?.pkvs?.load("SearchQuery");
@@ -413,14 +439,17 @@ const Commands = {
   },
   GetValue: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     await tp.user.GetValue(Argument);
   },
   SetValue: async (Argument, tp) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     await tp.user.SetValue(Argument);
   },
   StoreValue: async (Argument) => {
     Argument = await tp.user.ReplaceValues(Argument);
+    Argument = Argument.trim();
     await tp.user.StoreValue(Argument);
   },
   NextFile: async (Argument) => {
@@ -527,8 +556,8 @@ const Commands = {
     await tp.user.AddYamlValue(Meta, currentFile);
     await tp.user.AddInlineValue(Meta, currentFile);
 
-    await tp.user.AddKeyValue(Meta,currentFile);
-    
+    await tp.user.AddKeyValue(Meta, currentFile);
+
 
   },
   MoveMedia: async (Argument) => {

@@ -123,19 +123,17 @@ async function MakeDocumentFiles(Template, DocumentDirectory, addToOverview, isN
   console.log(`06-Utility Specific: MakeDocumentFiles: \nAdding DV Inline to File`);
   file = await tp.user.AddInlineValue(Meta, file)
 
-  // This is utility specific, may not be necessary or useful outside of the simple obsidian setup
-  // file = await tp.user.ReplaceKeyWithMetaIntoFile(file)
-
-  //  Get Overview global value
-  let OverviewPath = await window?.pkvs?.load("OverviewPath");
-  let Overview = await app.vault.getAbstractFileByPath(OverviewPath)
-
   // Check if script should add the A card linking to the default file in the overview File.
   if (!addToOverview) {
+    console.log(`06-Utility Specific: MakeDocumentFiles: \nDon't Make a kanban card`)
     return
   }
   // If it is the default template add it to the overview file
   if (isDefault) {
+    //  Get Overview global value
+    let OverviewPath = await window?.pkvs?.load("OverviewPath");
+    let Overview = await app.vault.getAbstractFileByPath(OverviewPath)
+    console.log(`06-Utility Specific: MakeDocumentFiles: \nOverview Path \n`, OverviewPath, `\nOverview File : \n`, Overview);
     // If overview file exists, add the project to it.
     if (Overview) {
       console.log(`06-Utility Specific: MakeDocumentFiles: \nAdding document to overview.`)

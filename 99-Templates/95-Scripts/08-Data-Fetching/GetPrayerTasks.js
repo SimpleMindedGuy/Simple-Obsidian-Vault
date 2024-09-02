@@ -45,6 +45,7 @@ async function GetPrayerTasks(prayerDate, Country, City) {
 
 
   const apiDate = moment(`${prayerDate}`).format("DD-MM-YYYY")
+  console.log(`city`, City, `\ncountry`, Country);
   const timings = await fetch(`http://api.aladhan.com/v1/timingsByCity/${apiDate}?city=${City}&country=${Country}&method=4`).then(
     async (response) => {
 

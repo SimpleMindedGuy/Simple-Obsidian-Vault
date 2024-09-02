@@ -77,7 +77,7 @@ async function MakeBuildPath(BuildRoot, BuildList, Options) {
   // if a directory already exists, no new directory will be created.
   for (const dir of BuildList) {
     // check if name is only white space
-    if (await dir.match(whiteSpaceRegExp)) {
+    if (dir.match(whiteSpaceRegExp)) {
       // escape the creating the directory, if the name is only white space
       console.log(`06-Utility Specific: MakeBuildPath:\nsuggested path is empty/has no name`)
       continue
@@ -88,7 +88,7 @@ async function MakeBuildPath(BuildRoot, BuildList, Options) {
 
     // if directory does not exist, create new directory. 
     if (!NextDirectory) {
-      let DirName = `${dir}`;
+      let DirName = `${dir.trim()}`;
 
       // if numbered object is checked get the next number for the directory.
       if (isNumbered) {
@@ -104,8 +104,9 @@ async function MakeBuildPath(BuildRoot, BuildList, Options) {
 
     BuildFolder = NextDirectory
 
-    let currentFilePath = window?.pkvs?.load("currentFilePath");
+    let currentFilePath = await window?.pkvs?.load("currentFilePath");
     let currentFile = await app.vault.getAbstractFileByPath(currentFilePath)
+    console.info(`06-Utility Specific: MakeBuildPath:\nCurrentFile Path is : \n`, currentFilePath, `\ncurrent File is \n`, currentFile)
 
     // ignore instructions and start with the next directory, if we don't want to make Overview. 
     if (!Overview) {
@@ -116,7 +117,7 @@ async function MakeBuildPath(BuildRoot, BuildList, Options) {
       continue
     }
     if (!currentFile) {
-      console.log(`06-Utility Specific: MakeBuildPath:\ncurrentFile was not provided/dose not exist.\ncannot create overview file`)
+      console.log(`06-Utility Specific: MakeBuildPath:\ncurrentFile was not provided/dose not exist.\ncannot create overview file\n`, currentFile);
       continue
     }
 
@@ -127,39 +128,47 @@ async function MakeBuildPath(BuildRoot, BuildList, Options) {
 
 
 
-    /// If there is no folder make it
-    if (!OverviewFile) {
-      // getting the template for the overview folder 
-      console.log(`06-Utility Specific: MakeBuildPath:\noverview file was not found, making new overview file\ngetting the template for the overview file`)
-
-      let OverviewTemplate = await tp.user.GetFile("Overview", currentFile.parent.path)
-
-      // if the overview template dose not exist, do nothing and continue loop.
-      if (!OverviewTemplate) {
-        console.warn(`06-Utility Specific: MakeBuildPath:\ntemplate dose not have an Overview`)
-        console.warn(OverviewTemplate)
-        continue
-      }
-
-      // Make the Overview file
-      console.log(`06-Utility Specific: MakeBuildPath:\nmaking overview file @: ${BuildFolder.path}`)
-      OverviewFile = await tp.user.CreateTemplateNote(dir, BuildFolder, OverviewTemplate, false);
+    /// If if the file already exist, set the pasth state and continue to next file
+    if (OverviewFile) {
       // set Overview file Global value
       await window?.pkvs?.store("OverviewPath", OverviewFile.path)
-
-      // Getting kanbanHelper from MetaData
-      let MetaEdit = await app.plugins.plugins["metaedit"].settings.KanbanHelper;
-
-
-      // making sure that that over view key is set/provided
-      if (!OverviewKey) {
-        console.warn(`06-Utility Specific: MakeBuildPath:\nOverview Key was not provided, script does not know what to keep track of.`)
-        continue
-      }
-      // adding overview to MetaEdit using the Overview key
-      await MetaEdit.boards.push({ boardName: `${OverviewLayer}`, property: `${OverviewKey}` })
-
+      continue;
     }
+
+
+
+    // getting the template for the overview folder 
+    console.log(`06-Utility Specific: MakeBuildPath:\noverview file was not found, making new overview file\ngetting the template for the overview file`)
+
+    let OverviewTemplate = await tp.user.GetFile("Overview", currentFile.parent.path)
+
+    // if the overview template dose not exist, do nothing and continue loop.
+    if (!OverviewTemplate) {
+      console.warn(`06-Utility Specific: MakeBuildPath:\ntemplate dose not have an Overview`)
+      console.warn(OverviewTemplate)
+      continue
+    }
+
+    // Make the Overview file
+    console.log(`06-Utility Specific: MakeBuildPath:\nmaking overview file @: ${BuildFolder.path}`)
+    OverviewFile = await tp.user.CreateTemplateNote(dir, BuildFolder, OverviewTemplate, false);
+
+    // Getting kanbanHelper from MetaData
+    let MetaEdit = await app.plugins.plugins["metaedit"].settings.KanbanHelper;
+
+
+    // making sure that that over view key is set/provided
+    if (!OverviewKey) {
+      console.warn(`06-Utility Specific: MakeBuildPath:\nOverview Key was not provided, script does not know what to keep track of.`)
+      continue
+    }
+    // adding overview to MetaEdit using the Overview key
+    await MetaEdit.boards.push({ boardName: `${OverviewLayer}`, property: `${OverviewKey}` })
+
+    // set Overview file Global value
+    await window?.pkvs?.store("OverviewPath", OverviewFile.path)
+
+    continue
   }
 
   return BuildFolder;

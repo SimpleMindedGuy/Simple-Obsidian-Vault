@@ -7,20 +7,21 @@
  * @param {string|undefined} Argument
  * @returns {Promise<void>}
  */
-async function SetModifiedKey(Argument){
-    console.log(`01-Commands: SetModifiedKey:\nSetting Modified Date key/variables to ${Argument}`);
+async function SetModifiedKey(Argument) {
+  console.log(`01-Commands: SetModifiedKey:\nSetting Modified Date key/variables to ${Argument}`);
 
-    if(!Argument)
-    {
+  if (!Argument) {
 
-        console.warn(`01-Commands: SetModifiedKey:\nCannot set ( modifiedKey ) to null/undefined `)
-        console.warn(Argument);
-        return 
-    }
-    let modifiedKey = Argument;
-    console.log(modifiedKey);
-    // store global value
-    await window?.pkvs?.store("modifiedKey" , modifiedKey);
+    console.warn(`01-Commands: SetModifiedKey:\nCannot set ( modifiedKey ) to null/undefined `)
+    console.warn(Argument);
+    return
+  }
+  let modifiedKey = Argument.trim();
+
+  console.log(modifiedKey);
+
+  // store global value
+  await window?.pkvs?.store("modifiedKey", modifiedKey);
 }
 
 module.exports = SetModifiedKey
