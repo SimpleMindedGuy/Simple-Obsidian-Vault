@@ -1188,36 +1188,31 @@ body:not(.is-translucent) .titlebar-text {
     opacity: 1;
 }
 
-body.is-hidden-frameless .titlebar .titlebar-button-container {
+.is-hidden-frameless .titlebar .titlebar-button-container {
     background-color: transparent !important;
 }
 
-.titlebar .titlebar-button-container.mod-right {
-    margin-right: 16px;
-}
 
-body.mod-windows .titlebar .titlebar-button.mod-close:hover,
-body.mod-windows .titlebar .titlebar-button.mod-close:focus {
+
+.mod-windows .titlebar .titlebar-button.mod-close:hover,
+.mod-windows .titlebar .titlebar-button.mod-close:focus {
     background-color: var(--background-modifier-error) !important;
 }
 
-body.mod-windows .titlebar .titlebar-button.mod-close:hover::after,
-body.mod-windows .titlebar .titlebar-button.mod-close:focus::after {
+.mod-windows .titlebar .titlebar-button.mod-close:hover::after,
+.mod-windows .titlebar .titlebar-button.mod-close:focus::after {
     background-color: var(--text-on-accent) !important;
 }
 
-body.mod-windows .titlebar .titlebar-button.mod-close:hover,
-body.mod-windows .titlebar .titlebar-button.mod-close:focus {
+.mod-windows .titlebar .titlebar-button.mod-close:hover,
+.mod-windows .titlebar .titlebar-button.mod-close:focus {
     color: var(--text-on-accent) !important;
 }
 
-.titlebar-button-container.mod-right .titlebar-button {
-    height: 24px;
-    width: 24px;
-    border-radius: 12px;
+.is-hidden-frameless .titlebar-button-container.mod-right .titlebar-button {
+    height: 44px;
+    width: 44px;
     padding: 0;
-    margin: auto 8px;
-    background-color: transparent;
 }
 
 .titlebar-button-container.mod-right .titlebar-button:hover {
@@ -1228,7 +1223,7 @@ body.mod-windows .titlebar .titlebar-button.mod-close:focus {
     margin-right: 0px;
 }
 
-body.is-hidden-frameless .titlebar-button-container.mod-right {
+.is-hidden-frameless .titlebar-button-container.mod-right {
     height: 44px;
 }
 
@@ -2785,6 +2780,34 @@ body:not(.file-icon-remove).colorful-folder .workspace-leaf-content[data-type="f
 
 body:not(.file-icon-remove).colorful-folder .nav-folder.mod-root>.nav-folder-title::before {
     background-color: currentColor;
+}
+
+/* vault profile */
+
+body:not(.is-mobile) .workspace-split.mod-left-split {
+    position: relative;
+}
+
+body:not(.is-mobile) .workspace-split.mod-left-split .workspace-tabs:last-of-type .workspace-tab-container {
+    padding-bottom: 44px;
+}
+
+body:not(.is-mobile) .workspace-split.mod-left-split .workspace-sidedock-vault-profile {
+    padding: 6px;
+    background-color: transparent;
+    position: absolute;
+    bottom: 0;
+    z-index: 10;
+    height: 44px;
+}
+
+body:not(.is-mobile) .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher {
+    height: 32px;
+    border-radius: var(--radius-l);
+}
+
+body:not(.is-mobile) .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-actions {
+    gap: var(--size-2-1);
 }
 
 /*====== empty state ======*/

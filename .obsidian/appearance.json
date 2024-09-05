@@ -1,15 +1,15 @@
 {
-  "baseFontSize": 14,
+  "baseFontSize": 18,
   "translucency": false,
   "cssTheme": "Mado Miniflow",
-  "theme": "system",
+  "theme": "obsidian",
   "baseFontSizeAction": true,
-  "interfaceFontFamily": "",
-  "textFontFamily": "Carlito",
-  "monospaceFontFamily": "",
+  "interfaceFontFamily": "Andale Mono,Bradley Hand",
+  "textFontFamily": "Bradley Hand,Noto Sans Arabic,Overpass Nerd Font,OverpassM Nerd Font Mono,JetBrainsMono Nerd Font Mono",
+  "monospaceFontFamily": "OverpassM Nerd Font Mono,JetBrainsMono Nerd Font Mono",
   "enabledCssSnippets": [
-    "MyStyle",
-    "SlRvb Checkboxes"
+    "SlRvb Checkboxes",
+    "MyStyle"
   ],
   "accentColor": "#9580ff",
   "showViewHeader": true,

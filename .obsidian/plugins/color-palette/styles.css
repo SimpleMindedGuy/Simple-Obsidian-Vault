@@ -1,36 +1,40 @@
-/* Container */
+/* Palette Container */
+
+.palette-container {
+    cursor: pointer;
+    position: relative;
+}
+
+.palette-container.palette-scroll {
+    overflow-x: auto;
+}
+
+/* Palette */
+
 .palette {
     /* fallback vars */
     --palette-height: 150px;
+    --palette-width: 100%;
     --palette-direction: row;
     --not-palette-direction: row;
     --palette-background-color: transparent;
     --palette-color: #000;
     --palette-column-flex-basis: 20px;
     --notice-duration: 2.5s;
+    --palette-corners: 5px;
     
     display: flex;
     flex-direction: var(--palette-direction);
-    width: 100%;
-    border-radius: 5px;
+    border-radius: var(--palette-corners);
     overflow: hidden;
     cursor: pointer;
     height: var(--palette-height);
+    width: var(--palette-width);
+    position: relative;
 }
 
-.palette-pulse {
-    animation: pulse var(--notice-duration) infinite;
-    transform: scale(1);
-    border: transparent 1px solid;
-}
+/* Palette Item */
 
-@keyframes pulse {
-    50% {
-        background-color: #FFFF0080;
-    }
-}
-
-/* Child */
 .palette > div {
     display: flex;
     flex: 1;
@@ -38,41 +42,43 @@
     flex-direction: var(--not-palette-direction);
     justify-content: center;
     align-items: center;
+    height: var(--palette-height);
     transition: all 0.1s ease-in-out;
     background-color: var(--palette-background-color);
     gap: 3%;
 }
 
-.palette > canvas {
+/*
+Canvas
+(HTML Canvas, NOT Obsidian.md canvas) 
+*/
+
+.palette-canvas {
     position: relative;
+}
+
+.palette-canvas > canvas {
     transition: all 0.1s ease-in-out;
     object-fit: contain;
 }
 
-.palette > canvas.gradient {
+.palette-canvas > canvas.gradient {
     background: linear-gradient(to right, var(--palette-background-color));
 }
 
-.palette.paletteColumn > div:hover {
-    flex-basis: var(--palette-column-flex-basis);
+.palette-canvas > image {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
 }
 
-.palette:not(.paletteColumn) > div:hover {
-    flex-basis: 80px;
+.palette-canvas > canvas.image:hover ~ .palette-tooltip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.palette > div:hover > span {
-    display: block;
-}
-
-/* Child Text */
-.palette > div > span {
-    display: none;
-    text-align: center;
-    font-size: 100%;
-    font-weight: bold;
-    color: var(--palette-color);
-}
+/* Canvas Tooltip */
 
 .palette-tooltip {
     position: absolute;
@@ -86,11 +92,82 @@
     font-size: 100%;
 }
 
-.palette > canvas:hover ~ .palette-tooltip {
+.palette.palette-hover > canvas:hover ~ .palette-tooltip {
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
+/* Palette Direction & Hover */
+
+.palette.paletteColumn.palette-hover > div:hover {
+    flex-basis: var(--palette-column-flex-basis);
+}
+
+.palette:not(.paletteColumn).palette-hover > div:hover {
+    flex-basis: 80px;
+}
+
+.palette.palette-hover > div:hover > span {
+    display: block;
+}
+
+/* Palette Item Text */
+
+.palette > div > span {
+    display: none;
+    text-align: center;
+    font-size: 100%;
+    font-weight: bold;
+    color: var(--palette-color);
+    user-select: none;
+}
+
+/* Edit Mode */
+
+.palette.edit-mode {
+    overflow-x: auto;
+}
+
+.palette > div > .edit-container {
+    --edit-background-color: #000000;
+    --edit-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 16px 0;
+    gap: 16px;
+}
+
+.palette > div > .edit-container > span {
+    --edit-font-size: 16px;
+    color: var(--edit-color);
+    font-weight: bold;
+    font-size: var(--edit-font-size);
+    user-select: none;
+}
+
+.palette > div > .edit-container > .color-span-editable {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px -50px 20px -28px inset;
+    cursor: pointer;
+}
+
+/* Color Trash Button */
+.palette > div > .edit-container > button {
+    background-color: var(--edit-background-color);
+    color: var(--edit-color);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px -50px 20px -28px inset;
+    cursor: pointer;
+}
+
+/* Drag & Drop */
+
+.palette > .is-dragging {
+    opacity: 0;
+}
+
+/* Invalid Palette */
 
 .palette > .invalid {
     position: absolute;
@@ -98,9 +175,9 @@
     justify-content: center;
     align-items: center;
     height: var(--palette-height);
-    width: 100%;
+    width: var(--palette-width);
     background-color: #000000C0;
-    border-radius: 5px;
+    border-radius: var(--palette-corners);;
 }
 
 .palette > .invalid > span {
@@ -112,61 +189,126 @@
     width: 100%;
     height: 30%;
     text-align: center;
+    user-select: none;
 }
 
-/* Container */
-.create-palette {
-    --selected-colors-display: none;
-    --trash-background-color: #000000;
-    --trash-color: #ffffff;
+/* Invalid Pulse */
+
+.palette-pulse {
+    animation: pulse var(--notice-duration) infinite;
 }
 
-.create-palette > .or-container {
+.palette-pulse > .invalid {
+    animation: pulse-shadow var(--notice-duration) infinite;
+}
+
+.palette-pulse > .invalid > span {
+    /* 1px padding so that box-shadow can show in full on left / right */
+    margin: 0px 1px;
+}
+
+@keyframes pulse {
+    50% {
+        background-color: #FFFF0080;
+    }
+}
+
+@keyframes pulse-shadow {
+    50% {
+        box-shadow: inset 0px 0px 0px 1px #FFFF0080;
+    }
+}
+
+/* Tabs */
+
+.palette-editor > section > .control-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 5%;
+    padding: .75em 0;
 }
 
-.create-palette > .or-container > span {
-    font-weight: bold;
+.palette-editor > section > .control-container > button {
+    cursor: pointer;
 }
 
-.color-picker {
+.palette-editor > section > .colors-container {
+    padding: .75em 0 0 0;
+}
+
+/* Color Picker Mode */
+
+.palette-editor > section > .select-color-picker > div > div {
+
+}
+
+/* Generate Mode */
+
+.palette-editor > section > .select-generate > div > div > button {
+    cursor: pointer;
+}
+
+/* Image Mode Add Colors */
+
+.palette-editor > section > .select-image > .add-colors > .setting-item-control > div {
     display: flex;
-    flex: 1;
     flex-direction: column;
-    justify-content: center;
     align-items: flex-end;
+    justify-content: center;
 }
 
-/* Selected Colors Container */
-.color-picker > div {
-    display: var(--selected-colors-display);
-    flex-direction: column;
-    width: 100%;
-    margin-top: 5%;
-}
-
-/* Colors Container */
-.color-picker > div > div {
+.palette-editor > section > .select-image > .add-colors > .setting-item-control > div > div {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    margin: 8px 0;
-    gap: 8px;
+    justify-content: center;
+    gap: 5px;
 }
 
-.color-picker > div > div > span {
-    padding: 2%;
+.palette-editor > section > .select-image > .add-colors > .setting-item-control > div > div > button {
+    cursor: pointer;
 }
 
-.color-picker > div > div > .color-span-editable {
-    border-width: 2px;
-    border-style: solid;
+.palette-editor > section > .select-image > .add-colors > .setting-item-control > div > div > input[type="file"] {
+    display: none;
 }
 
-/* Color Trash Button */
-.color-picker > div > div > button {
-    background-color: var(--trash-background-color);
-    color: var(--trash-color);
+.palette-editor> section > .select-image > .image-preview > .setting-item-info {
+    display: none;
+}
+
+/* Image Mode Preview */
+
+.palette-editor > section > .select-image > .image-preview > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.palette-editor > section > .select-image > .hide-image-preview {
+    display: none;
+}
+
+/* URL Mode */
+
+.palette-editor > section > .select-url > div > div > button {
+    cursor: pointer;
+}
+
+/* Palette Preview */
+
+.palette-editor > section > .palette-preview {
+    
+}
+
+.color-palette-settings {
+    & > h2 {
+        font-size: 20px;
+    }
+}
+
+.color-palette-donate {
+    height: 100%;
+    padding: 0;
+    margin: 2%;
 }

@@ -2,7 +2,8 @@
   "fileDirections": {
     "15-University/07 - Machine Learning/Machine Learning Progress.md": "auto",
     "14-Book/01 - الميتافيزيقا/SubNotes/0002 - مشكلات الميتافيزيقا.md": "auto",
-    "14-Book/04-الرياضيات المسلية/الرياضيات المسلية Description.md": "auto"
+    "14-Book/04-الرياضيات المسلية/الرياضيات المسلية Description.md": "auto",
+    "14-Book/03-The C programming Language/The C programming language Second Edition Progress.md": "ltr"
   },
   "defaultDirection": "auto",
   "rememberPerFile": true,

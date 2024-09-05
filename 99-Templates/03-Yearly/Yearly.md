@@ -86,10 +86,12 @@ customJS.DvMonthlyCharts.renderYear({
 
 
 
-<%* tp.user.NewDocument(tp,true) %>
+
+
 
 {{{:::
 
+<%* tp.user.main(true) %>
 Dialog :=> {
 Books to refer to if any
 }

@@ -1,59 +1,20 @@
 {
   "main": {
-    "id": "b6be2056f8c6f62c",
+    "id": "438428c5e732c967",
     "type": "split",
     "children": [
       {
-        "id": "e678fa4f26a62092",
+        "id": "0671d9097bdfd7d8",
         "type": "tabs",
         "children": [
           {
-            "id": "b0c86647ba9afd98",
+            "id": "4a697d72109474f8",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "9999 - Accounts.md",
+                "file": "99-Templates/Habit Tracking Documentation.md",
                 "mode": "source",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "1a86d58cf9852d4b",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "12-Video/03-Clips/0002 - Just doing noita stuff/Just doing noita stuff Description.md",
-                "mode": "preview",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "fed5ab4c82448755",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "12-Video/modify.md",
-                "mode": "source",
-                "backlinks": true,
-                "source": true
-              }
-            }
-          },
-          {
-            "id": "6b8ef96f7c3c7048",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "12-Video/07-Simple Talk/58-Bad Managment/Bad Managment Description .md",
-                "mode": "preview",
                 "backlinks": true,
                 "source": true
               }
@@ -65,15 +26,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "689fadd1cbfe9775",
+    "id": "beca6561c5468aa8",
     "type": "split",
     "children": [
       {
-        "id": "cc9aaa7762441c95",
+        "id": "0fed4f5db81b1d9c",
         "type": "tabs",
         "children": [
           {
-            "id": "ccfa9f300fd13d9c",
+            "id": "63021d870380b022",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -83,22 +44,14 @@
             }
           },
           {
-            "id": "a9064e1b1ef5af44",
-            "type": "leaf",
-            "state": {
-              "type": "bookmarks",
-              "state": {}
-            }
-          },
-          {
-            "id": "cb0f9e3485236cb9",
+            "id": "7bdd173ac5d037f2",
             "type": "leaf",
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#-  ",
                 "matchingCase": false,
-                "explainSearch": true,
+                "explainSearch": false,
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
@@ -106,33 +59,30 @@
             }
           },
           {
-            "id": "d0d83656605c5435",
+            "id": "21e95636f741fda3",
             "type": "leaf",
             "state": {
-              "type": "tag",
-              "state": {
-                "sortOrder": "alphabetical",
-                "useHierarchy": true
-              }
+              "type": "bookmarks",
+              "state": {}
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 379
+    "width": 289
   },
   "right": {
-    "id": "cf0c977f7f90dfd4",
+    "id": "e71a5aa56484da81",
     "type": "split",
     "children": [
       {
-        "id": "5cc77365d0d8e474",
+        "id": "1b78938212dba62a",
         "type": "tabs",
-        "dimension": 33.400402414486926,
+        "dimension": 39.37007874015748,
         "children": [
           {
-            "id": "206300cfce5ca9b9",
+            "id": "a4eb98ffa1a3df03",
             "type": "leaf",
             "state": {
               "type": "calendar",
@@ -140,175 +90,176 @@
             }
           },
           {
-            "id": "a3bbbd456c67b2ed",
+            "id": "31594c49302531f7",
             "type": "leaf",
             "state": {
-              "type": "dictionary-view",
-              "state": {}
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
             }
           },
           {
-            "id": "9d7c9d1cd769c9e2",
+            "id": "75d9469f8b849b7a",
             "type": "leaf",
             "state": {
-              "type": "advanced-tables-toolbar",
+              "type": "dictionary-view",
               "state": {}
             }
           }
         ]
       },
       {
-        "id": "5c1134142e0ac0a6",
+        "id": "a07c89a7eb21c47a",
         "type": "tabs",
-        "dimension": 66.59959758551308,
+        "dimension": 60.62992125984252,
         "children": [
           {
-            "id": "6311cc4f6775fc4d",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "9999 - Accounts.md"
-              }
-            }
-          },
-          {
-            "id": "936079224987c447",
+            "id": "ca95d948511f7b9a",
             "type": "leaf",
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "9999 - Accounts.md"
+                "file": "99-Templates/Habit Tracking Documentation.md"
               }
             }
           },
           {
-            "id": "74f905f6442c0d00",
+            "id": "b42006025b257c29",
             "type": "leaf",
             "state": {
-              "type": "outgoing-link",
+              "type": "outline",
               "state": {
-                "file": "9999 - Accounts.md",
-                "linksCollapsed": false,
-                "unlinkedCollapsed": false
+                "file": "99-Templates/Habit Tracking Documentation.md"
               }
             }
           },
           {
-            "id": "f182945107d9f033",
+            "id": "892bad20115c7707",
             "type": "leaf",
             "state": {
-              "type": "backlink",
-              "state": {
-                "file": "9999 - Accounts.md",
-                "collapseAll": true,
-                "extraContext": false,
-                "sortOrder": "alphabetical",
-                "showSearch": false,
-                "searchQuery": "",
-                "backlinkCollapsed": false,
-                "unlinkedCollapsed": false
-              }
+              "type": "reminder-list",
+              "state": {}
             }
           },
           {
-            "id": "7f1b755e3f390727",
+            "id": "6b858687c18e5e54",
+            "type": "leaf",
+            "state": {
+              "type": "todo",
+              "state": {}
+            }
+          },
+          {
+            "id": "fac57a8184888215",
             "type": "leaf",
             "state": {
               "type": "all-properties",
               "state": {
                 "sortOrder": "frequency",
-                "showSearch": true,
+                "showSearch": false,
                 "searchQuery": ""
               }
             }
           },
           {
-            "id": "dc31c6aa06df1b20",
+            "id": "a030c5732c08d5d7",
             "type": "leaf",
             "state": {
-              "type": "todo",
-              "state": {}
+              "type": "backlink",
+              "state": {
+                "file": "99-Templates/Habit Tracking Documentation.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "da5cbbca5ae88284",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "99-Templates/Habit Tracking Documentation.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 394
+    "width": 376
   },
   "left-ribbon": {
     "hiddenItems": {
+      "homepage:Open homepage": false,
+      "obsidian-gallery:Gallery": false,
+      "templater-obsidian:Templater": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "quran-helper:Insert Ayah": false,
+      "obsidian-kanban:Create new board": false,
+      "webpage-html-export:Export Vault to HTML": false,
+      "obsidian-excalidraw-plugin:Create new drawing": false,
+      "time-ruler:Open Time Ruler": false,
+      "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
-      "audio-recorder:Start/stop recording": false,
-      "switcher:Open quick switcher": true,
       "canvas:Create new canvas": false,
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
       "markdown-importer:Open format converter": false,
-      "zk-prefixer:Create new unique note": true,
-      "workspaces:Manage workspace layouts": true,
-      "obsidian-gallery:Gallery": false,
-      "table-editor-obsidian:Advanced Tables Toolbar": false,
-      "homepage:Open homepage": false,
-      "webpage-html-export:Export Vault to HTML": false,
-      "templater-obsidian:Templater": false,
-      "obsidian-excalidraw-plugin:Create new drawing": false,
-      "3d-graph-new:Global 3D Graph": false,
-      "obsidian-kanban:Create new board": false,
+      "zk-prefixer:Create new unique note": false,
+      "audio-recorder:Start/stop recording": false,
+      "workspaces:Manage workspace layouts": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "b0c86647ba9afd98",
+  "active": "4a697d72109474f8",
   "lastOpenFiles": [
-    "99-Templates/03-Yearly/Yearly.md",
+    "99-Templates/Utility documentation.md",
+    "01-Weekly/2024/2024-W35.md",
     "Home.md",
-    "12-Video/03-Clips/0002 - Just doing noita stuff/Just doing noita stuff Description.md",
-    "12-Video/modify.md",
-    "12-Video/07-Simple Talk/58-Bad Managment/Bad Managment Description .md",
-    "12-Video/07-Simple Talk/01 - filterring through people/filterring through people Description.md",
-    "12-Video/07-Simple Talk/58-bless you/bless you Description .md",
-    "12-Video/03-Clips/23-My Sign Now/My Sign Now Description.md",
-    "12-Video/03-Clips/41-Simply too fat/Simply too fat Description .md",
-    "12-Video/03-Clips/42-we are all stupid/we are all stupid Description .md",
-    "12-Video/03-Clips/24-Un Lucky Company/Un Lucky Company Description.md",
-    "12-Video/04-Memories/0004 - i dont like this/i dont like this.mp4",
-    "12-Video/04-Memories/0005 - vibe check/videoplayback.mp4",
-    "12-Video/03-Clips/0003 - Homing Rocks/Homing Rocks Description.md",
-    "12-Video/03-Clips/0003 - Homing Rocks/Media/Homing Rocks.mp4",
-    "00-Daily/2024/2024-05-29.md",
-    "00-Daily/2024/2024-05-28.md",
-    "12-Video/07-Simple Talk/02 - Tom Dream 1/Tom Dream 1 Description.md",
-    "11-Learning/03 - NextJS/NextJS Progress.md",
-    "99-Templates/02-Monthly/Monthly.md",
-    "99-Templates/01-Weekly/Weekly.md",
-    "99-Templates/00-Daily/Daily.md",
-    "81-DailyFiles/Year-2024/Month-05/Day-28",
-    "81-DailyFiles/Year-2024/Month-05",
-    "81-DailyFiles/Year-2024",
-    "81-DailyFiles/Year-2024/Month-05/Day-28/02-IMG_20240526_163952.jpg",
-    "99-Templates/95-Scripts/03-FileManagement/MoveMedia.js~",
-    "81-DailyFiles/Year-2024/Month-05/Day-28/01-IMG_20240526_164522.jpg",
-    "81-DailyFiles/01-Year-2024/00-Month-05/00-Day-28",
-    "81-DailyFiles/01-Year-2024/00-Month-05",
-    "81-DailyFiles/01-Year-2024",
-    "80-Gallery/Storing data.gif",
-    "80-Gallery/untitled.gif",
-    "80-Gallery/Icons/myicons/Audio31.svg",
-    "80-Gallery/Icons/myicons/Audio43.svg",
-    "80-Gallery/Icons/myicons/Banner.svg",
-    "00-Daily/2024/2024-02-01.md",
-    "80-Gallery/Banner/Library.jpg",
-    "00-Daily/2023/2023-04-11.md",
-    "00-Daily/2023/2023-04-10.md",
-    "00-Daily/2023/2023-04-09.md",
-    "00-Daily/2023/2023-02-08.md",
-    "00-Daily/2023/2023-02-13.md",
-    "00-Daily/2023/2023-04-07.md",
-    "80-Gallery/Screenshot_20230204_003109.png",
-    "80-Gallery/Pasted image 20240330232035.png",
-    "Untitled.canvas",
-    "Templates/Activity/Canvas Subnote.canvas"
+    "9999 - Accounts.md",
+    "10-Project/03-SimpleUI/SimpleUI Progress.md",
+    "00-Daily/2024/2024-09-01.md",
+    "00-Daily/2024/2024-09-02.md",
+    "00-Daily/2024/2024-09-03.md",
+    "00-Daily/2024/2024-09-04.md",
+    "09-Tasks/General View.md",
+    "09-Tasks/14-Book.md",
+    "09-Tasks/10-Projects.md",
+    "09-Tasks/11-Learning.md",
+    "09-Tasks/00-Today.md",
+    "09-Tasks/01-Overdue.md",
+    "10-Project/02-Simple Obsidian Vault/SubNotes/01 - Habit Tracking Documentation.md",
+    "10-Project/02-Simple Obsidian Vault/SubNotes/00 - Utility Documentation.md",
+    "Cover Letter.md",
+    "10-Project/04-allama/allama Tracking .md",
+    "10-Project/04-allama/allama Progress .md",
+    "00-Daily/2024/2024-08-30.md",
+    "00-Daily/2024/2024-08-31.md",
+    "10-Project/04-allama/allama Description .md",
+    "10-Project/04-allama",
+    "10-Project/03-SimpleUI/SimpleUI Description.md",
+    "10-Project/Project.md",
+    "9999 - Accounts 1.md",
+    "30-People/07-test",
+    "99-Templates/95-Scripts/05-Writing-text/AddDocumentToKanban.js",
+    "30-People/06-anothertest",
+    "99-Templates/95-Scripts/06-Utility Specific/MakeBuildPath.js~",
+    "99-Templates/95-Scripts/06-Utility Specific/MakeDocumentFiles.js~",
+    "30-People/07-Nigger",
+    "99-Templates/95-Scripts/05-Writing-text/AddDocumentToOverview.js~",
+    "30-People/06-Tom",
+    "30-People/06-tom",
+    "80-Gallery/Screenshot 2024-07-28 at 22-45-28 Create Next App.png"
   ]
 }

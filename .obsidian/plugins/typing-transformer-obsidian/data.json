@@ -1,0 +1,17 @@
+{
+  "debug": false,
+  "convertRules": "\n# Line head conversion\n# Note: this rule can't apply to the very first line of the document\n\n\n\n'varx|' -> '`Variable`|'\n\n'statx|' -> '*Static*|'\n\n'charx|' ->'`char`|'\n\n'flox|'-> '`float`|'\n\n'dux|'-> '`double`|'\n\n'intx|' -> '`int`|'\n\n'lintx|' -> '`long int`|'\n\n'ldblx|' -> '`long double`|'\n",
+  "zoneIndicatorOn": false,
+  "autoFormatOn": true,
+  "profiles": [
+    {
+      "title": "global",
+      "content": "\n# Line head conversion\n# Note: this rule can't apply to the very first line of the document\n\n"
+    },
+    {
+      "title": "Programming",
+      "content": "\n'varx|' -> '`Variable`|'\n\n'statx|' -> '*Static*|'\n\n'charx|' ->'`char`|'\n\n'flox|'-> '`float`|'\n\n'dux|'-> '`double`|'\n\n'intx|' -> '`int`|'\n\n'lintx|' -> '`long int`|'\n\n'ldblx|' -> '`long double`|'\n"
+    }
+  ],
+  "activeProfile": "Programming"
+}

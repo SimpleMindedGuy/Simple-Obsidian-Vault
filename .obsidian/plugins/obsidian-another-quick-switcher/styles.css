@@ -617,3 +617,8 @@
   align-items: center;
   margin-right: 12px;
 }
+
+.another-quick-switcher__modal-prompt .search-input-clear-button {
+  display: none;
+}
+

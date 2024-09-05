@@ -142,7 +142,7 @@ __export(main_exports, {
   default: () => AnotherQuickSwitcher
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian12 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 var import_ts_deepmerge2 = __toESM(require_dist());
 
 // src/app-helper.ts
@@ -1030,7 +1030,10 @@ var AppHelper = class {
     const editor = activeMarkdownView.editor;
     editor.replaceSelection(
       // XXX: dirty hack
-      linkText.endsWith(".excalidraw]]") ? `!${linkText}` : linkText
+      linkText.endsWith(".excalidraw]]") ? `!${linkText}` : (
+        // ![[hoge.pdf]] -> [[hoge.pdf]]
+        linkText.endsWith(".pdf]]") ? linkText.replace("!", "") : linkText
+      )
     );
   }
   async createMarkdown(linkText) {
@@ -1108,6 +1111,12 @@ var AppHelper = class {
       pos: { x: x + offset.x, y: y + offset.y }
     });
   }
+  enableFileExplorer() {
+    return this.unsafeApp.internalPlugins.getEnabledPluginById("file-explorer");
+  }
+  revealInFolder(folder) {
+    this.unsafeApp.internalPlugins.plugins["file-explorer"].instance.revealInFolder(folder);
+  }
   // TODO: Use another interface instead of TFile
   createPhantomFile(linkText) {
     const linkPath = this.getPathToBeCreated(linkText);
@@ -1137,7 +1146,7 @@ var AppHelper = class {
 };
 
 // src/commands.ts
-var import_obsidian11 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 
 // src/ui/AnotherQuickSwitcherModal.ts
 var import_obsidian4 = require("obsidian");
@@ -1679,6 +1688,12 @@ var createDefaultHotkeys = () => ({
     "navigate back": [{ modifiers: ["Alt"], key: "ArrowLeft" }],
     dismiss: [{ modifiers: [], key: "Escape" }]
   },
+  folder: {
+    up: [{ modifiers: ["Mod"], key: "p" }],
+    down: [{ modifiers: ["Mod"], key: "n" }],
+    "open in default app": [],
+    dismiss: [{ modifiers: [], key: "Escape" }]
+  },
   move: {
     up: [{ modifiers: ["Mod"], key: "p" }],
     down: [{ modifiers: ["Mod"], key: "n" }],
@@ -2050,6 +2065,7 @@ var AnotherQuickSwitcherSettingTab = class extends import_obsidian3.PluginSettin
     this.resetLock = true;
     this.hotkeyExpandedStatus = {
       main: false,
+      folder: false,
       move: false,
       header: false,
       backlink: false,
@@ -2280,7 +2296,7 @@ var AnotherQuickSwitcherSettingTab = class extends import_obsidian3.PluginSettin
       addHotkeyItems(dialogKey, div);
     };
     addHotkeysForDialog("main", "Main dialog");
-    addHotkeysForDialog("move", "Move dialog");
+    addHotkeysForDialog("folder", "Folder dialog");
     addHotkeysForDialog("header", "Header dialog");
     addHotkeysForDialog("backlink", "Backlink dialog");
     addHotkeysForDialog("link", "Link dialog");
@@ -2760,9 +2776,10 @@ function createItemDiv(item, aliasesDisplayedAsTitle, options) {
   const entryDiv = createDiv({
     cls: "another-quick-switcher__item__entry"
   });
+  const shouldShowAliasAsTitle = aliasesDisplayedAsTitle.length > 0 && (options.displayAliaseAsTitle || options.displayAliasAsTitleOnKeywordMatched);
   const titleDiv = createDiv({
     cls: "another-quick-switcher__item__title",
-    text: aliasesDisplayedAsTitle.length > 0 ? aliasesDisplayedAsTitle.join(" / ") : item.file.basename
+    text: shouldShowAliasAsTitle ? aliasesDisplayedAsTitle.join(" / ") : item.file.basename
   });
   entryDiv.appendChild(titleDiv);
   const isExcalidrawFile = isExcalidraw(item.file);
@@ -3010,6 +3027,7 @@ var AnotherQuickSwitcherModal = class _AnotherQuickSwitcherModal extends import_
     this.isClosed = new Promise((resolve) => {
       this.markClosed = resolve;
     });
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.appHelper = new AppHelper(args.app);
     this.settings = args.settings;
     this.logger = Logger.of(this.settings);
@@ -3753,6 +3771,7 @@ var BacklinkModal = class extends import_obsidian5.SuggestModal {
       this.markClosed = resolve;
     });
     this.navQueue = Promise.resolve();
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.vaultRootPath = normalizePath(
       this.app.vault.adapter.basePath
     );
@@ -4102,8 +4121,156 @@ var BacklinkModal = class extends import_obsidian5.SuggestModal {
   }
 };
 
-// src/ui/GrepModal.ts
+// src/ui/FolderModal.ts
 var import_obsidian6 = require("obsidian");
+function matchQuery2(item, query, matcher, isNormalizeAccentsDiacritics) {
+  const qs = query.split("/");
+  const folder = qs.pop();
+  return qs.every(
+    (dir) => {
+      var _a;
+      return smartIncludes(
+        (_a = item.folder.parent) == null ? void 0 : _a.path,
+        dir,
+        isNormalizeAccentsDiacritics
+      );
+    }
+  ) && matcher(item, folder);
+}
+function matchQueryAll2(item, queries, matcher, isNormalizeAccentsDiacritics) {
+  return queries.every(
+    (q) => matchQuery2(item, q, matcher, isNormalizeAccentsDiacritics)
+  );
+}
+function stampMatchType(item, queries, isNormalizeAccentsDiacritics) {
+  if (matchQueryAll2(
+    item,
+    queries,
+    (item2, query) => smartStartsWith(item2.folder.name, query, isNormalizeAccentsDiacritics),
+    isNormalizeAccentsDiacritics
+  )) {
+    return { ...item, matchType: "prefix-name" };
+  }
+  if (matchQueryAll2(
+    item,
+    queries,
+    (item2, query) => smartIncludes(item2.folder.name, query, isNormalizeAccentsDiacritics),
+    isNormalizeAccentsDiacritics
+  )) {
+    return { ...item, matchType: "name" };
+  }
+  if (matchQueryAll2(
+    item,
+    queries,
+    (item2, query) => smartIncludes(item2.folder.path, query, isNormalizeAccentsDiacritics),
+    isNormalizeAccentsDiacritics
+  )) {
+    return { ...item, matchType: "directory" };
+  }
+  return item;
+}
+var FolderModal = class extends import_obsidian6.SuggestModal {
+  constructor(app, settings) {
+    super(app);
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
+    this.appHelper = new AppHelper(app);
+    this.settings = settings;
+    this.setHotkeys();
+    this.originItems = this.appHelper.getFolders().filter((x) => !x.isRoot()).map((x) => ({
+      folder: x
+    }));
+    this.filteredItems = this.originItems;
+  }
+  getSuggestions(query) {
+    const qs = query.split(" ").filter((x) => x);
+    return this.filteredItems.map(
+      (x) => stampMatchType(x, qs, this.settings.normalizeAccentsAndDiacritics)
+    ).filter((x) => x.matchType).sort(sorter((x) => x.matchType === "directory" ? 1 : 0)).sort(
+      sorter(
+        (x) => x.matchType === "prefix-name" ? 1e3 - x.folder.name.length : 0,
+        "desc"
+      )
+    ).slice(0, 10);
+  }
+  renderSuggestion(item, el) {
+    var _a;
+    const itemDiv = createDiv({
+      cls: [
+        "another-quick-switcher__item",
+        "another-quick-switcher__directory_item"
+      ]
+    });
+    const entryDiv = createDiv({
+      cls: "another-quick-switcher__item__entry"
+    });
+    const folderDiv = createDiv({
+      cls: "another-quick-switcher__item__title",
+      text: item.folder.name
+    });
+    entryDiv.appendChild(folderDiv);
+    const directoryDiv = createDiv({
+      cls: "another-quick-switcher__item__directory"
+    });
+    directoryDiv.insertAdjacentHTML("beforeend", FOLDER);
+    directoryDiv.appendText(` ${(_a = item.folder.parent) == null ? void 0 : _a.name}`);
+    entryDiv.appendChild(directoryDiv);
+    itemDiv.appendChild(entryDiv);
+    el.appendChild(itemDiv);
+  }
+  async onChooseSuggestion(item) {
+    if (!this.appHelper.enableFileExplorer()) {
+      new import_obsidian6.Notice("File explorer (core plugin) is not enabled.");
+      return;
+    }
+    this.appHelper.revealInFolder(item.folder);
+  }
+  registerKeys(key, handler) {
+    var _a;
+    for (const x of (_a = this.settings.hotkeys.folder[key]) != null ? _a : []) {
+      this.scope.register(x.modifiers, x.key.toUpperCase(), (evt) => {
+        evt.preventDefault();
+        handler();
+        return false;
+      });
+    }
+  }
+  setHotkeys() {
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "Escape"));
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "Home"));
+    this.scope.unregister(this.scope.keys.find((x) => x.key === "End"));
+    if (!this.settings.hideHotkeyGuides) {
+      this.setInstructions([
+        { command: "[\u21B5]", purpose: "reveal in file tree" },
+        { command: "[\u2191]", purpose: "up" },
+        { command: "[\u2193]", purpose: "down" },
+        ...createInstructions(this.settings.hotkeys.folder)
+      ]);
+    }
+    this.registerKeys("up", () => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+    });
+    this.registerKeys("down", () => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowDown" })
+      );
+    });
+    this.registerKeys("open in default app", () => {
+      var _a, _b;
+      const folder = (_b = (_a = this.chooser.values) == null ? void 0 : _a[this.chooser.selectedItem]) == null ? void 0 : _b.folder;
+      if (!folder) {
+        return;
+      }
+      this.appHelper.openFolderInDefaultApp(folder);
+      this.close();
+    });
+    this.registerKeys("dismiss", async () => {
+      this.close();
+    });
+  }
+};
+
+// src/ui/GrepModal.ts
+var import_obsidian7 = require("obsidian");
 
 // src/utils/ripgrep.ts
 var import_child_process = require("child_process");
@@ -4137,13 +4304,14 @@ var globalInternalStorage2 = {
   basePath: void 0,
   selected: void 0
 };
-var GrepModal = class extends import_obsidian6.SuggestModal {
+var GrepModal = class extends import_obsidian7.SuggestModal {
   constructor(app, settings, initialLeaf) {
     super(app);
     this.isClosed = new Promise((resolve) => {
       this.markClosed = resolve;
     });
     this.navQueue = Promise.resolve();
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.suggestions = globalInternalStorage2.items;
     this.vaultRootPath = normalizePath(
       this.app.vault.adapter.basePath
@@ -4561,13 +4729,14 @@ var GrepModal = class extends import_obsidian6.SuggestModal {
 };
 
 // src/ui/HeaderModal.ts
-var import_obsidian7 = require("obsidian");
-var HeaderModal = class extends import_obsidian7.SuggestModal {
+var import_obsidian8 = require("obsidian");
+var HeaderModal = class extends import_obsidian8.SuggestModal {
   constructor(app, settings, floating) {
     super(app);
     this.hitItems = [];
-    /** ⚠Not work correctly in all cases */
+    /** !Not work correctly in all cases */
     this.unsafeSelectedIndex = 0;
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.limit = 1e3;
     this.appHelper = new AppHelper(app);
     this.settings = settings;
@@ -4654,7 +4823,7 @@ var HeaderModal = class extends import_obsidian7.SuggestModal {
   }
   enableFloating() {
     this.floating = true;
-    if (!import_obsidian7.Platform.isPhone) {
+    if (!import_obsidian8.Platform.isPhone) {
       setFloatingModal(this.appHelper);
     }
   }
@@ -4804,11 +4973,15 @@ var HeaderModal = class extends import_obsidian7.SuggestModal {
       }
     });
     this.registerKeys("insert all to editor", async () => {
-      var _a;
       this.close();
-      for (const x of (_a = this.chooser.values) != null ? _a : []) {
+      const headers = this.chooser.values;
+      if (!headers) {
+        return;
+      }
+      const minLevel = minBy(headers, (x) => x.level).level;
+      for (const x of headers) {
         this.appHelper.insertStringToActiveFile(
-          `${" ".repeat((x.level - 1) * 4)}- ${x.value}
+          `${" ".repeat((x.level - minLevel) * 4)}- ${x.value}
 `
         );
       }
@@ -4820,17 +4993,18 @@ var HeaderModal = class extends import_obsidian7.SuggestModal {
 };
 
 // src/ui/InFileModal.ts
-var import_obsidian8 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 var globalInternalStorage3 = {
   query: "",
   selected: null
 };
-var InFileModal = class extends import_obsidian8.SuggestModal {
+var InFileModal = class extends import_obsidian9.SuggestModal {
   constructor(app, settings, initialLeaf) {
     super(app);
-    /** ⚠Not work correctly in all cases */
+    /** !Not work correctly in all cases */
     this.unsafeSelectedIndex = 0;
     this.suggestions = [];
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.appHelper = new AppHelper(app);
     this.settings = settings;
     this.logger = Logger.of(this.settings);
@@ -4842,7 +5016,7 @@ var InFileModal = class extends import_obsidian8.SuggestModal {
     this.setPlaceholder("Type anything then shows the results");
   }
   close() {
-    if (import_obsidian8.Platform.isMobile) {
+    if (import_obsidian9.Platform.isMobile) {
       this.onClose();
     }
     super.close();
@@ -4925,7 +5099,7 @@ var InFileModal = class extends import_obsidian8.SuggestModal {
   }
   enableFloating() {
     this.floating = true;
-    if (!import_obsidian8.Platform.isPhone) {
+    if (!import_obsidian9.Platform.isPhone) {
       setFloatingModal(this.appHelper);
     }
   }
@@ -5151,8 +5325,8 @@ var InFileModal = class extends import_obsidian8.SuggestModal {
 };
 
 // src/ui/LinkModal.ts
-var import_obsidian9 = require("obsidian");
-var LinkModal = class extends import_obsidian9.SuggestModal {
+var import_obsidian10 = require("obsidian");
+var LinkModal = class extends import_obsidian10.SuggestModal {
   constructor(app, settings, initialLeaf) {
     super(app);
     this.lastOpenFileIndexByPath = {};
@@ -5161,6 +5335,7 @@ var LinkModal = class extends import_obsidian9.SuggestModal {
       this.markClosed = resolve;
     });
     this.navQueue = Promise.resolve();
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.vaultRootPath = normalizePath(
       this.app.vault.adapter.basePath
     );
@@ -5173,7 +5348,7 @@ var LinkModal = class extends import_obsidian9.SuggestModal {
       this.lastOpenFileIndexByPath[v] = i;
     });
     this.setHotkeys();
-    this.debounceGetSuggestions = (0, import_obsidian9.debounce)(
+    this.debounceGetSuggestions = (0, import_obsidian10.debounce)(
       (query, cb) => {
         cb(this._getSuggestions(query));
       },
@@ -5186,7 +5361,7 @@ var LinkModal = class extends import_obsidian9.SuggestModal {
   }
   onOpen() {
     super.onOpen();
-    if (!import_obsidian9.Platform.isPhone) {
+    if (!import_obsidian10.Platform.isPhone) {
       setFloatingModal(this.appHelper);
     }
     this.opened = true;
@@ -5457,8 +5632,8 @@ var LinkModal = class extends import_obsidian9.SuggestModal {
 };
 
 // src/ui/MoveModal.ts
-var import_obsidian10 = require("obsidian");
-function matchQuery2(item, query, matcher, isNormalizeAccentsDiacritics) {
+var import_obsidian11 = require("obsidian");
+function matchQuery3(item, query, matcher, isNormalizeAccentsDiacritics) {
   const qs = query.split("/");
   const folder = qs.pop();
   return qs.every(
@@ -5472,13 +5647,13 @@ function matchQuery2(item, query, matcher, isNormalizeAccentsDiacritics) {
     }
   ) && matcher(item, folder);
 }
-function matchQueryAll2(item, queries, matcher, isNormalizeAccentsDiacritics) {
+function matchQueryAll3(item, queries, matcher, isNormalizeAccentsDiacritics) {
   return queries.every(
-    (q) => matchQuery2(item, q, matcher, isNormalizeAccentsDiacritics)
+    (q) => matchQuery3(item, q, matcher, isNormalizeAccentsDiacritics)
   );
 }
-function stampMatchType(item, queries, isNormalizeAccentsDiacritics) {
-  if (matchQueryAll2(
+function stampMatchType2(item, queries, isNormalizeAccentsDiacritics) {
+  if (matchQueryAll3(
     item,
     queries,
     (item2, query) => smartStartsWith(item2.folder.name, query, isNormalizeAccentsDiacritics),
@@ -5486,7 +5661,7 @@ function stampMatchType(item, queries, isNormalizeAccentsDiacritics) {
   )) {
     return { ...item, matchType: "prefix-name" };
   }
-  if (matchQueryAll2(
+  if (matchQueryAll3(
     item,
     queries,
     (item2, query) => smartIncludes(item2.folder.name, query, isNormalizeAccentsDiacritics),
@@ -5494,7 +5669,7 @@ function stampMatchType(item, queries, isNormalizeAccentsDiacritics) {
   )) {
     return { ...item, matchType: "name" };
   }
-  if (matchQueryAll2(
+  if (matchQueryAll3(
     item,
     queries,
     (item2, query) => smartIncludes(item2.folder.path, query, isNormalizeAccentsDiacritics),
@@ -5504,9 +5679,10 @@ function stampMatchType(item, queries, isNormalizeAccentsDiacritics) {
   }
   return item;
 }
-var MoveModal = class extends import_obsidian10.SuggestModal {
+var MoveModal = class extends import_obsidian11.SuggestModal {
   constructor(app, settings) {
     super(app);
+    this.modalEl.addClass("another-quick-switcher__modal-prompt");
     this.appHelper = new AppHelper(app);
     this.settings = settings;
     this.setHotkeys();
@@ -5522,7 +5698,7 @@ var MoveModal = class extends import_obsidian10.SuggestModal {
   getSuggestions(query) {
     const qs = query.split(" ").filter((x) => x);
     return this.filteredItems.map(
-      (x) => stampMatchType(x, qs, this.settings.normalizeAccentsAndDiacritics)
+      (x) => stampMatchType2(x, qs, this.settings.normalizeAccentsAndDiacritics)
     ).filter((x) => x.matchType).sort(sorter((x) => x.matchType === "directory" ? 1 : 0)).sort(
       sorter(
         (x) => x.matchType === "prefix-name" ? 1e3 - x.folder.name.length : 0,
@@ -5614,8 +5790,8 @@ var MoveModal = class extends import_obsidian10.SuggestModal {
 var SEARCH_COMMAND_PREFIX = "search-command";
 function showSearchDialog(app, settings, command) {
   var _a, _b, _c, _d, _e;
-  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian11.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
-  const editor = (_d = (_c = app.workspace.getActiveViewOfType(import_obsidian11.MarkdownView)) == null ? void 0 : _c.editor) != null ? _d : null;
+  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian12.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
+  const editor = (_d = (_c = app.workspace.getActiveViewOfType(import_obsidian12.MarkdownView)) == null ? void 0 : _c.editor) != null ? _d : null;
   const modal = new AnotherQuickSwitcherModal({
     app,
     settings,
@@ -5629,6 +5805,10 @@ function showSearchDialog(app, settings, command) {
   });
   modal.open();
 }
+function showFolderDialog(app, settings) {
+  const modal = new FolderModal(app, settings);
+  modal.open();
+}
 function showMoveDialog(app, settings) {
   if (!app.workspace.getActiveFile()) {
     return;
@@ -5638,17 +5818,17 @@ function showMoveDialog(app, settings) {
 }
 async function showGrepDialog(app, settings) {
   var _a, _b;
-  if (!import_obsidian11.Platform.isDesktop) {
-    new import_obsidian11.Notice("Grep is not supported on mobile.");
+  if (!import_obsidian12.Platform.isDesktop) {
+    new import_obsidian12.Notice("Grep is not supported on mobile.");
     return;
   }
   if (!await existsRg(settings.ripgrepCommand)) {
-    new import_obsidian11.Notice(
+    new import_obsidian12.Notice(
       `"${settings.ripgrepCommand}" was not working as a ripgrep command. If you have not installed ripgrep yet, please install it.`
     );
     return;
   }
-  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian11.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
+  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian12.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
   const modal = new GrepModal(app, settings, activeFileLeaf);
   modal.open();
 }
@@ -5657,7 +5837,7 @@ async function showBacklinkDialog(app, settings) {
   if (!app.workspace.getActiveFile()) {
     return;
   }
-  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian11.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
+  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian12.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
   const modal = new BacklinkModal(app, settings, activeFileLeaf);
   await modal.init();
   modal.open();
@@ -5667,7 +5847,7 @@ async function showLinkDialog(app, settings) {
   if (!app.workspace.getActiveFile()) {
     return;
   }
-  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian11.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
+  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian12.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
   const modal = new LinkModal(app, settings, activeFileLeaf);
   await modal.init();
   modal.open();
@@ -5677,7 +5857,7 @@ async function showInFileDialog(app, settings) {
   if (!app.workspace.getActiveFile()) {
     return;
   }
-  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian11.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
+  const activeFileLeaf = (_b = (_a = app.workspace.getActiveViewOfType(import_obsidian12.FileView)) == null ? void 0 : _a.leaf) != null ? _b : null;
   const modal = new InFileModal(app, settings, activeFileLeaf);
   await modal.init();
   modal.open();
@@ -5712,6 +5892,14 @@ function createCommands(app, settings) {
       }
     },
     {
+      id: "folder",
+      name: "Reveal a folder in the file tree",
+      hotkeys: [],
+      callback: () => {
+        showFolderDialog(app, settings);
+      }
+    },
+    {
       id: "move",
       name: "Move file to another folder",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: "m" }],
@@ -5728,7 +5916,7 @@ function createCommands(app, settings) {
       hotkeys: [],
       checkCallback: (checking) => {
         if (checking) {
-          return import_obsidian11.Platform.isDesktop;
+          return import_obsidian12.Platform.isDesktop;
         }
         showGrepDialog(app, settings);
       }
@@ -5780,7 +5968,7 @@ function createCommands(app, settings) {
 }
 
 // src/main.ts
-var AnotherQuickSwitcher = class extends import_obsidian12.Plugin {
+var AnotherQuickSwitcher = class extends import_obsidian13.Plugin {
   async onload() {
     this.appHelper = new AppHelper(this.app);
     await this.loadSettings();

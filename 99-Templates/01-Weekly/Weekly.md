@@ -69,6 +69,9 @@ Week :{{date: ww}} - {{date: MM - MMMM}} - {{date: DD/MM/YYYY - hh:mm a}}
 [[/00-Daily/<%moment(tp.file.title,"YYYY-[W]ww").format("YYYY") %>/<%moment(tp.file.title,"YYYY-[W]ww").weekday(6).format("YYYY-MM-DD") %>|<%moment(tp.file.title).weekday(6).format("dddd")%>'s note]]
 
 
+## Week's Tasks
+- [ ] Clean The room ⏫ 📆 <% moment(tp.file.title,"YYYY-[W]ww").weekday(4).format("YYYY-MM-DD")%> 
+- [ ] Write a weekly note 🔼 📆 <% moment(tp.file.title,"YYYY-[W]ww").weekday(4).format("YYYY-MM-DD")%>
 
 
 ## Overview
@@ -114,10 +117,11 @@ templater true
 ```
 ^MoveProjectMedia
 
-<%* tp.user.main(true) %>
+
 
 {{{:::
 
+<%* tp.user.main(true) %>
 
 Dialog :=> {
 Books to refer to if any

@@ -1,19 +1,19 @@
 ---
 🌐: 
-⚖️: 
+⚖️: 0 
 🏋️‍♂️: false
 📖: false
-📕: 
-🍱: 
-🍩: 
-🍵: 
-💼: 
-💻: 
-💰: 
-💵: 
-💳: 
-🕌: 
-⛔: 
+📕: 0 
+🍱: 0 
+🍩: 0 
+🍵: 0 
+💼: 0 
+💻: 0 
+💰: 0 
+💵: 0 
+💳: 0 
+🕌: 0 
+⛔: 0
 😶: ""
 🗓️: <%   tp.date.now ("") %>
 🖋️: 
@@ -38,7 +38,9 @@ banner_icon: 📆
 <% tp.date.now("[W]ww / DD - dddd / MM - MMMM / YYYY",0,tp.file.title, "YYYY-MM-DD")%> - <% tp.date.now("hh:mm a") %>
 
 
-talk about your day and thoughts in the moment
+```timekeep
+{"entries":[]}
+```
 
 ## What happened today 
 
@@ -63,18 +65,32 @@ talk about your day and thoughts in the moment
 ## Today's Tasks
 
 
-- [ ] tidy up the room.  📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Pray Fajhr 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Eat breakfast 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] 20 Pages of the Qur'an 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Pray Duhr 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] 1 Hour Math 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] 1 Hour Reading 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Pray Asr 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] 2-4 Hours Project 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Pray Maghrib 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Pray Isha 📆 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+### High priority
+<% tp.user.GetPrayerTasks(
+moment(tp.file.title,"YYYY-MM-DD").format("yyyy-MM-DD"), // date
+"Jordan", // country
+"Amman" // city
+)
+%>
 
+### Medium priority
+- [ ] Tidy up the room 🔼 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Write Journal  🔼 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Learn something (reading) for 1-2 Hours 🔼 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%> 
+- [ ] Work on a project for 1-2 Hours  🔼  📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Read 5-20 Pages of the Quran  🔼  📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+
+### Normal priority
+- [ ] Take out the trash 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+
+### Tasks done today
+
+> [!important] Today's tasks
+> ```tasks
+> 
+> done on <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+> 
+> ``` 
 
 ```button
 name Diary Media
@@ -84,91 +100,13 @@ templater true
 ```
 ^DiaryMedia
 
-<%* tp.user.main(true) %>
 
 {{{:::
 
+<%* tp.user.main(true) %>
 Dialog :=> {
 how much did you weight today
 }
-
-Input :=> ⚖️
-
-Dialog :=> {
-Did you go to the gym today ?
-}
-
-Check :=> 🏋️‍♂️
-
-Dialog :=> {
-Did you read the Quran today ? 
-}
-
-Check :=> 📖
-
-Dialog :=> {
-how many reading hours ?
-}
-
-Input :=> 📕
-
-Dialog :=> {
-how many work hours ?
-}
-
-Input :=> 💼
-
-Dialog :=> {
-How many projects work hours ?
-}
-
-Input :=> 💻
-
-Dialog :=> {
-Prayers today ? 0-5
-}
-
-Input :=> 🕌
-
-Dialog :=> {
-How many bad things done today ?
-}
-
-Input :=> ⛔
-
-Dialog :=> {
-How many meals did you eat today ?
-}
-Input :=> 🍱
-
-Dialog :=> {
-how much candy/sweets did you eat today ? 
-}
-
-Input :=> 🍩
-
-Dialog :=> {
-how much tea did you drink today (cups) ?
-}
-
-Input :=> 🍵
-
-Dialog :=> {
-Money Gained today ?
-}
-
-Input :=> 💰
-
-Dialog :=> {
-Money Spent ?
-}
-Input :=> 💵
-
-Dialog :=> {
-How many items you bought today ?
-}
-
-Input :=> 💳
 
 
 Dialog :=> {
@@ -184,11 +122,7 @@ Menu :=> [!(menu)]
 
 OptionsAdd :=> tags
 
-Dialog :=> {
-What Aliases you want to use ?
-}
 
-List :=> aliases
 
 Dialog :=> {
 General mood of the day
@@ -212,3 +146,4 @@ Input :=> 🏷️
 BuildInFile :=>
 
 :::}}}
+

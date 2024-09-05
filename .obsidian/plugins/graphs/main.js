@@ -27,7 +27,7 @@ __export(main_exports, {
   default: () => ObsidianGraphs
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian2 = require("obsidian");
+var import_obsidian3 = require("obsidian");
 
 // node_modules/jsxgraph/src/jxg.js
 var jxg = {};
@@ -266,8 +266,8 @@ var jxg_default = jxg;
 
 // node_modules/jsxgraph/src/base/constants.js
 var major = 1;
-var minor = 8;
-var patch = 0;
+var minor = 9;
+var patch = 2;
 var add = "";
 var version = major + "." + minor + "." + patch + (add ? "-" + add : "");
 var constants;
@@ -314,6 +314,7 @@ constants = /** @lends JXG */
   OBJECT_TYPE_LINE: 11,
   OBJECT_TYPE_POINT: 12,
   OBJECT_TYPE_SLIDER: 13,
+  // unused
   OBJECT_TYPE_CAS: 14,
   OBJECT_TYPE_GXTCAS: 15,
   OBJECT_TYPE_POLYGON: 16,
@@ -339,6 +340,10 @@ constants = /** @lends JXG */
   OBJECT_TYPE_CURVE3D: 36,
   OBJECT_TYPE_SURFACE3D: 37,
   OBJECT_TYPE_MEASUREMENT: 38,
+  OBJECT_TYPE_INTERSECTION_LINE3D: 39,
+  OBJECT_TYPE_SPHERE3D: 40,
+  OBJECT_TYPE_CIRCLE3D: 41,
+  OBJECT_TYPE_INTERSECTION_CIRCLE3D: 42,
   // IMPORTANT:
   // ----------
   // For being able to differentiate between the (sketchometry specific) SPECIAL_OBJECT_TYPEs and
@@ -399,6 +404,43 @@ jxg_default.Math = {
    */
   mod: function(a, m) {
     return a - Math.floor(a / m) * m;
+  },
+  /**
+   * Translate <code>x</code> into the interval <code>[a, b)</code> by adding
+   * a multiple of <code>b - a</code>.
+   * @param {Number} x
+   * @param {Number} a
+   * @param {Number} b
+   */
+  wrap: function(x, a, b) {
+    return a + this.mod(x - a, b - a);
+  },
+  /**
+   * Clamp <code>x</code> within the interval <code>[a, b]</code>. If
+   * <code>x</code> is below <code>a</code>, increase it to <code>a</code>. If
+   * it's above <code>b</code>, decrease it to <code>b</code>.
+   */
+  clamp: function(x, a, b) {
+    return Math.min(Math.max(x, a), b);
+  },
+  /**
+   * A way of clamping a periodic variable. If <code>x</code> is congruent mod
+   * <code>period</code> to a point in <code>[a, b]</code>, return that point.
+   * Otherwise, wrap it into <code>[mid - period/2, mid + period/2]</code>,
+   * where <code>mid</code> is the mean of <code>a</code> and <code>b</code>,
+   * and then clamp it to <code>[a, b]</code> from there.
+   */
+  wrapAndClamp: function(x, a, b, period) {
+    var mid = 0.5 * (a + b), half_period = 0.5 * period;
+    return this.clamp(
+      this.wrap(
+        x,
+        mid - half_period,
+        mid + half_period
+      ),
+      a,
+      b
+    );
   },
   /**
    * Initializes a vector of size <tt>n</tt> wih coefficients set to the init value (default 0)
@@ -1109,6 +1151,39 @@ jxg_default.Math = {
   hstep: function(x) {
     return x > 0 ? 1 : x < 0 ? 0 : 0.5;
   },
+  /**
+   * Gamma function for real parameters by Lanczos approximation.
+   * Implementation straight from {@link https://en.wikipedia.org/wiki/Lanczos_approximation}.
+   *
+   * @param {Number} z
+   * @returns Number
+   */
+  gamma: function(z) {
+    var x, y, t, i2, le, g = 7, p = [
+      1,
+      676.5203681218851,
+      -1259.1392167224028,
+      771.3234287776531,
+      -176.6150291621406,
+      12.507343278686905,
+      -0.13857109526572012,
+      9984369578019572e-21,
+      15056327351493116e-23
+    ];
+    if (z < 0.5) {
+      y = Math.PI / (Math.sin(Math.PI * z) * this.gamma(1 - z));
+    } else {
+      z -= 1;
+      x = p[0];
+      le = p.length;
+      for (i2 = 1; i2 < le; i2++) {
+        x += p[i2] / (z + i2);
+      }
+      t = z + g + 0.5;
+      y = Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+    }
+    return y;
+  },
   /* ********************  Comparisons and logical operators ************** */
   /**
    * Logical test: a < b?
@@ -1461,9 +1536,14 @@ jxg_default.extend(
       }
       return false;
     },
+    /**
+     * Checks if a given variable is a reference of a JSXGraph Point3D element.
+     * @param v A variable of any type.
+     * @returns {Boolean} True, if v is of type JXG.Point3D.
+     */
     isPoint3D: function(v) {
-      if (v !== null && typeof v === "object" && this.exists(v.elType)) {
-        return v.elType === "point3d";
+      if (v !== null && typeof v === "object" && this.exists(v.type)) {
+        return v.type === constants_default.OBJECT_TYPE_POINT3D;
       }
       return false;
     },
@@ -1487,6 +1567,28 @@ jxg_default.extend(
       }
       p = board.select(v);
       return this.isPoint(p);
+    },
+    /**
+     * Checks if a given variable is a reference of a JSXGraph Point3D element or an array of length three
+     * or a function returning an array of length three.
+     * @param {JXG.Board} board
+     * @param v A variable of any type.
+     * @returns {Boolean} True, if v is of type JXG.Point3D or an array of length at least 3, or a function returning
+     * such an array.
+     */
+    isPointType3D: function(board, v) {
+      var val, p;
+      if (this.isArray(v) && v.length >= 3) {
+        return true;
+      }
+      if (this.isFunction(v)) {
+        val = v();
+        if (this.isArray(val) && val.length >= 3) {
+          return true;
+        }
+      }
+      p = board.select(v);
+      return this.isPoint3D(p);
     },
     /**
      * Checks if a given variable is a reference of a JSXGraph transformation element or an array
@@ -1646,7 +1748,7 @@ jxg_default.extend(
         f = board.jc.snippet(term, true, variableName, false);
       } else if (this.isFunction(term)) {
         f = term;
-        f.deps = {};
+        f.deps = this.isObject(term.deps) ? term.deps : {};
       } else if (this.isNumber(term)) {
         f = function() {
           return term;
@@ -2071,7 +2173,20 @@ jxg_default.extend(
       }
       return str2;
     },
-    parseNumber: function(v, percentOfWhat, convertPx, toUnit) {
+    /**
+     * Convert value v. If v has the form
+     * <ul>
+     * <li> 'x%': return floating point number x * percentOfWhat * 0.01
+     * <li> 'xfr': return floating point number x * percentOfWhat
+     * <li> 'xpx': return x * convertPx or convertPx(x) or x
+     * <li> x or 'x': return floating point number x
+     * </ul>
+     * @param {String|Number} v
+     * @param {Number} percentOfWhat
+     * @param {Function|Number|*} convertPx
+     * @returns {String|Number}
+     */
+    parseNumber: function(v, percentOfWhat, convertPx) {
       var str2;
       if (this.isString(v) && v.indexOf("%") > -1) {
         str2 = v.replace(/\s+%\s+/, "");
@@ -2094,13 +2209,20 @@ jxg_default.extend(
       }
       return parseFloat(v);
     },
+    /**
+     * Parse a string for label positioning of the form 'left pos' or 'pos right'
+     * and return e.g.
+     * <tt>{ side: 'left', pos: 'pos' }</tt>.
+     * @param {String} str
+     * @returns {Obj}  <tt>{ side, pos }</tt>
+     */
     parsePosition: function(str2) {
       var a, i2, side = "", pos = "";
       str2 = str2.trim();
       if (str2 !== "") {
         a = str2.split(/[ ,]+/);
         for (i2 = 0; i2 < a.length; i2++) {
-          if (a[i2] in ["left", "right"]) {
+          if (a[i2] === "left" || a[i2] === "right") {
             side = a[i2];
           } else {
             pos = a[i2];
@@ -2320,13 +2442,15 @@ jxg_default.extend(
      * @param {Object} attr Object with attributes - usually containing default options
      * @param {Object} special Special option values which overwrite (recursively) the default options
      * @param {Boolean} [toLower=true] If true the keys are converted to lower case.
+     * @param {Boolean} [ignoreUndefinedSpecials=false] If true the values in special that are undefined are not used.
      *
      * @see JXG#merge
      *
      */
-    mergeAttr: function(attr, special, toLower) {
+    mergeAttr: function(attr, special, toLower, ignoreUndefinedSpecials) {
       var e, e2, o;
       toLower = toLower || true;
+      ignoreUndefinedSpecials = ignoreUndefinedSpecials || false;
       for (e in special) {
         if (special.hasOwnProperty(e)) {
           e2 = toLower ? e.toLowerCase() : e;
@@ -2338,11 +2462,40 @@ jxg_default.extend(
               attr[e2] = {};
             }
             this.mergeAttr(attr[e2], o, toLower);
-          } else {
+          } else if (!ignoreUndefinedSpecials || this.exists(o)) {
             attr[e2] = o;
           }
         }
       }
+    },
+    /**
+     * Convert a n object to a new object containing only
+     * lower case properties.
+     *
+     * @param {Object} obj
+     * @returns Object
+     * @example
+     * var attr = JXG.keysToLowerCase({radiusPoint: {visible: false}});
+     *
+     * // return {radiuspoint: {visible: false}}
+     */
+    keysToLowerCase: function(obj) {
+      var key, val, keys2 = Object.keys(obj), n = keys2.length, newObj = {};
+      if (typeof obj !== "object") {
+        return obj;
+      }
+      while (n--) {
+        key = keys2[n];
+        if (obj.hasOwnProperty(key)) {
+          val = obj[key];
+          if (typeof val === "object" && val !== null && !this.isArray(val) && !this.exists(val.nodeType) && !this.exists(val.board)) {
+            newObj[key.toLowerCase()] = this.keysToLowerCase(val);
+          } else {
+            newObj[key.toLowerCase()] = val;
+          }
+        }
+      }
+      return newObj;
     },
     /**
      * Generates an attributes object that is filled with default values from the Options object
@@ -2353,7 +2506,7 @@ jxg_default.extend(
      * @returns {Object} The resulting attributes object
      */
     copyAttributes: function(attributes, options, s) {
-      var a, i2, len, o, isAvail, primitives = {
+      var a, arg, i2, len, o, isAvail, primitives = {
         circle: 1,
         curve: 1,
         foreignobject: 1,
@@ -2377,8 +2530,9 @@ jxg_default.extend(
       o = options;
       isAvail = true;
       for (i2 = 2; i2 < len; i2++) {
-        if (this.exists(o[arguments[i2]])) {
-          o = o[arguments[i2]];
+        arg = arguments[i2];
+        if (this.exists(o[arg])) {
+          o = o[arg];
         } else {
           isAvail = false;
           break;
@@ -2387,11 +2541,12 @@ jxg_default.extend(
       if (isAvail) {
         a = jxg_default.deepCopy(a, o, true);
       }
-      o = typeof attributes === "object" ? attributes : {};
+      o = typeof attributes === "object" ? this.keysToLowerCase(attributes) : {};
       isAvail = true;
       for (i2 = 3; i2 < len; i2++) {
-        if (this.exists(o[arguments[i2]])) {
-          o = o[arguments[i2]];
+        arg = arguments[i2].toLowerCase();
+        if (this.exists(o[arg])) {
+          o = o[arg];
         } else {
           isAvail = false;
           break;
@@ -2406,17 +2561,18 @@ jxg_default.extend(
       o = options;
       isAvail = true;
       for (i2 = 2; i2 < len; i2++) {
-        if (this.exists(o[arguments[i2]])) {
-          o = o[arguments[i2]];
+        arg = arguments[i2];
+        if (this.exists(o[arg])) {
+          o = o[arg];
         } else {
           isAvail = false;
           break;
         }
       }
       if (isAvail && this.exists(o.label)) {
-        a.label = jxg_default.deepCopy(o.label, a.label);
+        a.label = jxg_default.deepCopy(o.label, a.label, true);
       }
-      a.label = jxg_default.deepCopy(options.label, a.label);
+      a.label = jxg_default.deepCopy(options.label, a.label, true);
       return a;
     },
     /**
@@ -2443,6 +2599,7 @@ jxg_default.extend(
      * @param {Object} obj A JavaScript object, functions will be ignored.
      * @param {Boolean} [noquote=false] No quotes around the name of a property.
      * @returns {String} The given object stored in a JSON string.
+     * @deprecated
      */
     toJSON: function(obj, noquote) {
       var list2, prop, i2, s, val;
@@ -2649,10 +2806,12 @@ jxg_default.extend(
         if (arr[0] < 0) {
           str2 += "-";
         }
-        if (arr[1] !== 0) {
-          str2 += arr[1] + " ";
-        }
-        if (arr[2] !== 0) {
+        if (arr[2] === 0) {
+          str2 += arr[1];
+        } else if (!(arr[2] === 1 && arr[3] === 1)) {
+          if (arr[1] !== 0) {
+            str2 += arr[1] + " ";
+          }
           if (useTeX === true) {
             str2 += "\\frac{" + arr[2] + "}{" + arr[3] + "}";
           } else {
@@ -2661,6 +2820,24 @@ jxg_default.extend(
         }
       }
       return str2;
+    },
+    /**
+     * Concat array src to array dest.
+     * Uses push instead of JavaScript concat, which is much
+     * faster.
+     * The array dest is changed in place.
+     * <p><b>Attention:</b> if "dest" is an anonymous array, the correct result is returned from the function.
+     *
+     * @param {Array} dest
+     * @param {Array} src
+     * @returns Array
+     */
+    concat: function(dest, src) {
+      var i2, le = src.length;
+      for (i2 = 0; i2 < le; i2++) {
+        dest.push(src[i2]);
+      }
+      return dest;
     },
     /**
      * Convert HTML tags to entities or use html_sanitize if the google caja html sanitizer is available.
@@ -2699,6 +2876,8 @@ jxg_default.extend(
     /**
      * Convert a string containing a MAXIMA /STACK expression into a JSXGraph / JessieCode string
      * or an array of JSXGraph / JessieCode strings.
+     * <p>
+     * This function is meanwhile superseded by stack_jxg.stack2jsxgraph.
      *
      * @example
      * console.log( JXG.stack2jsxgraph("%e**x") );
@@ -2730,13 +2909,13 @@ jxg_default.extendConstants(
   jxg_default,
   /** @lends JXG */
   {
-    /**
-     * Determines the property that stores the relevant information in the event object.
-     * @type String
-     * @default 'touches'
-     * @private
-     */
-    touchProperty: "touches"
+    // /**
+    //  * Determines the property that stores the relevant information in the event object.
+    //  * @type String
+    //  * @default 'touches'
+    //  * @private
+    //  */
+    // touchProperty: "touches"
   }
 );
 jxg_default.extend(
@@ -2749,7 +2928,7 @@ jxg_default.extend(
      * @returns {Boolean}
      */
     isTouchEvent: function(evt) {
-      return jxg_default.exists(evt[jxg_default.touchProperty]);
+      return jxg_default.exists(evt["touches"]);
     },
     /**
      * Determines whether evt is a pointer event.
@@ -2776,7 +2955,7 @@ jxg_default.extend(
     getNumberOfTouchPoints: function(evt) {
       var n = -1;
       if (jxg_default.isTouchEvent(evt)) {
-        n = evt[jxg_default.touchProperty].length;
+        n = evt["touches"].length;
       }
       return n;
     },
@@ -2876,6 +3055,7 @@ jxg_default.extend(
     /**
      * Detects if the user is using an Android powered device.
      * @returns {Boolean}
+     * @deprecated
      */
     isAndroid: function() {
       return type_default.exists(navigator) && navigator.userAgent.toLowerCase().indexOf("android") > -1;
@@ -2883,6 +3063,7 @@ jxg_default.extend(
     /**
      * Detects if the user is using the default Webkit browser on an Android powered device.
      * @returns {Boolean}
+     * @deprecated
      */
     isWebkitAndroid: function() {
       return this.isAndroid() && navigator.userAgent.indexOf(" AppleWebKit/") > -1;
@@ -2890,6 +3071,7 @@ jxg_default.extend(
     /**
      * Detects if the user is using a Apple iPad / iPhone.
      * @returns {Boolean}
+     * @deprecated
      */
     isApple: function() {
       return type_default.exists(navigator) && (navigator.userAgent.indexOf("iPad") > -1 || navigator.userAgent.indexOf("iPhone") > -1);
@@ -2897,6 +3079,7 @@ jxg_default.extend(
     /**
      * Detects if the user is using Safari on an Apple device.
      * @returns {Boolean}
+     * @deprecated
      */
     isWebkitApple: function() {
       return this.isApple() && navigator.userAgent.search(/Mobile\/[0-9A-Za-z.]*Safari/) > -1;
@@ -2904,6 +3087,7 @@ jxg_default.extend(
     /**
      * Returns true if the run inside a Windows 8 "Metro" App.
      * @returns {Boolean}
+     * @deprecated
      */
     isMetroApp: function() {
       return typeof window === "object" && window.clientInformation && window.clientInformation.appVersion && window.clientInformation.appVersion.indexOf("MSAppHost") > -1;
@@ -2911,6 +3095,7 @@ jxg_default.extend(
     /**
      * Detects if the user is using a Mozilla browser
      * @returns {Boolean}
+     * @deprecated
      */
     isMozilla: function() {
       return type_default.exists(navigator) && navigator.userAgent.toLowerCase().indexOf("mozilla") > -1 && navigator.userAgent.toLowerCase().indexOf("apple") === -1;
@@ -2918,6 +3103,7 @@ jxg_default.extend(
     /**
      * Detects if the user is using a firefoxOS powered device.
      * @returns {Boolean}
+     * @deprecated
      */
     isFirefoxOS: function() {
       return type_default.exists(navigator) && navigator.userAgent.toLowerCase().indexOf("android") === -1 && navigator.userAgent.toLowerCase().indexOf("apple") === -1 && navigator.userAgent.toLowerCase().indexOf("mobile") > -1 && navigator.userAgent.toLowerCase().indexOf("mozilla") > -1;
@@ -2927,6 +3113,7 @@ jxg_default.extend(
      * @returns {boolean}
      *
      * @see https://stackoverflow.com/a/61073480
+     * @deprecated
      */
     isDesktop: function() {
       return true;
@@ -2936,6 +3123,8 @@ jxg_default.extend(
      * @returns {boolean}
      *
      * @see https://stackoverflow.com/questions/25542814/html5-detecting-if-youre-on-mobile-or-pc-with-javascript
+     * @deprecated
+     *
      */
     isMobile: function() {
       return true;
@@ -2943,6 +3132,7 @@ jxg_default.extend(
     /**
      * Internet Explorer version. Works only for IE > 4.
      * @type Number
+     * @deprecated
      */
     ieVersion: function() {
       var div, all, v = 3;
@@ -3045,7 +3235,7 @@ jxg_default.extend(
         return;
       }
       if (!type_default.exists(owner["x_internal" + type])) {
-        jxg_default.debug("no such type: " + type);
+        jxg_default.debug("removeEvent: no such type: " + type);
         return;
       }
       if (!type_default.isArray(owner["x_internal" + type])) {
@@ -3065,7 +3255,7 @@ jxg_default.extend(
           obj.detachEvent("on" + type, owner["x_internal" + type][i2]);
         }
       } catch (e) {
-        jxg_default.debug("event not registered in browser: (" + type + " -- " + fn + ")");
+        jxg_default.debug("removeEvent: event not registered in browser: (" + type + " -- " + fn + ")");
       }
       owner["x_internal" + type].splice(i2, 1);
     },
@@ -3103,7 +3293,7 @@ jxg_default.extend(
         e = window.event;
       }
       doc = doc || document;
-      evtTouches = e[jxg_default.touchProperty];
+      evtTouches = e["touches"];
       if (type_default.exists(evtTouches) && evtTouches.length === 0) {
         evtTouches = e.changedTouches;
       }
@@ -3323,7 +3513,7 @@ jxg_default.extend(
      * @param {Function} callback This function is called after the last array element has been processed.
      */
     timedChunk: function(items, process2, context, callback) {
-      var todo = items.concat(), timerFun = function() {
+      var todo = items.slice(), timerFun = function() {
         var start = +new Date();
         do {
           process2.call(context, todo.shift());
@@ -3473,7 +3663,7 @@ jxg_default.EventEmitter = {
    * @param {Array} args The arguments passed onto the event handler
    * @returns Reference to the object.
    */
-  trigger: function(event, args2) {
+  trigger: function(event, args) {
     var i2, j, h, evt, len1, len2;
     len1 = event.length;
     for (j = 0; j < len1; j++) {
@@ -3484,7 +3674,7 @@ jxg_default.EventEmitter = {
           len2 = evt.length;
           for (i2 = 0; i2 < len2; i2++) {
             h = evt[i2];
-            h.handler.apply(h.context, args2);
+            h.handler.apply(h.context, args);
           }
         }
         this.suspended[event[j]] = false;
@@ -4352,10 +4542,9 @@ var probfuncs_default = math_default.ProbFuncs;
 
 // node_modules/jsxgraph/src/math/ia.js
 jxg_default.Math.DoubleBits = function() {
-  var hasTypedArrays = false, DOUBLE_VIEW = new Float64Array(1), UINT_VIEW = new Uint32Array(DOUBLE_VIEW.buffer), doubleBitsLE, toDoubleLE, lowUintLE, highUintLE, doubleBitsBE, toDoubleBE, lowUintBE, highUintBE, doubleBits2, toDouble, lowUint, highUint;
+  var DOUBLE_VIEW = new Float64Array(1), UINT_VIEW = new Uint32Array(DOUBLE_VIEW.buffer), doubleBitsLE, toDoubleLE, lowUintLE, highUintLE, doubleBitsBE, toDoubleBE, lowUintBE, highUintBE;
   if (Float64Array !== void 0) {
     DOUBLE_VIEW[0] = 1;
-    hasTypedArrays = true;
     if (UINT_VIEW[1] === 1072693248) {
       doubleBitsLE = function(n) {
         DOUBLE_VIEW[0] = n;
@@ -4400,8 +4589,6 @@ jxg_default.Math.DoubleBits = function() {
       this.pack = toDoubleBE;
       this.lo = lowUintBE;
       this.hi = highUintBE;
-    } else {
-      hasTypedArrays = false;
     }
   }
 };
@@ -7470,11 +7657,11 @@ math_default.Numerics = {
   generatePolynomialTerm: function(coeffs, deg, varname, prec) {
     var i2, t = [];
     for (i2 = deg; i2 >= 0; i2--) {
-      t = t.concat(["(", coeffs[i2].toPrecision(prec), ")"]);
+      type_default.concat(t, ["(", coeffs[i2].toPrecision(prec), ")"]);
       if (i2 > 1) {
-        t = t.concat(["*", varname, "<sup>", i2, "<", "/sup> + "]);
+        type_default.concat(t, ["*", varname, "<sup>", i2, "<", "/sup> + "]);
       } else if (i2 === 1) {
-        t = t.concat(["*", varname, " + "]);
+        type_default.concat(t, ["*", varname, " + "]);
       }
     }
     return t.join("");
@@ -10510,6 +10697,60 @@ jxg_default.extend(
       }
       return func;
     },
+    otherIntersectionFunction: function(input, others, alwaysintersect, precision) {
+      var func, board, el1, el2, that2 = this;
+      el1 = input[0];
+      el2 = input[1];
+      board = el1.board;
+      func = function() {
+        var i2, k, c, d, isClose, le = others.length, eps = type_default.evaluate(precision);
+        for (i2 = le; i2 >= 0; i2--) {
+          if (el1.elementClass === constants_default.OBJECT_CLASS_CIRCLE && [constants_default.OBJECT_CLASS_CIRCLE, constants_default.OBJECT_CLASS_LINE].indexOf(el2.elementClass) >= 0) {
+            c = that2.meet(el1.stdform, el2.stdform, i2, board);
+          } else if (el1.elementClass === constants_default.OBJECT_CLASS_CURVE && [constants_default.OBJECT_CLASS_CURVE, constants_default.OBJECT_CLASS_CIRCLE].indexOf(el2.elementClass) >= 0) {
+            c = that2.meetCurveCurve(el1, el2, i2, 0, board, "segment");
+          } else if (el1.elementClass === constants_default.OBJECT_CLASS_CURVE && el2.elementClass === constants_default.OBJECT_CLASS_LINE) {
+            if (type_default.exists(el1.dataX)) {
+              c = jxg_default.Math.Geometry.meetCurveLine(el1, el2, i2, el1.board, type_default.evaluate(alwaysintersect));
+            } else {
+              c = jxg_default.Math.Geometry.meetCurveLineContinuous(el1, el2, i2, el1.board);
+            }
+          }
+          isClose = false;
+          for (k = 0; !isClose && k < le; k++) {
+            d = c.distance(jxg_default.COORDS_BY_USER, others[k].coords);
+            if (d < eps) {
+              isClose = true;
+            }
+          }
+          if (!isClose) {
+            return c;
+          }
+        }
+        return c;
+      };
+      return func;
+    },
+    /**
+     * Generate the function which computes the data of the intersection.
+     */
+    intersectionFunction3D: function(view, el1, el2, i2) {
+      var func, that2 = this;
+      if (el1.type === constants_default.OBJECT_TYPE_PLANE3D) {
+        if (el2.type === constants_default.OBJECT_TYPE_PLANE3D) {
+          func = () => view.intersectionPlanePlane(el1, el2)[i2];
+        } else if (el2.type === constants_default.OBJECT_TYPE_SPHERE3D) {
+          func = that2.meetPlaneSphere(el1, el2);
+        }
+      } else if (el1.type === constants_default.OBJECT_TYPE_SPHERE3D) {
+        if (el2.type === constants_default.OBJECT_TYPE_PLANE3D) {
+          func = that2.meetPlaneSphere(el2, el1);
+        } else if (el2.type === constants_default.OBJECT_TYPE_SPHERE3D) {
+          func = that2.meetSphereSphere(el1, el2);
+        }
+      }
+      return func;
+    },
     /**
      * Returns true if the coordinates are on the arc element,
      * false otherwise. Usually, coords is an intersection
@@ -10780,7 +11021,7 @@ jxg_default.extend(
      * @returns {JXG.Coords} Coords object containing the intersection.
      */
     meetCurveLineContinuous: function(cu, li, nr, board, testSegment) {
-      var t, func0, func1, v, x, y, z, eps = math_default.eps, epsLow = math_default.eps, steps, delta, tnew, i2, tmin, fmin, ft;
+      var func0, func1, t, v, x, y, z, eps = math_default.eps, epsLow = math_default.eps, steps, delta, tnew, tmin, fmin, i2, ft;
       v = this.meetCurveLineDiscrete(cu, li, nr, board, testSegment);
       x = v.usrCoords[1];
       y = v.usrCoords[2];
@@ -10789,8 +11030,8 @@ jxg_default.extend(
         if (t2 > cu.maxX() || t2 < cu.minX()) {
           return Infinity;
         }
-        c1 = x - cu.X(t2);
-        c2 = y - cu.Y(t2);
+        c1 = cu.X(t2) - x;
+        c2 = cu.Y(t2) - y;
         return c1 * c1 + c2 * c2;
       };
       func1 = function(t2) {
@@ -10891,7 +11132,7 @@ jxg_default.extend(
     },
     /**
      * Find the n-th intersection point of two curves named red (first parameter) and blue (second parameter).
-     * We go through each segment of the red curve and search if there is an intersection with a segemnt of the blue curve.
+     * We go through each segment of the red curve and search if there is an intersection with a segment of the blue curve.
      * This double loop, i.e. the outer loop runs along the red curve and the inner loop runs along the blue curve, defines
      * the n-th intersection point. The segments are either line segments or Bezier curves of degree 3. This depends on
      * the property bezierDegree of the curves.
@@ -11025,6 +11266,68 @@ jxg_default.extend(
         crds = intersections[n];
       }
       return new coords_default(constants_default.COORDS_BY_USER, crds, board);
+    },
+    meetPlaneSphere: function(el1, el2) {
+      var dis = function() {
+        return el1.normal[0] * el2.center.X() + el1.normal[1] * el2.center.Y() + el1.normal[2] * el2.center.Z() - el1.d;
+      };
+      return [
+        [
+          // Center
+          function() {
+            return el2.center.X() - dis() * el1.normal[0];
+          },
+          function() {
+            return el2.center.Y() - dis() * el1.normal[1];
+          },
+          function() {
+            return el2.center.Z() - dis() * el1.normal[2];
+          }
+        ],
+        [
+          // Normal
+          () => el1.normal[0],
+          () => el1.normal[1],
+          () => el1.normal[2]
+        ],
+        function() {
+          var r = el2.Radius(), s = dis();
+          return Math.sqrt(r * r - s * s);
+        }
+      ];
+    },
+    meetSphereSphere: function(el1, el2) {
+      var skew = function() {
+        var dist = el1.center.distance(el2.center), r1 = el1.Radius(), r2 = el2.Radius();
+        return (r1 - r2) * (r1 + r2) / (dist * dist);
+      };
+      return [
+        [
+          // Center
+          function() {
+            var s = skew();
+            return 0.5 * ((1 - s) * el1.center.X() + (1 + s) * el2.center.X());
+          },
+          function() {
+            var s = skew();
+            return 0.5 * ((1 - s) * el1.center.Y() + (1 + s) * el2.center.Y());
+          },
+          function() {
+            var s = skew();
+            return 0.5 * ((1 - s) * el1.center.Z() + (1 + s) * el2.center.Z());
+          }
+        ],
+        [
+          // Normal
+          () => el2.center.X() - el1.center.X(),
+          () => el2.center.Y() - el1.center.Y(),
+          () => el2.center.Z() - el1.center.Z()
+        ],
+        function() {
+          var dist = el1.center.distance(el2.center), r1 = el1.Radius(), r2 = el2.Radius(), s = skew(), rIxnSq = 0.5 * (r1 * r1 + r2 * r2 - 0.5 * dist * dist * (1 + s * s));
+          return Math.sqrt(rIxnSq);
+        }
+      ];
     },
     /****************************************/
     /****   BEZIER CURVE ALGORITHMS      ****/
@@ -11322,7 +11625,7 @@ jxg_default.extend(
      * @param {Number} sgn Wither 1 or -1. Needed for minor and major arcs. In case of doubt, use 1.
      */
     bezierArc: function(A, B, C, withLegs, sgn) {
-      var p1, p2, p3, p4, r, phi, beta, PI2 = Math.PI * 0.5, x = B[1], y = B[2], z = B[0], dataX = [], dataY = [], co, si, ax, ay, bx, by, k, v, d, matrix;
+      var p1, p2, p3, p4, r, phi, beta, delta, x = B[1], y = B[2], z = B[0], dataX = [], dataY = [], co, si, ax, ay, bx, by, k, v, d, matrix;
       r = this.distance(B, A);
       x /= z;
       y /= z;
@@ -11330,6 +11633,7 @@ jxg_default.extend(
       if (sgn === -1) {
         phi = 2 * Math.PI - phi;
       }
+      delta = phi / 4;
       p1 = A;
       p1[1] /= p1[0];
       p1[2] /= p1[0];
@@ -11343,9 +11647,9 @@ jxg_default.extend(
         dataY = [p1[2]];
       }
       while (phi > math_default.eps) {
-        if (phi > PI2) {
-          beta = PI2;
-          phi -= PI2;
+        if (phi > delta) {
+          beta = delta;
+          phi -= delta;
         } else {
           beta = phi;
           phi = 0;
@@ -11371,17 +11675,17 @@ jxg_default.extend(
         }
         p2 = [1, p1[1] - k * ay, p1[2] + k * ax];
         p3 = [1, p4[1] + k * by, p4[2] - k * bx];
-        dataX = dataX.concat([p2[1], p3[1], p4[1]]);
-        dataY = dataY.concat([p2[2], p3[2], p4[2]]);
+        type_default.concat(dataX, [p2[1], p3[1], p4[1]]);
+        type_default.concat(dataY, [p2[2], p3[2], p4[2]]);
         p1 = p4.slice(0);
       }
       if (withLegs) {
-        dataX = dataX.concat([
+        type_default.concat(dataX, [
           p4[1] + 0.333 * (x - p4[1]),
           p4[1] + 0.666 * (x - p4[1]),
           x
         ]);
-        dataY = dataY.concat([
+        type_default.concat(dataY, [
           p4[2] + 0.333 * (y - p4[2]),
           p4[2] + 0.666 * (y - p4[2]),
           y
@@ -11501,7 +11805,11 @@ jxg_default.extend(
       if (!type_default.exists(board)) {
         board = point.board;
       }
-      var x = point.X(), y = point.Y(), t = point.position || 0, result = this.projectCoordsToCurve(x, y, t, curve, board);
+      var x = point.X(), y = point.Y(), t = point.position, result;
+      if (!type_default.exists(t)) {
+        t = type_default.evaluate(curve.visProp.curvetype) === "functiongraph" ? x : 0;
+      }
+      result = this.projectCoordsToCurve(x, y, t, curve, board);
       return result;
     },
     /**
@@ -11573,6 +11881,19 @@ jxg_default.extend(
         }
         newCoordsObj = new coords_default(constants_default.COORDS_BY_USER, newCoords, board);
       } else {
+        if (type_default.evaluate(curve.visProp.curvetype) === "functiongraph") {
+          let dy = Math.abs(y - curve.Y(x));
+          if (!isNaN(dy)) {
+            minX = x - dy;
+            maxX = x + dy;
+          } else {
+            minX = curve.minX();
+            maxX = curve.maxX();
+          }
+        } else {
+          minX = curve.minX();
+          maxX = curve.maxX();
+        }
         minfunc = function(t2) {
           var dx, dy;
           if (t2 < curve.minX() || t2 > curve.maxX()) {
@@ -11584,8 +11905,6 @@ jxg_default.extend(
         };
         f_old = minfunc(t);
         steps = 50;
-        minX = curve.minX();
-        maxX = curve.maxX();
         delta = (maxX - minX) / steps;
         t_new = minX;
         for (i2 = 0; i2 < steps; i2++) {
@@ -11727,6 +12046,84 @@ jxg_default.extend(
         }
       }
       return coords;
+    },
+    /**
+     * Given a the coordinates of a point, finds the nearest point on the given
+     * parametric curve or surface, and returns its view-space coordinates.
+     * @param {Array} pScr Screen coordinates to project.
+     * @param {JXG.Curve3D|JXG.Surface3D} target Parametric curve or surface to project to.
+     * @param {Array} params Parameters of point on the target, initially specifying the starting point of
+     * the search. The parameters are modified in place during the search, ending up at the nearest point.
+     * @returns {Array} Array of length 4 containing the coordinates of the nearest point on the curve or surface.
+     */
+    projectCoordsToParametric: function(p, target, params) {
+      var rhobeg, rhoend, iprint = 0, maxfun = 200, dim = params.length, _minFunc;
+      if (dim === 1) {
+        rhobeg = 0.1 * (target.range[1] - target.range[0]);
+      } else if (dim === 2) {
+        rhobeg = 0.1 * Math.min(
+          target.range_u[1] - target.range_u[0],
+          target.range_v[1] - target.range_v[0]
+        );
+      }
+      rhoend = rhobeg / 5e6;
+      _minFunc = function(n, m, w, con) {
+        var xDiff = p[0] - target.X.apply(null, w), yDiff = p[1] - target.Y.apply(null, w), zDiff = p[2] - target.Z.apply(null, w);
+        if (n === 1) {
+          con[0] = w[0] - target.range[0];
+          con[1] = -w[0] + target.range[1];
+        } else if (n === 2) {
+          con[0] = w[0] - target.range_u[0];
+          con[1] = -w[0] + target.range_u[1];
+          con[2] = w[1] - target.range_v[0];
+          con[3] = -w[1] + target.range_v[1];
+        }
+        return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
+      };
+      math_default.Nlp.FindMinimum(_minFunc, dim, 2 * dim, params, rhobeg, rhoend, iprint, maxfun);
+      return [1, target.X.apply(null, params), target.Y.apply(null, params), target.Z.apply(null, params)];
+    },
+    /**
+     * Given a the screen coordinates of a point, finds the point on the
+     * given parametric curve or surface which is nearest in screen space,
+     * and returns its view-space coordinates.
+     * @param {Array} pScr Screen coordinates to project.
+     * @param {JXG.Curve3D|JXG.Surface3D} target Parametric curve or surface to project to.
+     * @param {Array} params Parameters of point on the target, initially specifying the starting point of
+     * the search. The parameters are modified in place during the search, ending up at the nearest point.
+     * @returns {Array} Array of length 4 containing the coordinates of the nearest point on the curve or surface.
+     */
+    projectScreenCoordsToParametric: function(pScr, target, params) {
+      var rhobeg, rhoend, iprint = 0, maxfun = 200, dim = params.length, _minFunc;
+      if (dim === 1) {
+        rhobeg = 0.1 * (target.range[1] - target.range[0]);
+      } else if (dim === 2) {
+        rhobeg = 0.1 * Math.min(
+          target.range_u[1] - target.range_u[0],
+          target.range_v[1] - target.range_v[0]
+        );
+      }
+      rhoend = rhobeg / 5e6;
+      _minFunc = function(n, m, w, con) {
+        var c3d = [
+          1,
+          target.X.apply(null, w),
+          target.Y.apply(null, w),
+          target.Z.apply(null, w)
+        ], c2d = target.view.project3DTo2D(c3d), xDiff = pScr[0] - c2d[1], yDiff = pScr[1] - c2d[2];
+        if (n === 1) {
+          con[0] = w[0] - target.range[0];
+          con[1] = -w[0] + target.range[1];
+        } else if (n === 2) {
+          con[0] = w[0] - target.range_u[0];
+          con[1] = -w[0] + target.range_u[1];
+          con[2] = w[1] - target.range_v[0];
+          con[3] = -w[1] + target.range_v[1];
+        }
+        return xDiff * xDiff + yDiff * yDiff;
+      };
+      math_default.Nlp.FindMinimum(_minFunc, dim, 2 * dim, params, rhobeg, rhoend, iprint, maxfun);
+      return [1, target.X.apply(null, params), target.Y.apply(null, params), target.Z.apply(null, params)];
     },
     /**
      * Calculates the distance of a point to a line. The point and the line are given by homogeneous
@@ -12315,16 +12712,16 @@ type_default.extend(
         }
       }
       if (this.northWest !== null && box[0] <= this.cx & box[1] >= this.cy) {
-        hits = hits.concat(this.northWest.find(box));
+        type_default.concat(hits, this.northWest.find(box));
       }
       if (this.southWest !== null && box[0] <= this.cx & box[3] <= this.cy) {
-        hits = hits.concat(this.southWest.find(box));
+        type_default.concat(hits, this.southWest.find(box));
       }
       if (this.northEast !== null && box[2] >= this.cx & box[1] >= this.cy) {
-        hits = hits.concat(this.northEast.find(box));
+        type_default.concat(hits, this.northEast.find(box));
       }
       if (this.southEast !== null && box[2] >= this.cx & box[3] <= this.cy) {
-        hits = hits.concat(this.southEast.find(box));
+        type_default.concat(hits, this.southEast.find(box));
       }
       return hits;
     },
@@ -12395,23 +12792,23 @@ type_default.extend(
       dataY.push(NaN);
       if (this.northWest !== null) {
         ret = this.northWest.plot();
-        dataX = dataX.concat(ret[0]);
-        dataY = dataY.concat(ret[1]);
+        type_default.concat(dataX, ret[0]);
+        type_default.concat(dataY, ret[1]);
       }
       if (this.northEast !== null) {
         ret = this.northEast.plot();
-        dataX = dataX.concat(ret[0]);
-        dataY = dataY.concat(ret[1]);
+        type_default.concat(dataX, ret[0]);
+        type_default.concat(dataY, ret[1]);
       }
       if (this.southEast !== null) {
         ret = this.southEast.plot();
-        dataX = dataX.concat(ret[0]);
-        dataY = dataY.concat(ret[1]);
+        type_default.concat(dataX, ret[0]);
+        type_default.concat(dataY, ret[1]);
       }
       if (this.southWest !== null) {
         ret = this.southWest.plot();
-        dataX = dataX.concat(ret[0]);
-        dataY = dataY.concat(ret[1]);
+        type_default.concat(dataX, ret[0]);
+        type_default.concat(dataY, ret[1]);
       }
       return [dataX, dataY];
     }
@@ -13759,11 +14156,13 @@ math_default.Statistics = {
   },
   /**
    * Generate values of a standard normal random variable with the Marsaglia polar method, see
-   * https://en.wikipedia.org/wiki/Marsaglia_polar_method .
+   * {@link https://en.wikipedia.org/wiki/Marsaglia_polar_method}.
+   * See also D. E. Knuth, The art of computer programming, vol 2, p. 117.
    *
    * @param {Number} mean mean value of the normal distribution
    * @param {Number} stdDev standard deviation of the normal distribution
    * @returns {Number} value of a standard normal random variable
+   * @memberof JXG.Math.Statistics
    */
   generateGaussian: function(mean, stdDev) {
     var u, v, s;
@@ -13780,6 +14179,402 @@ math_default.Statistics = {
     this.spare = v * s;
     this.hasSpare = true;
     return mean + stdDev * u * s;
+  },
+  /**
+   * Generate value of a standard normal random variable with given mean and standard deviation.
+   * Alias for {@link JXG.Math.Statistics#generateGaussian}
+   *
+   * @param {Number} mean
+   * @param {Number} stdDev
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   * @see JXG.Math.Statistics#generateGaussian
+   */
+  randomNormal: function(mean, stdDev) {
+    return this.generateGaussian(mean, stdDev);
+  },
+  /**
+   * Generate value of a uniform distributed random variable in the interval [a, b].
+   * @param {Number} a
+   * @param {Number} b
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomUniform: function(a, b) {
+    return Math.random() * (b - a) + a;
+  },
+  /**
+   * Generate value of a random variable with exponential distribution, i.e.
+   * <i>f(x; lambda) = lambda * e^(-lambda x)</i> if <i>x >= 0</i> and <i>f(x; lambda) = 0</i> if <i>x < 0</i>.
+   * See {@link https://en.wikipedia.org/wiki/Exponential_distribution}.
+   * Algorithm: D.E. Knuth, TAOCP 2, p. 128.
+   *
+   * @param {Number} lambda <i>&gt; 0</i>
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomExponential: function(lbda) {
+    var u;
+    if (lbda <= 0) {
+      return NaN;
+    }
+    do {
+      u = Math.random();
+    } while (u === 0);
+    return -Math.log(u) / lbda;
+  },
+  /**
+       * Generate value of a random variable with gamma distribution of order alpha.
+       * See {@link https://en.wikipedia.org/wiki/Gamma_distribution}.
+       * Algorithm: D.E. Knuth, TAOCP 2, p. 129.
+  
+       * @param {Number} a shape, <i> &gt; 0</i>
+       * @param {Number} [b=1] scale, <i> &gt; 0</i>
+       * @param {Number} [t=0] threshold
+       * @returns Number
+       * @memberof JXG.Math.Statistics
+       */
+  randomGamma: function(a, b, t) {
+    var u, v, x, y, p, q;
+    if (a <= 0) {
+      return NaN;
+    }
+    b = b || 1;
+    t = t || 0;
+    if (a === 1) {
+      return b * this.randomExponential(1) + t;
+    }
+    if (a < 1) {
+      p = Math.E / (a + Math.E);
+      do {
+        u = Math.random();
+        do {
+          v = Math.random();
+        } while (v === 0);
+        if (u < p) {
+          x = Math.pow(v, 1 / a);
+          q = Math.exp(-x);
+        } else {
+          x = 1 - Math.log(v);
+          q = Math.pow(x, a - 1);
+        }
+        u = Math.random();
+      } while (u >= q);
+      return b * x + t;
+    }
+    do {
+      y = Math.tan(Math.PI * Math.random());
+      x = Math.sqrt(2 * a - 1) * y + a - 1;
+      if (x > 0) {
+        v = Math.random();
+      } else {
+        continue;
+      }
+    } while (x <= 0 || v > (1 + y * y) * Math.exp((a - 1) * Math.log(x / (a - 1)) - Math.sqrt(2 * a - 1) * y));
+    return b * x + t;
+  },
+  /**
+   * Generate value of a random variable with beta distribution with shape parameters alpha and beta.
+   * See {@link https://en.wikipedia.org/wiki/Beta_distribution}.
+   *
+   * @param {Number} alpha <i>&gt; 0</i>
+   * @param {Number} beta <i>&gt; 0</i>
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomBeta: function(a, b) {
+    var x1, x2, x;
+    if (a <= 0 || b <= 0) {
+      return NaN;
+    }
+    x1 = this.randomGamma(a);
+    x2 = this.randomGamma(b);
+    x = x1 / (x1 + x2);
+    return x;
+  },
+  /**
+   * Generate value of a random variable with chi-square distribution with k degrees of freedom.
+   * See {@link https://en.wikipedia.org/wiki/Chi-squared_distribution}.
+   *
+   * @param {Number} k <i>&gt; 0</i>
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomChisquare: function(nu) {
+    if (nu <= 0) {
+      return NaN;
+    }
+    return 2 * this.randomGamma(nu * 0.5);
+  },
+  /**
+   * Generate value of a random variable with F-distribution with d<sub>1</sub> and d<sub>2</sub> degrees of freedom.
+   * See {@link https://en.wikipedia.org/wiki/F-distribution}.
+   * @param {Number} d1 <i>&gt; 0</i>
+   * @param {Number} d2 <i>&gt; 0</i>
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomF: function(nu1, nu2) {
+    var y1, y2;
+    if (nu1 <= 0 || nu2 <= 0) {
+      return NaN;
+    }
+    y1 = this.randomChisquare(nu1);
+    y2 = this.randomChisquare(nu2);
+    return y1 * nu2 / (y2 * nu1);
+  },
+  /**
+   * Generate value of a random variable with Students-t-distribution with &nu; degrees of freedom.
+   * See {@link https://en.wikipedia.org/wiki/Student%27s_t-distribution}.
+   * @param {Number} nu <i>&gt; 0</i>
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomT: function(nu) {
+    var y1, y2;
+    if (nu <= 0) {
+      return NaN;
+    }
+    y1 = this.randomNormal(0, 1);
+    y2 = this.randomChisquare(nu);
+    return y1 / Math.sqrt(y2 / nu);
+  },
+  /**
+   * Generate values for a random variable in binomial distribution with parameters <i>n</i> and <i>p</i>.
+   * See {@link https://en.wikipedia.org/wiki/Binomial_distribution}.
+   * It uses algorithm BG from {@link https://dl.acm.org/doi/pdf/10.1145/42372.42381}.
+   *
+   * @param {Number} n Number of trials (n >= 0)
+   * @param {Number} p Propability (0 <= p <= 1)
+   * @returns Number Integer value of a random variable in binomial distribution
+   * @memberof JXG.Math.Statistics
+   *
+   * @example
+   * console.log(JXG.Mat.Statistics.generateBinomial(100,0.1));
+   * // Possible output: 18
+   *
+   */
+  randomBinomial: function(n, p) {
+    var x, y, c, a, b, N1;
+    if (p < 0 || p > 1 || n < 0) {
+      return NaN;
+    }
+    if (p === 0) {
+      return 0;
+    }
+    if (p === 1) {
+      return n;
+    }
+    if (n === 0) {
+      return 0;
+    }
+    if (n === 1) {
+      return Math.random() < p ? 1 : 0;
+    }
+    if (p > 0.5) {
+      return n - this.randomBinomial(n, 1 - p);
+    }
+    if (n < 100) {
+      x = -1;
+      y = 0;
+      c = Math.log(1 - p);
+      if (c === 0) {
+        return 0;
+      }
+      do {
+        x += 1;
+        y += Math.floor(Math.log(Math.random()) / c) + 1;
+      } while (y < n);
+    } else {
+      a = 1 + Math.floor(n * 0.5);
+      b = n - a + 1;
+      x = this.randomBeta(a, b);
+      if (x >= p) {
+        N1 = this.randomBinomial(a - 1, p / x);
+        x = N1;
+      } else {
+        N1 = this.randomBinomial(b - 1, (p - x) / (1 - x));
+        x = a + N1;
+      }
+    }
+    return x;
+  },
+  /**
+   * Generate values for a random variable in geometric distribution with propability <i>p</i>.
+   * See {@link https://en.wikipedia.org/wiki/Geometric_distribution}.
+   *
+   * @param {Number} p (0 <= p <= 1)
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomGeometric: function(p) {
+    var u;
+    if (p < 0 || p > 1) {
+      return NaN;
+    }
+    u = Math.random();
+    return Math.ceil(Math.log(u) / Math.log(1 - p));
+  },
+  /**
+   * Generate values for a random variable in Poisson distribution with mean <i>mu</i>.
+   * See {@link https://en.wikipedia.org/wiki/Poisson_distribution}.
+   *
+   * @param {Number} mu (0 < mu)
+   * @returns Number
+   * @memberof JXG.Math.Statistics
+   */
+  randomPoisson: function(mu) {
+    var e = Math.exp(-mu), N, m = 0, u = 1, x, alpha = 7 / 8;
+    if (mu <= 0) {
+      return NaN;
+    }
+    if (mu < 10) {
+      do {
+        u *= Math.random();
+        m += 1;
+      } while (u > e);
+      N = m - 1;
+    } else {
+      m = Math.floor(alpha * mu);
+      x = this.randomGamma(m);
+      if (x < mu) {
+        N = m + this.randomPoisson(mu - x);
+      } else {
+        N = this.randomBinomial(m - 1, mu / x);
+      }
+    }
+    return N;
+  },
+  /**
+   * Generate values for a random variable in hypergeometric distribution.
+   * Samples are drawn from a hypergeometric distribution with specified parameters, <i>good</i> (ways to make a good selection),
+   * <i>bad</i> (ways to make a bad selection), and <i>samples</i> (number of items sampled, which is less than or equal to <i>good + bad</i>).
+   * <p>
+   * Naive implementation with runtime <i>O(samples)</i>.
+   *
+   * @param {Number} good ways to make a good selection
+   * @param {Number} bad ways to make a bad selection
+   * @param {Number} samples number of items sampled
+   * @returns
+   * @memberof JXG.Math.Statistics
+   */
+  randomHypergeometric: function(good, bad, k) {
+    var i2, u, x = 0, d1 = good + bad - k, d2 = Math.min(good, bad), y = d2;
+    if (good < 1 || bad < 1 || k > good + bad) {
+      return NaN;
+    }
+    i2 = k;
+    while (y * i2 > 0) {
+      u = Math.random();
+      y -= Math.floor(u + y / (d1 + i2));
+      i2 -= 1;
+    }
+    x = d2 - y;
+    if (good <= bad) {
+      return x;
+    } else {
+      return k - x;
+    }
+  },
+  /**
+   * Compute the histogram of a dataset.
+   * Optional parameters can be supplied through a JavaScript object
+   * with the following default values:
+   * <pre>
+   * {
+   *   bins: 10,          // Number of bins
+   *   range: false,      // false or array. The lower and upper range of the bins.
+   *                      // If not provided, range is simply [min(x), max(x)].
+   *                      // Values outside the range are ignored.
+   *   density: false,    // If true, normalize the counts by dividing by sum(counts)
+   *   cumulative: false
+   * }
+   * </pre>
+   * The function returns an array containing two arrays. The first array is of length bins+1
+   * containing the start values of the bins. The last entry contains the end values of the last bin.
+   * <p>
+   * The second array contains the counts of each bin.
+   * @param {Array} x
+   * @param {Object} opt Optional parameters
+   * @returns Array [bin, counts] Array bins contains start values of bins, array counts contains
+   * the number of entries of x which are contained in each bin.
+   * @memberof JXG.Math.Statistics
+   *
+   * @example
+   *     var curve = board.create('curve', [[], []]);
+   *     curve.updateDataArray = function () {
+   *       var i, res, x = [];
+   *
+   *       for (i = 0; i < 5000; i++) {
+   *         x.push(JXG.Math.Statistics.randomGamma(2));
+   *       }
+   *       res = JXG.Math.Statistics.histogram(x, { bins: 50, density: true, cumulative: false, range: [-5, 5] });
+   *       this.dataX = res[1];
+   *       this.dataY = res[0];
+   *     };
+   *     board.update();
+   *
+   * </pre><div id="JXGda56df4d-a5a5-4c87-9ffc-9bbc1b512302" class="jxgbox" style="width: 300px; height: 300px;"></div>
+   * <script type="text/javascript">
+   *     (function() {
+   *         var board = JXG.JSXGraph.initBoard('JXGda56df4d-a5a5-4c87-9ffc-9bbc1b512302',
+   *             {boundingbox: [-1, 3, 6, -1], axis: true, showcopyright: false, shownavigation: false});
+   *         var curve = board.create('curve', [[], []]);
+   *         curve.updateDataArray = function () {
+   *           var i, res, x = [];
+   *
+   *           for (i = 0; i < 5000; i++) {
+   *             x.push(JXG.Math.Statistics.randomGamma(2));
+   *           }
+   *           res = JXG.Math.Statistics.histogram(x, { bins: 50, density: true, cumulative: false, range: [-5, 5] });
+   *           this.dataX = res[1];
+   *           this.dataY = res[0];
+   *         };
+   *         board.update();
+   *     })();
+   *
+   * <\/script><pre>
+   *
+   */
+  histogram: function(x, opt) {
+    var i2, le, k, mi, ma, num_bins, delta, range, s, counts = [], bins = [];
+    num_bins = opt.bins || 10;
+    range = opt.range || false;
+    if (range === false) {
+      mi = Math.min.apply(null, x);
+      ma = Math.max.apply(null, x);
+    } else {
+      mi = range[0];
+      ma = range[1];
+    }
+    if (num_bins > 0) {
+      delta = (ma - mi) / (num_bins - 1);
+    } else {
+      delta = 0;
+    }
+    for (i2 = 0; i2 < num_bins; i2++) {
+      counts.push(0);
+      bins.push(mi + i2 * delta);
+    }
+    le = x.length;
+    for (i2 = 0; i2 < le; i2++) {
+      k = Math.floor((x[i2] - mi) / delta);
+      if (k >= 0 && k < num_bins) {
+        counts[k] += 1;
+      }
+    }
+    if (opt.density) {
+      s = jxg_default.Math.Statistics.sum(counts);
+      for (i2 = 0; i2 < num_bins; i2++) {
+        counts[i2] /= s;
+      }
+    }
+    if (opt.cumulative) {
+      for (i2 = 1; i2 < num_bins; i2++) {
+        counts[i2] += counts[i2 - 1];
+      }
+    }
+    return [counts, bins];
   }
 };
 var statistics_default = math_default.Statistics;
@@ -14803,6 +15598,9 @@ math_default.Plot = {
     }
     return s + table[0][idx];
   },
+  // Thiele's interpolation formula,
+  // https://en.wikipedia.org/wiki/Thiele%27s_interpolation_formula
+  // unused
   thiele: function(t, recip, t_values, idx, degree) {
     var i2, v = 0;
     for (i2 = degree; i2 > 1; i2--) {
@@ -14999,12 +15797,11 @@ math_default.Plot = {
     curve.points.push(p);
   },
   getInterval: function(curve, ta, tb) {
-    var t_int, x_int, y_int;
+    var t_int, y_int;
     ia_default.disable();
     t_int = ia_default.Interval(ta, tb);
     curve.board.mathLib = ia_default;
     curve.board.mathLibJXG = ia_default;
-    x_int = curve.X(t_int, true);
     y_int = curve.Y(t_int, true);
     curve.board.mathLib = Math;
     curve.board.mathLibJXG = jxg_default.Math;
@@ -15136,7 +15933,7 @@ math_default.Plot = {
     }
   },
   handleSingularity: function(curve, comp, group, x_table, y_table) {
-    var idx = group.idx, t, t1, t2, y_int, i1, i2, x, y, lo, hi, d_lft, d_rgt, d_thresh = 100, di1 = 5, di2 = 3, d1, d2;
+    var idx = group.idx, t, t1, t2, y_int, i1, i2, x, lo, hi, d_lft, d_rgt, d_thresh = 100, di1 = 5, di2 = 3;
     t = group.t;
     console.log("HandleSingularity at t =", t);
     t1 = comp.t_values[idx - di1];
@@ -15215,7 +16012,7 @@ math_default.Plot = {
    */
   criticalThreshold: 1e3,
   plot_v4: function(curve, ta, tb, steps) {
-    var i2, j, le, components, idx, comp, groups, g, start, ret, x_table, y_table, t, t1, t2, good, bad, x_int, y_int, degree_x, degree_y, h = (tb - ta) / steps, Ypl = function(x) {
+    var i2, le, components, idx, comp, groups, g, start, ret, x_table, y_table, t, t1, t2, y_int, h = (tb - ta) / steps, Ypl = function(x) {
       return curve.Y(x, true);
     }, Ymi = function(x) {
       return -curve.Y(x, true);
@@ -15227,8 +16024,6 @@ math_default.Plot = {
       groups = ret[0];
       x_table = ret[1];
       y_table = ret[2];
-      degree_x = ret[3];
-      degree_y = ret[4];
       if (groups.length === 0 || groups[0].type !== "borderleft") {
         groups.unshift({
           idx: 0,
@@ -15255,15 +16050,12 @@ math_default.Plot = {
         } else {
           le = groups[g].idx - 1;
         }
-        good = 0;
-        bad = 0;
         for (i2 = start; i2 < le - 2; i2++) {
           this._insertPoint_v4(
             curve,
             [1, comp.x_values[i2], comp.y_values[i2]],
             comp.t_values[i2]
           );
-          j = Math.max(0, i2 - 2);
           if (
             //degree_y === -1 && // No polynomial
             i2 >= start + 3 && i2 < le - 3 && // Do not do this if too close to a critical point
@@ -15309,9 +16101,6 @@ math_default.Plot = {
                 );
               }
             }
-            bad++;
-          } else {
-            good++;
           }
         }
         if (g < groups.length) {
@@ -15580,8 +16369,8 @@ type_default.extend(
               });
             }
             num_components++;
-            dataX = dataX.concat(ret[0]);
-            dataY = dataY.concat(ret[1]);
+            type_default.concat(dataX, ret[0]);
+            type_default.concat(dataY, ret[1]);
           }
         }
         m = t - delta * 0.01;
@@ -19518,10 +20307,10 @@ math_default.Clip = {
     if (geometry_default.windingNumber(P.coords.usrCoords, C) === 0) {
       if (geometry_default.windingNumber(Q.coords.usrCoords, S) !== 0) {
         if (clip_type === "union") {
-          path = path.concat(S);
+          type_default.concat(path, S);
           path.push(S[0]);
         } else if (clip_type === "difference") {
-          path = path.concat(S);
+          type_default.concat(path, S);
           path.push(S[0]);
           if (geometry_default.signedPolygon(S) * geometry_default.signedPolygon(C) > 0) {
             path.reverse();
@@ -19529,28 +20318,28 @@ math_default.Clip = {
           path.push([NaN, NaN]);
         }
         if (clip_type === "difference" || clip_type === "intersection") {
-          path = path.concat(C);
+          type_default.concat(path, C);
           path.push(C[0]);
           doClose = false;
         }
       } else {
         if (clip_type === "difference") {
-          path = path.concat(S);
+          type_default.concat(path, S);
           doClose = true;
         } else if (clip_type === "union") {
-          path = path.concat(S);
+          type_default.concat(path, S);
           path.push(S[0]);
           path.push([NaN, NaN]);
-          path = path.concat(C);
+          type_default.concat(path, C);
           path.push(C[0]);
         }
       }
     } else {
       if (clip_type === "intersection") {
-        path = path.concat(S);
+        type_default.concat(path, S);
         doClose = true;
       } else if (clip_type === "union") {
-        path = path.concat(C);
+        type_default.concat(path, C);
         path.push(C[0]);
       }
     }
@@ -21207,7 +21996,7 @@ jxg_default.Options = {
      * It is an array consisting of four values:
      * [x<sub>1</sub>, y<sub>1</sub>, x<sub>2</sub>, y<sub>2</sub>]
      *
-     * The canvas will be spanned from the upper left corner (<sub>1</sub>, y<sub>1</sub>)
+     * The canvas will be spanned from the upper left corner (x<sub>1</sub>, y<sub>1</sub>)
      * to the lower right corner (x<sub>2</sub>, y<sub>2</sub>).
      *
      * @name JXG.Board#boundingBox
@@ -21282,6 +22071,43 @@ jxg_default.Options = {
      *
      */
     browserPan: false,
+    /**
+     *
+     * Maximum time delay (in msec) between two clicks to be considered
+     * as double click. This attribute is used together with {@link JXG.Board#dblClickSuppressClick}.
+     * The JavaScript standard is that
+     * a click event is preceded by two click events,
+     * see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/dblclick_event}.
+     * In case of {@link JXG.Board#dblClickSuppressClick} being true, the JavaScript standard is ignored and
+     * this time delay is used to suppress the two click events if they are followed by a double click event.
+     * <p>
+     * In case of {@link JXG.Board#dblClickSuppressClick} being false, this attribute is used
+     * to clear the list of clicked elements after the time specified by this attribute.
+     * <p>
+     * Recommendation: if {@link JXG.Board#dblClickSuppressClick} is true, use a value of approx. 300,
+     * otherwise stay with the default 600.
+     *
+     * @name JXG.Board#clickDelay
+     * @type Number
+     * @default 600
+     * @see JXG.Board#dblClickSuppressClick
+     */
+    clickDelay: 600,
+    /**
+     * If false (default), JSXGraph follows the JavaScript standard and fires before a dblclick event two
+     * click events.
+     * <p>
+     * If true, the click events are suppressed if there is a dblclick event.
+     * The consequence is that in this case any click event is fired with a delay specified by
+     * {@link JXG.Board#clickDelay}.
+     *
+     * @name JXG.Board#dblClickSuppressClick
+     * @type Boolean
+     * @default false
+     * @see JXG.Board#clickDelay
+     *
+     */
+    dblClickSuppressClick: false,
     /**
      * Attributes for the default axes in case of the attribute
      * axis:true in {@link JXG.JSXGraph#initBoard}.
@@ -22098,7 +22924,7 @@ jxg_default.Options = {
     //  * {@link JXG.Board#removeEventHandlers()} directly.
     //  * <p>
     //  * This attribute just starts a resizeObserver. If the resizeObserver reacts
-    //  * to size changed is controled wuth {@link JXG.Board#resize}.
+    //  * to size changed is controlled with {@link JXG.Board#resize}.
     //  *
     //  * @name JXG.Board#registerResizeEvent
     //  * @see JXG.Board#resize
@@ -22129,6 +22955,10 @@ jxg_default.Options = {
      * by the user / browser.
      * The attribute "throttle" determines the minimal time in msec between to
      * resize calls.
+     * <p>
+     * <b>Attention:</b> if the JSXGraph container has no CSS property like width or height  nd max-width or max-height set, but
+     * has a property like boxsizing:box-content, then the interplay between CSS and the resize attribute may result in an
+     * infinite loop with ever increasing JSXgraph container.
      *
      * @see JXG.Board#startResizeObserver
      * @see JXG.Board#resizeListener
@@ -22465,7 +23295,8 @@ jxg_default.Options = {
      *   needShift: true,  // mouse wheel zooming needs pressing of the shift key
      *   min: 0.001,       // minimal values of {@link JXG.Board#zoomX} and {@link JXG.Board#zoomY}, limits zoomOut
      *   max: 1000.0,      // maximal values of {@link JXG.Board#zoomX} and {@link JXG.Board#zoomY}, limits zoomIn
-     *
+     *   center: 'auto',   // 'auto': the center of zoom is at the position of the mouse or at the midpoint of two fingers
+     *                     // 'board': the center of zoom is at the board's center
      *   pinch: true,      // pinch-to-zoom gesture for proportional zoom
      *   pinchHorizontal: true, // Horizontal pinch-to-zoom zooms horizontal axis. Only available if keepaspectratio:false
      *   pinchVertical: true,   // Vertical pinch-to-zoom zooms vertical axis only. Only available if keepaspectratio:false
@@ -22490,6 +23321,7 @@ jxg_default.Options = {
       factorY: 1.25,
       wheel: true,
       needShift: true,
+      center: "auto",
       min: 1e-4,
       max: 1e4,
       pinch: true,
@@ -23047,6 +23879,49 @@ jxg_default.Options = {
      * @name JXG.GeometryElement#needsRegularUpdate
      */
     needsRegularUpdate: true,
+    /**
+     * If some size of an element is controlled by a function, like the circle radius
+     * or segments of fixed length, this attribute controls what happens if the value
+     * is negative. By default, the absolute value is taken. If true, the maximum
+     * of 0 and the value is used.
+     *
+     * @type Boolean
+     * @default false
+     * @name JXG.GeometryElement#nonnegativeOnly
+     * @example
+     * var slider = board.create('slider', [[4, -3], [4, 3], [-4, 1, 4]], { name: 'a'});
+     * var circle = board.create('circle', [[-1, 0], 1], {
+     *     nonnegativeOnly: true
+     * });
+     * circle.setRadius('a');         // Use JessieCode
+     * var seg = board.create('segment', [[-4, 3], [0, 3], () => slider.Value()], {
+     *     point1: {visible: true},
+     *     point2: {visible: true},
+     *     nonnegativeOnly: true
+     * });
+     *
+     * </pre><div id="JXG9cb76224-1f78-4488-b20f-800788768bc9" class="jxgbox" style="width: 300px; height: 300px;"></div>
+     * <script type="text/javascript">
+     *     (function() {
+     *         var board = JXG.JSXGraph.initBoard('JXG9cb76224-1f78-4488-b20f-800788768bc9',
+     *             {boundingbox: [-8, 8, 8,-8], axis: true, showcopyright: false, shownavigation: false});
+     *     var slider = board.create('slider', [[4, -3], [4, 3], [-4, 1, 4]], { name: 'a'});
+     *     var circle = board.create('circle', [[-1, 0], 1], {
+     *         nonnegativeOnly: true
+     *     });
+     *     circle.setRadius('a');         // Use JessieCode
+     *     var seg = board.create('segment', [[-4, 3], [0, 3], () => slider.Value()], {
+     *         point1: {visible: true},
+     *         point2: {visible: true},
+     *         nonnegativeOnly: true
+     *     });
+     *
+     *     })();
+     *
+     * <\/script><pre>
+     *
+     */
+    nonnegativeOnly: false,
     /**
      * Precision options for JSXGraph elements.
      * This attributes takes either the value 'inherit' or an object of the form:
@@ -25688,6 +26563,7 @@ jxg_default.Options = {
     needsRegularUpdate: false,
     hasGrid: false,
     // Used in standardoptions
+    highlight: false,
     /**
      * Deprecated. Use {@link Grid#majorStep} instead.
      *
@@ -25756,123 +26632,177 @@ jxg_default.Options = {
      */
     includeBoundaries: false,
     /**
-     * This object contains the attributes for major grid elements.
+     * Size of grid elements. There are the following possibilities:
+     * <ul>
+     *     <li>Numbers or strings which are numbers (e.g. '10') are interpreted as size in pixels.
+     *     <li>Strings with additional '%' (e.g. '95%') are interpreted as the ratio of used space for one element.
+     * </ul>
+     * Unused for 'line' which will use the value of strokeWidth.
+     * Instead of one value you can provide two values as an array <tt>[x, y]</tt> here.
+     * These are used as size in x- and y-direction.
      *
-     * @see Grid#major_size
-     * @see Grid#major_face
-     * @see Grid#major_margin
-     * @see Grid#major_drawZero
-     * @see Grid#major_polygonVertices
+     * <p><b><i>This attribute can be set individually for major and minor grid as a sub-entry of {@link Grid#major} or {@link Grid#minor}</i></b>,
+     * e.g. <tt>major: {size: ...}</tt>
+     * For default values have a look there.</p>
+     *
+     * @type {Number|String|Array}
+     * @name Grid#size
+     */
+    // This attribute only exists for documentation purposes. It has no effect and is overwritten with actual values in major and minor.
+    size: void 0,
+    /**
+     * Appearance of grid elements.
+     * There are different styles which differ in appearance.
+     * Possible values are (comparing to {@link Point#face}):
+     * <table>
+     * <tr><th>Input</th><th>Output</th><th>Fillable by fillColor,...</th></tr>
+     * <tr><td>point, .</td><td>.</td><td>no</td></tr>
+     * <tr><td>line</td><td>&minus;</td><td>no</td></tr>
+     * <tr><td>cross, x</td><td>x</td><td>no</td></tr>
+     * <tr><td>circle, o</td><td>o</td><td>yes</td></tr>
+     * <tr><td>square, []</td><td>[]</td><td>yes</td></tr>
+     * <tr><td>plus, +</td><td>+</td><td>no</td></tr>
+     * <tr><td>minus, -</td><td>-</td><td>no</td></tr>
+     * <tr><td>divide, |</td><td>|</td><td>no</td></tr>
+     * <tr><td>diamond, &lt;&gt;</td><td>&lt;&gt;</td><td>yes</td></tr>
+     * <tr><td>diamond2, &lt;&lt;&gt;&gt;</td><td>&lt;&gt; (bigger)</td><td>yes</td></tr>
+     * <tr><td>triangleup, ^, a, A</td><td>^</td><td>no</td></tr>
+     * <tr><td>triangledown, v</td><td>v</td><td>no</td></tr>
+     * <tr><td>triangleleft, &lt;</td><td> &lt;</td><td>no</td></tr>
+     * <tr><td>triangleright, &gt;</td><td>&gt;</td><td>no</td></tr>
+     * <tr><td>regularPolygon, regpol</td><td>⬡</td><td>yes</td></tr>
+     * </table>
+     *
+     * <p><b><i>This attribute can be set individually for major and minor grid as a sub-entry of {@link Grid#major} or {@link Grid#minor}</i></b>,
+     * e.g. <tt>major: {face: ...}</tt>
+     * For default values have a look there.</p>
+     *
+     * @type {String}
+     * @name Grid#face
+     */
+    // This attribute only exists for documentation purposes. It has no effect and is overwritten with actual values in major and minor.
+    face: void 0,
+    /**
+     * This number (pixel value) controls where grid elements end at the canvas edge. If zero, the line
+     * ends exactly at the end, if negative there is a margin to the inside, if positive the line
+     * ends outside of the canvas (which is invisible).
+     *
+     * <p><b><i>This attribute can be set individually for major and minor grid as a sub-entry of {@link Grid#major} or {@link Grid#minor}</i></b>,
+     * e.g. <tt>major: {margin: ...}</tt>
+     * For default values have a look there.</p>
+     *
+     * @name Grid#margin
+     * @type {Number}
+     */
+    // This attribute only exists for documentation purposes. It has no effect and is overwritten with actual values in major and minor.
+    margin: void 0,
+    /**
+     * This attribute determines whether the grid elements located at <tt>x=0</tt>, <tt>y=0</tt>
+     * and (for major grid only) at <tt>(0, 0)</tt> are displayed.
+     * The main reason to set this attribute to "false", might be in combination with axes.
+     * <ul>
+     *     <li>If <tt>false</tt>, then all these elements are hidden.
+     *     <li>If <tt>true</tt>, all these elements are shown.
+     *     <li>If an object of the following form is given, the three cases can be distinguished individually:<br>
+     *     <tt>{x: true|false, y: true|false, origin: true|false}</tt>
+     * </ul>
+     *
+     * <p><b><i>This attribute can be set individually for major and minor grid as a sub-entry of {@link Grid#major} or {@link Grid#minor}</i></b>,
+     * e.g. <tt>major: {drawZero: ...}</tt>
+     * For default values have a look there.</p>
+     *
+     * @type {Boolean|Object}
+     * @name Grid#drawZero
+     */
+    // This attribute only exists for documentation purposes. It has no effect and is overwritten with actual values in major and minor.
+    drawZero: void 0,
+    /**
+     * Number of vertices for face 'polygon'.
+     *
+     * <p><b><i>This attribute can be set individually for major and minor grid as a sub-entry of {@link Grid#major} or {@link Grid#minor}</i></b>,
+     * e.g. <tt>major: {polygonVertices: ...}</tt>
+     * For default values have a look there.</p>
+     *
+     * @type {Number}
+     * @name Grid#polygonVertices
+     */
+    // This attribute only exists for documentation purposes. It has no effect and is overwritten with actual values in major and minor.
+    polygonVertices: void 0,
+    /**
+     * This object contains the attributes for major grid elements.
+     * You can override the following grid attributes individually here:
+     * <ul>
+     *     <li>{@link Grid#size}
+     *     <li>{@link Grid#face}
+     *     <li>{@link Grid#margin}
+     *     <li>{@link Grid#drawZero}
+     *     <li>{@link Grid#polygonVertices}
+     * </ul>
+     * Default values are:
+     * <pre>{
+     *      size: 5,
+     *      face: 'line',
+     *      margin: 0,
+     *      drawZero: true,
+     *      polygonVertices: 6
+     *  }</pre>
      *
      * @name Grid#major
-     * @type Object
+     * @type {Object}
      */
     major: {
       /**
-       * Size of major grid elements. There are the following possibilities:
-       * <ul>
-       *     <li>Numbers or strings which are numbers (e.g. '10') are interpreted as size in pixels.
-       *     <li>Strings with additional '%' (e.g. '95%') are interpreted as the ratio of used space for one element.
-       * </ul>
-       * Unused for 'line' and 'point', which will use the value of strokeWidth.
-       * Instead of one value you can provide two values as an array <tt>[x, y]</tt> here.
-       * These are used as size in x- and y-direction.
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#major}: <tt>major: {size: ...}</tt></i></b><br>
-       *
-       * @type {Number|String|Array}
-       * @name Grid#major_size
-       * @default 5
+       * Documented in Grid#size
+       * @class
+       * @ignore
        */
       size: 5,
       /**
-       * Appearance of major grid element.
-       * There are different styles which differ in appearance.
-       * Possible values are (comparing to {@link Point#face})
-       * <table>
-       * <tr><th>Input</th><th>Output</th><th>Fillable by fillColor,...</th></tr>
-       * <tr><td>point, .</td><td>.</td><td>no</td></tr>
-       * <tr><td>line</td><td>&minus;</td><td>no</td></tr>
-       * <tr><td>cross, x</td><td>x</td><td>no</td></tr>
-       * <tr><td>circle, o</td><td>o</td><td>yes</td></tr>
-       * <tr><td>square, []</td><td>[]</td><td>yes</td></tr>
-       * <tr><td>plus, +</td><td>+</td><td>no</td></tr>
-       * <tr><td>minus, -</td><td>-</td><td>no</td></tr>
-       * <tr><td>divide, |</td><td>|</td><td>no</td></tr>
-       * <tr><td>diamond, &lt;&gt;</td><td>&lt;&gt;</td><td>yes</td></tr>
-       * <tr><td>diamond2, &lt;&lt;&gt;&gt;</td><td>&lt;&gt; (bigger)</td><td>yes</td></tr>
-       * <tr><td>triangleup, ^, a, A</td><td>^</td><td>no</td></tr>
-       * <tr><td>triangledown, v</td><td>v</td><td>no</td></tr>
-       * <tr><td>triangleleft, &lt;</td><td> &lt;</td><td>no</td></tr>
-       * <tr><td>triangleright, &gt;</td><td>&gt;</td><td>no</td></tr>
-       * <tr><td>regularPolygon, regpol</td><td>⬡</td><td>yes</td></tr>
-       * </table>
-       *
-       * <br><b><i>This attribute is a sub-entry of {@link Grid#major}: <tt>major: {face: ...}</tt></i></b><br>
-       *
-       * @type {String}
-       * @name Grid#major_face
-       * @default 'line'
+       * Documented in Grid#face
+       * @class
+       * @ignore
        */
       face: "line",
       /**
-       * This number (pixel value) controls where infinite lines end at the canvas border. If zero, the line
-       * ends exactly at the border, if negative there is a margin to the inside, if positive the line
-       * ends outside of the canvas (which is invisible).
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#major}: <tt>major: {margin: ...}</tt></i></b><br>
-       *
-       * @name Grid#major_margin
-       * @type Number
-       * @default 0
+       * Documented in Grid#margin
+       * @class
+       * @ignore
        */
       margin: 0,
       /**
-       * This attribute determines whether the grid elements located at <tt>x=0</tt>, <tt>y=0</tt>
-       * and especially at <tt>(0, 0)</tt> are displayed.
-       * <ul>
-       *     <li>If <tt>false</tt>, then all these elements are hidden.
-       *     <li>If <tt>true</tt>, all these elements are shown.
-       *     <li>If an object of the following form is given, the three cases can be distinguished individually:<br>
-       *     <tt>{x: true|false, y: true|false, origin: true|false}</tt>
-       * </ul>
-       *
-       * <br><b><i>This attribute is a sub-entry of {@link Grid#major}: <tt>major: {drawZero: ...}</tt></i></b><br>
-       *
-       * @type {Boolean|Object}
-       * @name Grid#major_drawZero
-       * @default false
+       * Documented in Grid#drawZero
+       * @class
+       * @ignore
        */
-      drawZero: false,
+      drawZero: true,
       /**
-       * Number of vertices for face 'polygon'.
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#major}: <tt>major: {polygonVertices: ...}</tt></i></b><br>
-       *
-       * @type {Number}
-       * @name Grid#major_polygonVertices
-       * @default 6
+       * Documented in Grid#polygonVertices
+       * @class
+       * @ignore
        */
-      polygonVertices: 6,
-      strokeColor: "#c0c0c0",
-      // same in old grid
-      strokeWidth: 1,
-      // same in old grid
-      strokeOpacity: 0.5,
-      // same in old grid
-      highlight: false
+      polygonVertices: 6
     },
     /**
      * This object contains the attributes for minor grid elements.
-     *
-     * @see Grid#minor_size
-     * @see Grid#minor_face
-     * @see Grid#minor_margin
-     * @see Grid#minor_drawZero
-     * @see Grid#minor_polygonVertices
+     * You can override the following grid attributes individually here:
+     * <ul>
+     *     <li>{@link Grid#size}
+     *     <li>{@link Grid#face}
+     *     <li>{@link Grid#margin}
+     *     <li>{@link Grid#drawZero}
+     *     <li>{@link Grid#polygonVertices}
+     * </ul>
+     * Default values are:
+     * <pre>{
+     *      size: 3,
+     *      face: 'point',
+     *      margin: 0,
+     *      drawZero: true,
+     *      polygonVertices: 6
+     *  }</pre>
      *
      * @name Grid#minor
-     * @type Object
+     * @type {Object}
      */
     minor: {
       /**
@@ -25881,75 +26811,35 @@ jxg_default.Options = {
        */
       visible: "inherit",
       /**
-       * Size of minor grid elements. There are the following possibilities:
-       * <ul>
-       *     <li>Numbers or strings which are numbers (e.g. '10') are interpreted as size in pixels.
-       *     <li>Strings with additional '%' (e.g. '95%') are interpreted as the ratio of used space for one element.
-       * </ul>
-       * Unused for 'line' and 'point', which will use the value of strokeWidth.
-       * Instead of one value you can provide two values as an array <tt>[x, y]</tt> here.
-       * These are used as size in x- and y-direction.
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#minor}: <tt>minor: {size: ...}</tt></i></b><br>
-       *
-       * @type {Number|String|Array}
-       * @name Grid#minor_size
-       * @default 5
+       * Documented in Grid#size
+       * @class
+       * @ignore
        */
       size: 3,
       /**
-       * Appearance of minor grid elements. Same options as for major grid elements.
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#minor}: <tt>minor: {face: ...}</tt></i></b><br>
-       *
-       * @type {String}
-       * @name Grid#minor_face
-       * @default 'point'
-       * @see Grid#major_face
+       * Documented in Grid#face
+       * @class
+       * @ignore
        */
       face: "point",
       /**
-       * This number (pixel value) controls where infinite lines end at the canvas border. If zero, the line
-       * ends exactly at the border, if negative there is a margin to the inside, if positive the line
-       * ends outside of the canvas (which is invisible).
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#minor}: <tt>minor: {margin: ...}</tt></i></b><br>
-       *
-       * @name Grid#minor_margin
-       * @type Number
-       * @default 0
+       * Documented in Grid#margin
+       * @class
+       * @ignore
        */
       margin: 0,
       /**
-       * This attribute determines whether the minor grid elements located at <tt>x=0</tt> and <tt>y=0</tt> are displayed.
-       * <ul>
-       *     <li>If <tt>false</tt>, then all these elements are hidden.
-       *     <li>If <tt>true</tt>, all these elements are shown.
-       *     <li>If an object of the following form is given, the three cases can be distinguished individually:<br>
-       *     <tt>{x: true|false, y: true|false}</tt>
-       * </ul>
-       *
-       * <br><b><i>This attribute is a sub-entry of {@link Grid#minor}: <tt>minor: {drawZero: ...}</tt></i></b><br>
-       *
-       * @type {Boolean|Object}
-       * @name Grid#minor_drawZero
-       * @default false
+       * Documented in Grid#drawZero
+       * @class
+       * @ignore
        */
-      drawZero: false,
+      drawZero: true,
       /**
-       * Number of vertices for face 'polygon'.
-       *
-       * <br><br><b><i>This attribute is a sub-entry of {@link Grid#minor}: <tt>minor: {polygonVertices: ...}</tt></i></b><br>
-       *
-       * @type {Number}
-       * @name Grid#minor_polygonVertices
-       * @default 6
+       * Documented in Grid#polygonVertices
+       * @class
+       * @ignore
        */
-      polygonVertices: 6,
-      strokeColor: "#c0c0c0",
-      strokeWidth: 1,
-      strokeOpacity: 0.25,
-      highlight: false
+      polygonVertices: 6
     },
     /**
      * @class
@@ -25957,6 +26847,10 @@ jxg_default.Options = {
      * @deprecated
      */
     snapToGrid: false,
+    strokeColor: "#c0c0c0",
+    strokeWidth: 1,
+    strokeOpacity: 0.5,
+    dash: 0,
     /**
      * Use a predefined theme for grid.
      * Attributes can be overwritten by explicitly set the specific value.
@@ -25978,42 +26872,42 @@ jxg_default.Options = {
      * // Theme 1
      * // quadratic grid appearance with distance of major grid elements set to the primarily greater one
      *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
+     * JXG.JSXGraph.initBoard('jxgbox', {
      *     boundingbox: [-4, 4, 4, -4], axis: true,
      *     defaultAxes: {
      *         x: { ticks: {majorHeight: 10} },
      *         y: { ticks: {majorHeight: 10} }
      *     },
-     *     grid: { theme: 1, color: 'grey' },
+     *     grid: { theme: 1 },
      * });
      * </pre> <div id="JXGb8d606c4-7c67-4dc0-9941-3b3bd0932898" class="jxgbox" style="width: 300px; height: 200px;"></div>
      * <script type="text/javascript">
      *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXGb8d606c4-7c67-4dc0-9941-3b3bd0932898',
+     *         JXG.JSXGraph.initBoard('JXGb8d606c4-7c67-4dc0-9941-3b3bd0932898',
      *             {boundingbox: [-4, 4, 4, -4], axis: true, showcopyright: false, shownavigation: false,
      *                 defaultAxes: {
      *                     x: { ticks: {majorHeight: 10} },
      *                     y: { ticks: {majorHeight: 10} }
      *                 },
-     *                grid: { theme: 1, color: 'grey' },
+     *                grid: { theme: 1 },
      *             });
      *     })();
      * <\/script> <pre>
      *
      * @example
      * // Theme 2
-     * // lines and subtile points in between
+     * // lines and points in between
      *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
+     * JXG.JSXGraph.initBoard('jxgbox', {
      *     boundingbox: [-4, 4, 4, -4], axis: false,
-     *     grid: { theme: 2, minorElements: 4, color: 'grey' },
+     *     grid: { theme: 2 },
      * });
      * </pre> <div id="JXG4e11e6e3-472a-48e0-b7d0-f80d397c769b" class="jxgbox" style="width: 300px; height: 300px;"></div>
      * <script type="text/javascript">
      *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXG4e11e6e3-472a-48e0-b7d0-f80d397c769b',
+     *         JXG.JSXGraph.initBoard('JXG4e11e6e3-472a-48e0-b7d0-f80d397c769b',
      *             {boundingbox: [-4, 4, 4, -4], axis: false, showcopyright: false, shownavigation: false,
-     *                 grid: { theme: 2, minorElements: 4, color: 'grey' },
+     *                 grid: { theme: 2 },
      *             })
      *     })();
      * <\/script> <pre>
@@ -26022,88 +26916,70 @@ jxg_default.Options = {
      * // Theme 3
      * // lines and thinner lines in between
      *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
+     * JXG.JSXGraph.initBoard('jxgbox', {
      *     boundingbox: [-4, 4, 4, -4], axis: false,
-     *     grid: { theme: 4, minorElements: 4, color: 'grey' },
+     *     grid: { theme: 3 },
      * });
      * </pre> <div id="JXG334814a3-03a7-4231-a5a7-a42d3b8dc2de" class="jxgbox" style="width: 300px; height: 300px;"></div>
      * <script type="text/javascript">
      *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXG334814a3-03a7-4231-a5a7-a42d3b8dc2de',
+     *         JXG.JSXGraph.initBoard('JXG334814a3-03a7-4231-a5a7-a42d3b8dc2de',
      *             {boundingbox: [-4, 4, 4, -4], axis: false, showcopyright: false, shownavigation: false,
-     *                 grid: { theme: 4, minorElements: 4, color: 'grey' }
+     *                 grid: { theme: 3 }
      *         });
      *     })();
      * <\/script> <pre>
      *
      * @example
      * // Theme 4
-     * // lines with more subtle grid of '+'s plotted in between
+     * // lines with grid of '+'s plotted in between
      *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
+     * JXG.JSXGraph.initBoard('jxgbox', {
      *     boundingbox: [-4, 4, 4, -4], axis: false,
-     *     grid: { theme: 5, minorElements: 4, color: 'grey' },
+     *     grid: { theme: 4 },
      * });
      * </pre> <div id="JXG9e2bb29c-d998-428c-9432-4a7bf6cd9222" class="jxgbox" style="width: 300px; height: 300px;"></div>
      * <script type="text/javascript">
      *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXG9e2bb29c-d998-428c-9432-4a7bf6cd9222',
+     *         JXG.JSXGraph.initBoard('JXG9e2bb29c-d998-428c-9432-4a7bf6cd9222',
      *             {boundingbox: [-4, 4, 4, -4], axis: false, showcopyright: false, shownavigation: false,
-     *                 grid: { theme: 5, minorElements: 4, color: 'grey' },
+     *                 grid: { theme: 4 },
      *             });
      *     })();
      * <\/script> <pre>
      *
      * @example
      * // Theme 5
-     * // grid of '+'s and more subtile points in between
+     * // grid of '+'s and points in between
      *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
+     * JXG.JSXGraph.initBoard('jxgbox', {
      *     boundingbox: [-4, 4, 4, -4], axis: false,
-     *     grid: { theme: 6, minorElements: 4, color: 'grey' },
+     *     grid: { theme: 5 },
      * });
      * </pre> <div id="JXG6a967d83-4179-4827-9e97-63fbf1e872c8" class="jxgbox" style="width: 300px; height: 300px;"></div>
      * <script type="text/javascript">
      *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXG6a967d83-4179-4827-9e97-63fbf1e872c8',
+     *         JXG.JSXGraph.initBoard('JXG6a967d83-4179-4827-9e97-63fbf1e872c8',
      *             {boundingbox: [-4, 4, 4, -4], axis: false, showcopyright: false, shownavigation: false,
-     *                 grid: { theme: 6, minorElements: 4, color: 'grey' },
+     *                 grid: { theme: 5 },
      *         });
      *     })();
      * <\/script> <pre>
      *
      * @example
      * // Theme 6
-     * // grid of circles with subtile points in between
+     * // grid of circles with points in between
      *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
+     * JXG.JSXGraph.initBoard('jxgbox', {
      *     boundingbox: [-4, 4, 4, -4], axis: false,
-     *     grid: { theme: 3, minorElements: 4, strokeColor: 'grey' },
+     *     grid: { theme: 6 },
      * });
      * </pre> <div id="JXG28bee3da-a7ef-4590-9a18-38d1b99d09ce" class="jxgbox" style="width: 300px; height: 300px;"></div>
      * <script type="text/javascript">
      *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXG28bee3da-a7ef-4590-9a18-38d1b99d09ce',
+     *         JXG.JSXGraph.initBoard('JXG28bee3da-a7ef-4590-9a18-38d1b99d09ce',
      *             {boundingbox: [-4, 4, 4, -4], axis: false, showcopyright: false, shownavigation: false,
-     *                 grid: { theme: 3, minorElements: 4, strokeColor: 'grey' },
-     *         });
-     *     })();
-     * <\/script> <pre>
-     *
-     * @example
-     * // Theme 7
-     * // lines and subtile points in between, also plotted on axes
-     *
-     * const board = JXG.JSXGraph.initBoard('jxgbox', {
-     *     boundingbox: [-4, 4, 4, -4], axis: false,
-     *     grid: { theme: 7, minorElements: 4, color: 'grey' },
-     * });
-     * </pre> <div id="JXG7a787274-7f7e-4e10-b59c-f99f1aff35e7" class="jxgbox" style="width: 300px; height: 300px;"></div>
-     * <script type="text/javascript">
-     *     (function() {
-     *         var board = JXG.JSXGraph.initBoard('JXG7a787274-7f7e-4e10-b59c-f99f1aff35e7',
-     *             {boundingbox: [-4, 4, 4, -4], axis: false, showcopyright: false, shownavigation: false,
-     *                 grid: { theme: 7, minorElements: 4, color: 'grey' },
+     *                 grid: { theme: 6 },
      *         });
      *     })();
      * <\/script> <pre>
@@ -26114,25 +26990,38 @@ jxg_default.Options = {
       },
       {
         // Theme 1: quadratic grid appearance with distance of major grid elements in x- and y-direction set to the primarily smaller one
-        forceSquare: "min"
+        forceSquare: "min",
+        major: {
+          face: "line"
+        }
       },
       {
-        // Theme 2: lines and subtile points in between
+        // Theme 2: lines and points in between
+        major: {
+          face: "line"
+        },
         minor: {
           size: 3,
-          strokeColor: "#101010"
+          face: "point"
         },
         minorElements: "auto"
       },
       {
         // Theme 3: lines and thinner lines in between
-        minor: {
+        major: {
           face: "line"
+        },
+        minor: {
+          face: "line",
+          strokeOpacity: 0.25
         },
         minorElements: "auto"
       },
       {
-        // Theme 4: lines with more subtle grid of '+'s plotted in between
+        // Theme 4: lines with grid of '+'s plotted in between
+        major: {
+          face: "line"
+        },
         minor: {
           face: "+",
           size: "95%"
@@ -26140,38 +27029,30 @@ jxg_default.Options = {
         minorElements: "auto"
       },
       {
-        // Theme 5: grid of '+'s and more subtile points in between
+        // Theme 5: grid of '+'s and more points in between
         major: {
           face: "+",
           size: 10,
           strokeOpacity: 1
         },
         minor: {
+          face: "point",
           size: 3
         },
         minorElements: "auto"
       },
       {
-        // Theme 6: grid of circles with subtile points in between
+        // Theme 6: grid of circles with points in between
         major: {
           face: "circle",
-          size: 5
+          size: 8,
+          fillColor: "#c0c0c0"
         },
         minor: {
+          face: "point",
           size: 3
         },
         minorElements: "auto"
-      },
-      {
-        // Theme 7: lines and subtile points in between, also plotted on axes
-        major: {
-          drawZero: true
-        },
-        minor: {
-          size: 3,
-          drawZero: true
-        },
-        minorElements: 4
       }
     ]
     /**#@-*/
@@ -26710,6 +27591,12 @@ jxg_default.Options = {
     highlightStrokeColor: "#000000",
     fixed: true,
     /**
+     * Point labels are positioned by setting {@link Point#anchorX}, {@link Point#anchorY}
+     * and {@link Label#offset}.
+     * For line, circle and curve elements (and their derived objects)
+     * there are two possibilities to position labels.
+     * <p>
+     * The first possibility uses the <a href="https://www.tug.org/metapost.html">MetaPost</a> system:
      * Possible string values for the position of a label for
      * label anchor points are:
      * <ul>
@@ -26724,16 +27611,198 @@ jxg_default.Options = {
      * <li> 'llft'
      * <li> 'lrt'
      * </ul>
-     * This is relevant for non-points: line, circle, curve.
+     * <p>
+     * Since v1.9.0 there is a second possibility:
+     * With <tt>position: 'len side'</tt> the label can be positioned exactly along the
+     * element's path. Here,
+     * <ul>
+     * <li> 'len' is an expression of the form
+     *   <ul>
+     *     <li> xfr, denoting a fraction of the whole. x is expected to be a number between 0 and 1.
+     *     <li> x%, a percentage. x is expected to be a number between 0 and 100.
+     *     <li> x, a number: only possible for line elements and circles. For lines, the label is positioned x
+     *          user units from the starting point. For circles, the number is interpreted as degree, e.g. 45°.
+     *          For everything else, 0 is taken instead.
+     *     <li> xpx, a pixel value: only possible for line elements.
+     *          The label is positioned x pixels from the starting point.
+     *          For non-lines, 0% is taken instead.
+     *   </ul>
+     * <li> 'side' is either 'left' or 'right'. The label is positioned to the left or right of the path, when moving from the
+     * first point to the last. For circles, 'left' means inside of the circle, 'right' means outside of the circle.
+     * The distance of the label from the path can be controlled by {@link Label#distance}.
+     * </ul>
+     * Recommended for this second possibility is to use anchorX: 'middle' and 'anchorY: 'middle'.
      *
-     * The names have been borrowed from <a href="https://www.tug.org/metapost.html">MetaPost</a>.
+     * @example
+     * var l1 = board.create('segment', [[-3, 2], [3, 2]], {
+     *     name: 'l_1',
+     *     withLabel: true,
+     *     point1: { visible: true, name: 'A', withLabel: true },
+     *     point2: { visible: true, name: 'B', withLabel: true },
+     *     label: {
+     *         anchorX: 'middle',
+     *         anchorY: 'middle',
+     *         offset: [0, 0],
+     *         distance: 1.2,
+     *         position: '0.2fr left'
+     *     }
+     * });
+     *
+     * </pre><div id="JXG66395d34-fd7f-42d9-97dc-14ae8882c11f" class="jxgbox" style="width: 300px; height: 300px;"></div>
+     * <script type="text/javascript">
+     *     (function() {
+     *         var board = JXG.JSXGraph.initBoard('JXG66395d34-fd7f-42d9-97dc-14ae8882c11f',
+     *             {boundingbox: [-5, 5, 5, -5], axis: true, showcopyright: false, shownavigation: false});
+     *     var l1 = board.create('segment', [[-3, 2], [3, 2]], {
+     *         name: 'l_1',
+     *         withLabel: true,
+     *         point1: { visible: true, name: 'A', withLabel: true },
+     *         point2: { visible: true, name: 'B', withLabel: true },
+     *         label: {
+     *             anchorX: 'middle',
+     *             anchorY: 'middle',
+     *             offset: [0, 0],
+     *             distance: 1.2,
+     *             position: '0.2fr left'
+     *         }
+     *     });
+     *
+     *     })();
+     *
+     * <\/script><pre>
+     *
+     * @example
+     * var c1 = board.create('circle', [[0, 0], 3], {
+     *     name: 'c_1',
+     *     withLabel: true,
+     *     label: {
+     *         anchorX: 'middle',
+     *         anchorY: 'middle',
+     *         offset: [0, 0],
+     *         fontSize: 32,
+     *         distance: 1.5,
+     *         position: '50% right'
+     *     }
+     * });
+     *
+     * </pre><div id="JXG98ee16ab-fc5f-476c-bf57-0107ac69d91e" class="jxgbox" style="width: 300px; height: 300px;"></div>
+     * <script type="text/javascript">
+     *     (function() {
+     *         var board = JXG.JSXGraph.initBoard('JXG98ee16ab-fc5f-476c-bf57-0107ac69d91e',
+     *             {boundingbox: [-5, 5, 5, -5], axis: true, showcopyright: false, shownavigation: false});
+     *     var c1 = board.create('circle', [[0, 0], 3], {
+     *         name: 'c_1',
+     *         withLabel: true,
+     *         label: {
+     *             anchorX: 'middle',
+     *             anchorY: 'middle',
+     *             offset: [0, 0],
+     *             fontSize: 32,
+     *             distance: 1.5,
+     *             position: '50% right'
+     *         }
+     *     });
+     *
+     *     })();
+     *
+     * <\/script><pre>
+     *
+     * @example
+     * var cu1 = board.create('functiongraph', ['3 * sin(x)', -3, 3], {
+     *     name: 'cu_1',
+     *     withLabel: true,
+     *     label: {
+     *         anchorX: 'middle',
+     *         anchorY: 'middle',
+     *         offset: [0, 0],
+     *         distance: 2,
+     *         position: '0.8fr right'
+     *     }
+     * });
+     *
+     * </pre><div id="JXG65b2edee-12d8-48a1-94b2-d6e79995de8c" class="jxgbox" style="width: 300px; height: 300px;"></div>
+     * <script type="text/javascript">
+     *     (function() {
+     *         var board = JXG.JSXGraph.initBoard('JXG65b2edee-12d8-48a1-94b2-d6e79995de8c',
+     *             {boundingbox: [-5, 5, 5, -5], axis: true, showcopyright: false, shownavigation: false});
+     *     var cu1 = board.create('functiongraph', ['3 * sin(x)', -3, 3], {
+     *         name: 'cu_1',
+     *         withLabel: true,
+     *         label: {
+     *             anchorX: 'middle',
+     *             anchorY: 'middle',
+     *             offset: [0, 0],
+     *             distance: 2,
+     *             position: '0.8fr right'
+     *         }
+     *     });
+     *
+     *     })();
+     *
+     * <\/script><pre>
+     *
+     * @example
+     * var A = board.create('point', [-1, 4]);
+     * var B = board.create('point', [-1, -4]);
+     * var C = board.create('point', [1, 1]);
+     * var cu2 = board.create('ellipse', [A, B, C], {
+     *     name: 'cu_2',
+     *     withLabel: true,
+     *     label: {
+     *         anchorX: 'middle',
+     *         anchorY: 'middle',
+     *         offset: [0, 0],
+     *         fontSize: 20,
+     *         distance: 1.5,
+     *         position: '75% right'
+     *     }
+     * });
+     *
+     * </pre><div id="JXG9c3b2213-1b5a-4cb8-b547-a8d179b851f2" class="jxgbox" style="width: 300px; height: 300px;"></div>
+     * <script type="text/javascript">
+     *     (function() {
+     *         var board = JXG.JSXGraph.initBoard('JXG9c3b2213-1b5a-4cb8-b547-a8d179b851f2',
+     *             {boundingbox: [-5, 5, 5, -5], axis: true, showcopyright: false, shownavigation: false});
+     *     var A = board.create('point', [-1, 4]);
+     *     var B = board.create('point', [-1, -4]);
+     *     var C = board.create('point', [1, 1]);
+     *     var cu2 = board.create('ellipse', [A, B, C], {
+     *         name: 'cu_2',
+     *         withLabel: true,
+     *         label: {
+     *             anchorX: 'middle',
+     *             anchorY: 'middle',
+     *             offset: [0, 0],
+     *             fontSize: 20,
+     *             distance: 1.5,
+     *             position: '75% right'
+     *         }
+     *     });
+     *
+     *     })();
+     *
+     * <\/script><pre>
+     *
      *
      * @name Label#position
-     * @see Label#offset
      * @type String
      * @default 'urt'
+     * @see Label#distance
+     * @see Label#offset
      */
     position: "urt",
+    /**
+     * Distance of the label from a path element, like line, circle, curve.
+     * The true distance is this value multiplied by 0.5 times the size of the bounding box of the label text.
+     * That means, with a value of 1 the label will touch the path element.
+     * @name Label#distance
+     * @type Number
+     * @default 1.5
+     *
+     * @see Label#position
+     *
+     */
+    distance: 1.5,
     /**
      *  Label offset from label anchor.
      *  The label anchor is determined by {@link Label#position}
@@ -27350,6 +28419,33 @@ jxg_default.Options = {
     /**#@+
      * @visprop
      */
+    /**#@-*/
+  },
+  /* special otherintersection point options */
+  otherintersection: {
+    /**#@+
+     * @visprop
+     */
+    /**
+     * This flag sets the behavior of other intersection points of e.g.
+     * a circle and a segment. If true, the intersection is treated as intersection with a line. If false
+     * the intersection point exists if the segment intersects setwise.
+     *
+     * @name Otherintersection.alwaysIntersect
+     * @type Boolean
+     * @default true
+     */
+    alwaysIntersect: true,
+    /**
+     * Minimum distance (in user coordinates) for points to be defined as different.
+     * For implicit curves and other non approximate curves this number might have to be
+     * increased.
+     *
+     * @name Otherintersection.precision
+     * @type Number
+     * @default 0.001
+     */
+    precision: 1e-3
     /**#@-*/
   },
   /* special options for parallel lines */
@@ -28713,7 +29809,7 @@ jxg_default.Options = {
      * @name Tapemeasure#point1
      */
     point1: {
-      visible: "inherit",
+      visible: true,
       strokeColor: "#000000",
       fillColor: "#ffffff",
       fillOpacity: 0,
@@ -28733,7 +29829,7 @@ jxg_default.Options = {
      * @name Tapemeasure#point2
      */
     point2: {
-      visible: "inherit",
+      visible: true,
       strokeColor: "#000000",
       fillColor: "#ffffff",
       fillOpacity: 0,
@@ -28836,11 +29932,11 @@ jxg_default.Options = {
      *
      * @name formatNumber
      * @memberOf Text.prototype
-     * @default true
+     * @default false
      * @type Boolean
      *
      */
-    formatNumber: true,
+    formatNumber: false,
     /**
      * Used to round texts given by a number.
      *
@@ -28866,7 +29962,10 @@ jxg_default.Options = {
      * @type object
      * @default <pre>{
      *    enabled: 'inherit',
-     *    options: {}
+     *    options: {
+     *      minimumFractionDigits: 0,
+     *      maximumFractionDigits: 2
+     *    }
      * }</pre>
      * @see JXG.Board#intl
      *
@@ -28971,7 +30070,10 @@ jxg_default.Options = {
      */
     intl: {
       enabled: "inherit",
-      options: {}
+      options: {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }
     },
     /**
      * If set to true, the text is parsed and evaluated.
@@ -29723,8 +30825,6 @@ jxg_default.Validator = function() {
     return validateInteger(v2) && v2 >= 0;
   }, validatePositiveInteger = function(v2) {
     return validateInteger(v2) && v2 > 0;
-  }, validateScreenCoords = function(v2) {
-    return v2.length >= 2 && validateInteger(v2[0]) && validateInteger(v2[1]);
   }, validateRenderer = function(v2) {
     return v2 === "vml" || v2 === "svg" || v2 === "canvas" || v2 === "no";
   }, validatePositive = function(v2) {
@@ -32349,6 +33449,7 @@ jxg_default.GeometryElement = function(board, attributes, type, oclass) {
   event_default.eventify(this);
   this.mouseover = false;
   this.lastDragTime = new Date();
+  this.view = null;
   if (arguments.length > 0) {
     this.board = board;
     this.type = type;
@@ -32849,30 +33950,34 @@ jxg_default.extend(
     updateVisibility: function(parent_val) {
       var i2, len, s, len_s, obj, val;
       if (this.needsUpdate) {
-        if (parent_val !== void 0) {
-          this.visPropCalc.visible = parent_val;
+        if (type_default.exists(this.view) && type_default.evaluate(this.view.visProp.visible) === false) {
+          this.visPropCalc.visible = false;
         } else {
-          val = type_default.evaluate(this.visProp.visible);
-          if (type_default.exists(this.hiddenByParent) && this.hiddenByParent) {
-            val = false;
-          }
-          if (val !== "inherit") {
-            this.visPropCalc.visible = val;
-          }
-        }
-        len = this.inherits.length;
-        for (s = 0; s < len; s++) {
-          obj = this.inherits[s];
-          if (type_default.isArray(obj)) {
-            len_s = obj.length;
-            for (i2 = 0; i2 < len_s; i2++) {
-              if (type_default.exists(obj[i2]) && type_default.evaluate(obj[i2].visProp.visible) === "inherit") {
-                obj[i2].prepareUpdate().updateVisibility(this.visPropCalc.visible);
-              }
-            }
+          if (parent_val !== void 0) {
+            this.visPropCalc.visible = parent_val;
           } else {
-            if (type_default.exists(obj) && type_default.evaluate(obj.visProp.visible) === "inherit") {
-              obj.prepareUpdate().updateVisibility(this.visPropCalc.visible);
+            val = type_default.evaluate(this.visProp.visible);
+            if (type_default.exists(this.hiddenByParent) && this.hiddenByParent) {
+              val = false;
+            }
+            if (val !== "inherit") {
+              this.visPropCalc.visible = val;
+            }
+          }
+          len = this.inherits.length;
+          for (s = 0; s < len; s++) {
+            obj = this.inherits[s];
+            if (type_default.isArray(obj)) {
+              len_s = obj.length;
+              for (i2 = 0; i2 < len_s; i2++) {
+                if (type_default.exists(obj[i2]) && type_default.evaluate(obj[i2].visProp.visible) === "inherit") {
+                  obj[i2].prepareUpdate().updateVisibility(this.visPropCalc.visible);
+                }
+              }
+            } else {
+              if (type_default.exists(obj) && type_default.evaluate(obj.visProp.visible) === "inherit") {
+                obj.prepareUpdate().updateVisibility(this.visPropCalc.visible);
+              }
             }
           }
         }
@@ -33184,6 +34289,15 @@ jxg_default.extend(
               }
               this.hasLabel = value;
               break;
+            case "straightfirst":
+            case "straightlast":
+              this._set(key, value);
+              for (j in this.childElements) {
+                if (this.childElements.hasOwnProperty(j) && this.childElements[j].elType === "glider") {
+                  this.childElements[j].fullUpdate();
+                }
+              }
+              break;
             default:
               if (type_default.exists(this.visProp[key]) && (!jxg_default.Validator[key] || jxg_default.Validator[key] && jxg_default.Validator[key](value) || jxg_default.Validator[key] && type_default.isFunction(value) && jxg_default.Validator[key](value()))) {
                 value = value.toLowerCase && value.toLowerCase() === "false" ? false : value;
@@ -33426,6 +34540,7 @@ jxg_default.extend(
      * @type String
      * @private
      * @ignore
+     * @deprecated
      * @returns JSON string containing element's properties.
      */
     toJSON: function() {
@@ -34086,6 +35201,8 @@ jxg_default.extend(
      * on mobile browsers.
      * @name JXG.Board#dblclick
      * @param {Event} e The browser's event object.
+     * @see JXG.Board#clickDelay
+     * @see JXG.Board#dblClickSuppressClick
      */
     __evt__dblclick: function(e) {
     },
@@ -35898,7 +37015,7 @@ jxg_default.extend(
                   }
                 } else {
                   t = that2.content[i3];
-                  if (t.at(0) === '"' && t.at(-1) === '"') {
+                  if (t[0] === '"' && t[t.length - 1] === '"') {
                     t = t.slice(1, -1);
                   }
                 }
@@ -36525,14 +37642,17 @@ jxg_default.extend(
      * @return {Number}   Number of overlapping elements
      */
     getNumberOfConflicts: function(x, y, w, h) {
-      var count = 0, i2, obj, le, savePointPrecision;
+      var count = 0, i2, obj, le, savePointPrecision, saveHasInnerPoints;
       savePointPrecision = this.board.options.precision.hasPoint;
       this.board.options.precision.hasPoint = (w + h) * 0.25;
       for (i2 = 0, le = this.board.objectsList.length; i2 < le; i2++) {
         obj = this.board.objectsList[i2];
+        saveHasInnerPoints = obj.visProp.hasinnerpoints;
+        obj.visProp.hasinnerpoints = false;
         if (obj.visPropCalc.visible && obj.elType !== "axis" && obj.elType !== "ticks" && obj !== this.board.infobox && obj !== this && obj.hasPoint(x, y)) {
           count++;
         }
+        obj.visProp.hasinnerpoints = saveHasInnerPoints;
       }
       this.board.options.precision.hasPoint = savePointPrecision;
       return count;
@@ -36773,9 +37893,9 @@ jxg_default.extend(
      * @param {Array} args
      * @returns {Object}
      */
-    pushScope: function(args2) {
+    pushScope: function(args) {
       var scope2 = {
-        args: args2,
+        args,
         locals: {},
         context: null,
         previous: this.scope
@@ -37404,11 +38524,11 @@ jxg_default.extend(
       v = node2.value;
       if (node2.type === "node_var" && varnames.indexOf(v) < 0) {
         e = this.getvar(v);
-        if (e && e.visProp && e.type && e.elementClass && e.id && e.type === constants_default.OBJECT_TYPE_SLIDER) {
+        if (e && e.visProp && e.elType && e.elementClass && e.id && e.elType === "slider") {
           result[e.id] = e;
         }
       }
-      if (node2.type === "node_op" && node2.value === "op_execfun" && node2.children.length > 1 && node2.children[0].value === "$" && node2.children[1].length > 0) {
+      if (node2.type === "node_op" && node2.value === "op_execfun" && node2.children.length > 1 && (node2.children[0].value === "$" || node2.children[0].value === "$value") && node2.children[1].length > 0) {
         e = node2.children[1][0].value;
         result[e] = this.board.objects[e];
       }
@@ -39110,7 +40230,7 @@ var parser = function() {
      */
     parse: function parse(input) {
       var self2 = this, stack = [0], tstack = [], vstack = [null], lstack = [], table = this.table, yytext = "", yylineno = 0, yyleng = 0, recovering = 0, TERROR = 2, EOF = 1;
-      var args2 = lstack.slice.call(arguments, 1);
+      var args = lstack.slice.call(arguments, 1);
       var lexer2 = Object.create(this.lexer);
       var sharedState = { yy: {} };
       for (var k in this.yy) {
@@ -39224,7 +40344,7 @@ var parser = function() {
               action[1],
               vstack,
               lstack
-            ].concat(args2));
+            ].concat(args));
             if (typeof r !== "undefined") {
               return r;
             }
@@ -40014,6 +41134,7 @@ jxg_default.Board = function(container, renderer, id, origin, zoomX, zoomY, unit
   this.touchMoveLastId = Infinity;
   this.positionAccessLast = 0;
   this.downObjects = [];
+  this.clickObjects = {};
   this.focusObjects = [];
   if (this.attr.showcopyright) {
     this.renderer.displayCopyright(constants_default.licenseText, parseInt(this.options.text.fontSize, 10));
@@ -40034,6 +41155,7 @@ jxg_default.Board = function(container, renderer, id, origin, zoomX, zoomY, unit
   this.hasMouseUp = false;
   this.hasTouchEnd = false;
   this.hasPointerUp = false;
+  this.resizeHandlers = [];
   this._drag_offset = [0, 0];
   this._inputDevice = "mouse";
   this._board_touches = [];
@@ -40225,7 +41347,7 @@ jxg_default.extend(
           "z"
         ];
       }
-      if (!type_default.isPoint(object) && object.elementClass !== constants_default.OBJECT_CLASS_LINE && object.type !== constants_default.OBJECT_TYPE_ANGLE) {
+      if (!type_default.isPoint(object) && !type_default.isPoint3D(object) && object.elementClass !== constants_default.OBJECT_CLASS_LINE && object.type !== constants_default.OBJECT_TYPE_ANGLE) {
         if (object.type === constants_default.OBJECT_TYPE_POLYGON) {
           pre = "P_{";
         } else if (object.elementClass === constants_default.OBJECT_CLASS_CIRCLE) {
@@ -41018,7 +42140,7 @@ jxg_default.extend(
      * @return {Boolean}   returns if the origin is moved.
      */
     touchStartMoveOriginOneFinger: function(evt) {
-      var touches = evt[jxg_default.touchProperty], conditions, pos;
+      var touches = evt["touches"], conditions, pos;
       conditions = this.attr.pan.enabled && !this.attr.pan.needtwofingers && touches.length === 1;
       if (conditions) {
         pos = this.getMousePosition(evt, 0);
@@ -41055,8 +42177,21 @@ jxg_default.extend(
      *
      **********************************************************/
     /**
+     * Suppresses the default event handling.
+     * Used for context menu.
+     *
+     * @param {Event} e
+     * @returns {Boolean} false
+     */
+    suppressDefault: function(e) {
+      if (type_default.exists(e)) {
+        e.preventDefault();
+      }
+      return false;
+    },
+    /**
      * Add all possible event handlers to the board object
-     * which move objects, i.e. mouse, pointer and touch events.
+     * that move objects, i.e. mouse, pointer and touch events.
      */
     addEventHandlers: function() {
       if (env_default.supportsPointerEvents()) {
@@ -41066,46 +42201,80 @@ jxg_default.extend(
         this.addTouchEventHandlers();
       }
       if (this.containerObj !== null) {
-        this.containerObj.oncontextmenu = function(e) {
-          if (type_default.exists(e)) {
-            e.preventDefault();
-          }
-          return false;
-        };
-      }
-    },
-    /**
-     * Add resize event handlers
-     *
-     */
-    addResizeEventHandlers: function() {
-      if (env_default.isBrowser) {
-        try {
-          this.startResizeObserver();
-        } catch (err) {
-          env_default.addEvent(window, "resize", this.resizeListener, this);
-          this.startIntersectionObserver();
-        }
-        env_default.addEvent(window, "scroll", this.scrollListener, this);
+        env_default.addEvent(this.containerObj, "contextmenu", this.suppressDefault, this);
       }
     },
     /**
      * Remove all event handlers from the board object
      */
     removeEventHandlers: function() {
+      if ((this.hasPointerHandlers || this.hasMouseHandlers || this.hasTouchHandlers) && this.containerObj !== null) {
+        env_default.removeEvent(this.containerObj, "contextmenu", this.suppressDefault, this);
+      }
       this.removeMouseEventHandlers();
       this.removeTouchEventHandlers();
       this.removePointerEventHandlers();
       this.removeFullscreenEventHandlers();
       this.removeKeyboardEventHandlers();
+      this.removeResizeEventHandlers();
+    },
+    /**
+     * Add resize related event handlers
+     *
+     */
+    addResizeEventHandlers: function() {
+      this.resizeHandlers = [];
       if (env_default.isBrowser) {
-        if (type_default.exists(this.resizeObserver)) {
-          this.stopResizeObserver();
-        } else {
-          env_default.removeEvent(window, "resize", this.resizeListener, this);
-          this.stopIntersectionObserver();
+        try {
+          this.startResizeObserver();
+          this.resizeHandlers.push("resizeobserver");
+        } catch (err) {
+          env_default.addEvent(window, "resize", this.resizeListener, this);
+          this.startIntersectionObserver();
+          this.resizeHandlers.push("resize");
         }
-        env_default.removeEvent(window, "scroll", this.scrollListener, this);
+        env_default.addEvent(window, "scroll", this.scrollListener, this);
+        this.resizeHandlers.push("scroll");
+        try {
+          window.matchMedia("print").addEventListener("change", this.printListenerMatch.bind(this));
+          window.matchMedia("screen").addEventListener("change", this.printListenerMatch.bind(this));
+          this.resizeHandlers.push("print");
+        } catch (err) {
+          jxg_default.debug("Error adding printListener", err);
+        }
+      }
+    },
+    /**
+     * Remove resize related event handlers
+     *
+     */
+    removeResizeEventHandlers: function() {
+      var i2, e;
+      if (this.resizeHandlers.length > 0 && env_default.isBrowser) {
+        for (i2 = 0; i2 < this.resizeHandlers.length; i2++) {
+          e = this.resizeHandlers[i2];
+          switch (e) {
+            case "resizeobserver":
+              if (type_default.exists(this.resizeObserver)) {
+                this.stopResizeObserver();
+              }
+              break;
+            case "resize":
+              env_default.removeEvent(window, "resize", this.resizeListener, this);
+              if (type_default.exists(this.intersectionObserver)) {
+                this.stopIntersectionObserver();
+              }
+              break;
+            case "scroll":
+              env_default.removeEvent(window, "scroll", this.scrollListener, this);
+              break;
+            case "print":
+              window.matchMedia("print").removeEventListener("change", this.printListenerMatch.bind(this), false);
+              window.matchMedia("screen").removeEventListener("change", this.printListenerMatch.bind(this), false);
+              break;
+          }
+        }
+        this.resizeHandlers = [];
       }
     },
     /**
@@ -41349,7 +42518,7 @@ jxg_default.extend(
      * @returns {Boolean}
      */
     gestureChangeListener: function(evt) {
-      var c, dir1 = [], dir2 = [], angle, mi = 10, isPinch = false, zx = this.attr.zoom.factorx, zy = this.attr.zoom.factory, factor, dist, theta, bound, doZoom = false, dx, dy, cx, cy;
+      var c, dir1 = [], dir2 = [], angle, mi = 10, isPinch = false, zx = this.attr.zoom.factorx, zy = this.attr.zoom.factory, factor, dist, theta, bound, zoomCenter, doZoom = false, dx, dy, cx, cy;
       if (this.mode !== this.BOARD_MODE_ZOOM) {
         return true;
       }
@@ -41397,6 +42566,7 @@ jxg_default.extend(
         this.moveOrigin(c.scrCoords[1], c.scrCoords[2], true);
       } else if (this.attr.zoom.enabled && Math.abs(factor - 1) < 0.5) {
         doZoom = false;
+        zoomCenter = this.attr.zoom.center;
         if (this.attr.zoom.pinchhorizontal || this.attr.zoom.pinchvertical) {
           dx = Math.abs(evt.touches[0].clientX - evt.touches[1].clientX);
           dy = Math.abs(evt.touches[0].clientY - evt.touches[1].clientY);
@@ -41423,7 +42593,11 @@ jxg_default.extend(
           doZoom = true;
         }
         if (doZoom) {
-          this.zoomIn(cx, cy);
+          if (zoomCenter === "board") {
+            this.zoomIn();
+          } else {
+            this.zoomIn(cx, cy);
+          }
           this.attr.zoom.factorx = zx;
           this.attr.zoom.factory = zy;
         }
@@ -41716,83 +42890,101 @@ jxg_default.extend(
       return true;
     },
     /**
-     * Handle entries of this.downObjects to control click and dblclick events.
-     * @param {Number} i
+     * Internal handling of click events for pointers and mouse.
+     *
+     * @param {Event} evt The browsers event object.
+     * @param {Array} evtArray list of event names
      * @private
      */
-    _waitForDblClick: function(i2) {
-      var eh = this.downObjects[i2].eventHandlers;
-      if (type_default.exists(eh.dblclick) && eh.dblclick.length > 0 || type_default.exists(eh.mousedblclick) && eh.mousedblclick.length > 0) {
-        eh.clicks += 1;
-        if (eh.clicks !== 2) {
-          this.downObjects.splice(i2, 1);
-          setTimeout(function() {
-            eh.clicks = 0;
-          }, 400);
-        }
-      } else {
-        this.downObjects.splice(i2, 1);
+    _handleClicks: function(evt, evtArray) {
+      var that2 = this, el, delay, suppress;
+      if (this.selectingMode) {
+        evt.stopPropagation();
+        return;
       }
+      delay = type_default.evaluate(this.attr.clickdelay);
+      suppress = type_default.evaluate(this.attr.dblclicksuppressclick);
+      if (suppress) {
+        this._preventSingleClick = false;
+        this._singleClickTimer = setTimeout(function() {
+          if (!that2._preventSingleClick) {
+            that2.triggerEventHandlers(evtArray, [evt]);
+            for (el in that2.clickObjects) {
+              if (that2.clickObjects.hasOwnProperty(el)) {
+                that2.clickObjects[el].triggerEventHandlers(evtArray, [evt]);
+                delete that2.clickObjects[el];
+              }
+            }
+          }
+        }, delay);
+      } else {
+        that2.triggerEventHandlers(evtArray, [evt]);
+        for (el in that2.clickObjects) {
+          if (that2.clickObjects.hasOwnProperty(el)) {
+            that2.clickObjects[el].triggerEventHandlers(evtArray, [evt]);
+          }
+        }
+        setTimeout(function() {
+          for (el in that2.clickObjects) {
+            if (that2.clickObjects.hasOwnProperty(el)) {
+              delete that2.clickObjects[el];
+            }
+          }
+        }, delay);
+      }
+      evt.stopPropagation();
+    },
+    /**
+     * Internal handling of dblclick events for pointers and mouse.
+     *
+     * @param {Event} evt The browsers event object.
+     * @param {Array} evtArray list of event names
+     * @private
+     */
+    _handleDblClicks: function(evt, evtArray) {
+      var el;
+      if (this.selectingMode) {
+        evt.stopPropagation();
+        return;
+      }
+      this._preventSingleClick = true;
+      clearTimeout(this._singleClickTimer);
+      this.triggerEventHandlers(evtArray, [evt]);
+      for (el in this.clickObjects) {
+        if (this.clickObjects.hasOwnProperty(el)) {
+          this.clickObjects[el].triggerEventHandlers(evtArray, [evt]);
+          delete this.clickObjects[el];
+        }
+      }
+      evt.stopPropagation();
     },
     /**
      * This method is called by the browser when a pointer device clicks on the screen.
      * @param {Event} evt The browsers event object.
      */
     pointerClickListener: function(evt) {
-      var i2;
-      this.triggerEventHandlers(["click", "pointerclick"], [evt]);
-      if (!this.selectingMode) {
-        for (i2 = this.downObjects.length - 1; i2 > -1; i2--) {
-          this.downObjects[i2].triggerEventHandlers(["click", "pointerclick"], [evt]);
-          this._waitForDblClick(i2);
-        }
-      }
-      evt.stopPropagation();
-    },
-    /**
-     * This method is called by the browser when the mouse device clicks on the screen.
-     * @param {Event} evt The browsers event object.
-     */
-    mouseClickListener: function(evt) {
-      var i2;
-      this.triggerEventHandlers(["click", "mouseclick"], [evt]);
-      if (!this.selectingMode) {
-        for (i2 = this.downObjects.length - 1; i2 > -1; i2--) {
-          this.downObjects[i2].triggerEventHandlers(["click", "mouseclick"], [evt]);
-          this._waitForDblClick(i2);
-        }
-      }
+      this._handleClicks(evt, ["click", "pointerclick"]);
     },
     /**
      * This method is called by the browser when a pointer device double clicks on the screen.
      * @param {Event} evt The browsers event object.
      */
     pointerDblClickListener: function(evt) {
-      var i2;
-      this.triggerEventHandlers(["dblclick", "pointerdblclick"], [evt]);
-      if (!this.selectingMode) {
-        for (i2 = this.downObjects.length - 1; i2 > -1; i2--) {
-          this.downObjects[i2].triggerEventHandlers(["dblclick", "pointerdblclick"], [evt]);
-          this.downObjects[i2].eventHandlers.clicks = 0;
-          this.downObjects.splice(i2, 1);
-        }
-      }
-      evt.stopPropagation();
+      this._handleDblClicks(evt, ["dblclick", "pointerdblclick"]);
+    },
+    /**
+     * This method is called by the browser when the mouse device clicks on the screen.
+     * @param {Event} evt The browsers event object.
+     */
+    mouseClickListener: function(evt) {
+      this._handleClicks(evt, ["click", "mouseclick"]);
     },
     /**
      * This method is called by the browser when the mouse device double clicks on the screen.
      * @param {Event} evt The browsers event object.
      */
     mouseDblClickListener: function(evt) {
-      var i2;
-      this.triggerEventHandlers(["dblclick", "mousedblclick"], [evt]);
-      if (!this.selectingMode) {
-        for (i2 = this.downObjects.length - 1; i2 > -1; i2--) {
-          this.downObjects[i2].triggerEventHandlers(["dblclick", "mousedblclick"], [evt]);
-          this.downObjects[i2].eventHandlers.clicks = 0;
-          this.downObjects.splice(i2, 1);
-        }
-      }
+      this._handleDblClicks(evt, ["dblclick", "mousedblclick"]);
     },
     // /**
     //  * Called if pointer leaves an HTML tag. It is called by the inner-most tag.
@@ -41930,9 +43122,10 @@ jxg_default.extend(
               updateNeeded = true;
             }
             eh = this.downObjects[i2].eventHandlers;
-            if (!(type_default.exists(eh.click) && eh.click.length > 0) && !(type_default.exists(eh.pointerclick) && eh.pointerclick.length > 0) && !(type_default.exists(eh.dblclick) && eh.dblclick.length > 0) && !(type_default.exists(eh.pointerdblclick) && eh.pointerdblclick.length > 0)) {
-              this.downObjects.splice(i2, 1);
+            if (type_default.exists(eh.click) && eh.click.length > 0 || type_default.exists(eh.pointerclick) && eh.pointerclick.length > 0 || type_default.exists(eh.dblclick) && eh.dblclick.length > 0 || type_default.exists(eh.pointerdblclick) && eh.pointerdblclick.length > 0) {
+              this.clickObjects[this.downObjects[i2].id] = this.downObjects[i2];
             }
+            this.downObjects.splice(i2, 1);
           }
         }
       }
@@ -41983,7 +43176,7 @@ jxg_default.extend(
      * @returns {Boolean} ...
      */
     touchStartListener: function(evt) {
-      var i2, pos, elements2, j, k, eps = this.options.precision.touch, obj, found, targets, evtTouches = evt[jxg_default.touchProperty], target, touchTargets;
+      var i2, pos, elements2, j, k, eps = this.options.precision.touch, obj, found, targets, evtTouches = evt["touches"], target, touchTargets;
       if (!this.hasTouchEnd) {
         env_default.addEvent(this.document, "touchend", this.touchEndListener, this);
         this.hasTouchEnd = true;
@@ -42104,7 +43297,7 @@ jxg_default.extend(
      * @returns {Boolean}
      */
     touchMoveListener: function(evt) {
-      var i2, pos1, pos2, touchTargets, evtTouches = evt[jxg_default.touchProperty];
+      var i2, pos1, pos2, touchTargets, evtTouches = evt["touches"];
       if (!this.checkFrameRate(evt)) {
         return false;
       }
@@ -42198,7 +43391,7 @@ jxg_default.extend(
      * @returns {Boolean}
      */
     touchEndListener: function(evt) {
-      var i2, j, k, eps = this.options.precision.touch, tmpTouches = [], found, foundNumber, evtTouches = evt && evt[jxg_default.touchProperty], touchTargets, updateNeeded = false;
+      var i2, j, k, eps = this.options.precision.touch, tmpTouches = [], found, foundNumber, evtTouches = evt && evt["touches"], touchTargets, updateNeeded = false;
       this.triggerEventHandlers(["touchend", "up"], [evt]);
       this.displayInfobox(false);
       if (this.selectingMode) {
@@ -42430,15 +43623,22 @@ jxg_default.extend(
      * @returns {Boolean}
      */
     mouseWheelListener: function(evt) {
+      var wd, zoomCenter, pos;
       if (!this.attr.zoom.enabled || !this.attr.zoom.wheel || !this._isRequiredKeyPressed(evt, "zoom")) {
         return true;
       }
       evt = evt || window.event;
-      var wd = evt.detail ? -evt.detail : evt.wheelDelta / 40, pos = new coords_default(constants_default.COORDS_BY_SCREEN, this.getMousePosition(evt), this);
-      if (wd > 0) {
-        this.zoomIn(pos.usrCoords[1], pos.usrCoords[2]);
+      wd = evt.detail ? -evt.detail : evt.wheelDelta / 40;
+      zoomCenter = this.attr.zoom.center;
+      if (zoomCenter === "board") {
+        pos = [];
       } else {
-        this.zoomOut(pos.usrCoords[1], pos.usrCoords[2]);
+        pos = new coords_default(constants_default.COORDS_BY_SCREEN, this.getMousePosition(evt), this).usrCoords;
+      }
+      if (wd > 0) {
+        this.zoomIn(pos[1], pos[2]);
+      } else {
+        this.zoomOut(pos[1], pos[2]);
       }
       this.triggerEventHandlers(["mousewheel"], [evt]);
       evt.preventDefault();
@@ -42609,10 +43809,13 @@ jxg_default.extend(
     },
     /**
      * Update the width and height of the JSXGraph container div element.
-     * Read actual values with getBoundingClientRect(),
+     * If width and height are not supplied, read actual values with offsetWidth/Height,
      * and call board.resizeContainer() with this values.
      * <p>
      * If necessary, also call setBoundingBox().
+     * @param {Number} [width=this.containerObj.offsetWidth] Width of the container element
+     * @param {Number} [height=this.containerObj.offsetHeight] Height of the container element
+     * @returns
      *
      * @see JXG.Board#startResizeObserver
      * @see JXG.Board#resizeListener
@@ -42620,12 +43823,13 @@ jxg_default.extend(
      * @see JXG.Board#setBoundingBox
      *
      */
-    updateContainerDims: function() {
-      var w, h, bb, css, width_adjustment, height_adjustment;
-      bb = this.containerObj.getBoundingClientRect();
-      w = bb.width;
-      h = bb.height;
-      if (window && window.getComputedStyle) {
+    updateContainerDims: function(width, height) {
+      var w = width, h = height, css, width_adjustment, height_adjustment;
+      if (width === void 0) {
+        w = this.containerObj.offsetWidth;
+        h = this.containerObj.offsetHeight;
+      }
+      if (width === void 0 && window && window.getComputedStyle) {
         css = window.getComputedStyle(this.containerObj, null);
         width_adjustment = parseFloat(css.getPropertyValue("border-left-width")) + parseFloat(css.getPropertyValue("border-right-width"));
         if (!isNaN(width_adjustment)) {
@@ -42672,11 +43876,13 @@ jxg_default.extend(
         return;
       }
       this.resizeObserver = new ResizeObserver(function(entries) {
+        var bb;
         if (!that2._isResizing) {
           that2._isResizing = true;
+          bb = entries[0].contentRect;
           window.setTimeout(function() {
             try {
-              that2.updateContainerDims();
+              that2.updateContainerDims(bb.width, bb.height);
             } catch (err) {
               that2.stopResizeObserver();
             } finally {
@@ -42777,6 +43983,22 @@ jxg_default.extend(
     stopIntersectionObserver: function() {
       if (type_default.exists(this.intersectionObserver)) {
         this.intersectionObserver.unobserve(this.containerObj);
+      }
+    },
+    /**
+     * Update the container before and after printing.
+     * @param {Event} [evt]
+     */
+    printListener: function(evt) {
+      this.updateContainerDims();
+    },
+    /**
+     * Wrapper for printListener to be used in mediaQuery matches.
+     * @param {MediaQueryList} mql
+     */
+    printListenerMatch: function(mql) {
+      if (mql.matches) {
+        this.printListener();
       }
     },
     /**********************************************************
@@ -43603,8 +44825,8 @@ jxg_default.extend(
       if (!dontSetBoundingBox) {
         box = this.getBoundingBox();
       }
-      this.canvasWidth = Math.max(parseFloat(canvasWidth), math_default.eps);
-      this.canvasHeight = Math.max(parseFloat(canvasHeight), math_default.eps);
+      this.canvasWidth = parseFloat(canvasWidth);
+      this.canvasHeight = parseFloat(canvasHeight);
       if (!dontset) {
         this.containerObj.style.width = this.canvasWidth + "px";
         this.containerObj.style.height = this.canvasHeight + "px";
@@ -43613,8 +44835,8 @@ jxg_default.extend(
       if (!dontSetBoundingBox) {
         this.setBoundingBox(box, this.keepaspectratio, "keep");
       } else {
-        oX = (this.canvasWidth - oldWidth) / 2;
-        oY = (this.canvasHeight - oldHeight) / 2;
+        oX = (this.canvasWidth - oldWidth) * 0.5;
+        oY = (this.canvasHeight - oldHeight) * 0.5;
         this.moveOrigin(
           this.origin.scrCoords[1] + oX,
           this.origin.scrCoords[2] + oY
@@ -44015,7 +45237,14 @@ jxg_default.extend(
       w = this.canvasWidth;
       h = this.canvasHeight;
       if (keepaspectratio) {
-        ratio = ux / uy;
+        if (this.keepaspectratio) {
+          ratio = ux / uy;
+          if (isNaN(ratio)) {
+            ratio = 1;
+          }
+        } else {
+          ratio = 1;
+        }
         if (setZoom === "keep") {
           zoom_ratio = this.zoomX / this.zoomY;
         }
@@ -44232,6 +45461,9 @@ jxg_default.extend(
         }
         value = value.toLowerCase && value.toLowerCase() === "false" ? false : value;
         oldvalue = this.attr[key];
+        if (oldvalue === value) {
+          continue;
+        }
         switch (key) {
           case "axis":
             if (value === false) {
@@ -44264,9 +45496,7 @@ jxg_default.extend(
             break;
           case "keepaspectratio":
             this._set(key, value);
-            oldvalue = this.getBoundingBox();
-            this.setBoundingBox([0, this.canvasHeight, this.canvasWidth, 0], false, "keep");
-            this.setBoundingBox(oldvalue, value, "keep");
+            this.setBoundingBox(this.getBoundingBox(), value, "keep");
             break;
           case "document":
           case "maxboundingbox":
@@ -44940,6 +46170,7 @@ jxg_default.extend(
      * @event
      * @description Whenever the user clicks on the board.
      * @name JXG.Board#click
+     * @see JXG.Board#clickDelay
      * @param {Event} e The browser's event object.
      */
     __evt__click: function(e) {
@@ -44950,6 +46181,8 @@ jxg_default.extend(
      * This event works on desktop browser, but is undefined
      * on mobile browsers.
      * @name JXG.Board#dblclick
+     * @see JXG.Board#clickDelay
+     * @see JXG.Board#dblClickSuppressClick
      * @param {Event} e The browser's event object.
      */
     __evt__dblclick: function(e) {
@@ -44966,6 +46199,7 @@ jxg_default.extend(
      * @event
      * @description Whenever the user double clicks on the board with a mouse device.
      * @name JXG.Board#mousedblclick
+     * @see JXG.Board#clickDelay
      * @param {Event} e The browser's event object.
      */
     __evt__mousedblclick: function(e) {
@@ -44984,6 +46218,7 @@ jxg_default.extend(
      * This event works on desktop browser, but is undefined
      * on mobile browsers.
      * @name JXG.Board#pointerdblclick
+     * @see JXG.Board#clickDelay
      * @param {Event} e The browser's event object.
      */
     __evt__pointerdblclick: function(e) {
@@ -46209,8 +47444,12 @@ jxg_default.extend(
           el.rendNodeTriangleStart = node2;
           el.rendNode.setAttributeNS(null, "marker-start", this.toURL(str2));
         }
-      } else if (type_default.exists(node2)) {
-        this.remove(node2);
+      } else {
+        if (type_default.exists(node2)) {
+          this.remove(node2);
+          el.rendNodeTriangleStart = null;
+        }
+        el.rendNode.setAttributeNS(null, "marker-start", null);
       }
       node2 = el.rendNodeTriangleEnd;
       if (ev_la) {
@@ -46224,8 +47463,12 @@ jxg_default.extend(
           el.rendNodeTriangleEnd = node2;
           el.rendNode.setAttributeNS(null, "marker-end", this.toURL(str2));
         }
-      } else if (type_default.exists(node2)) {
-        this.remove(node2);
+      } else {
+        if (type_default.exists(node2)) {
+          this.remove(node2);
+          el.rendNodeTriangleEnd = null;
+        }
+        el.rendNode.setAttributeNS(null, "marker-end", null);
       }
     },
     // Already documented in JXG.AbstractRenderer
@@ -46943,24 +48186,24 @@ jxg_default.extend(
           if (node2.id !== void 0 && node2.value !== void 0) {
             values.push([node2.id, node2.value]);
           }
-          values = values.concat(this._getValuesOfDOMElements(node2));
+          type_default.concat(values, this._getValuesOfDOMElements(node2));
           node2 = node2.nextSibling;
         }
       }
       return values;
     },
-    _getDataUri: function(url, callback) {
-      var image = new Image();
-      image.onload = function() {
-        var canvas = document.createElement("canvas");
-        canvas.width = this.naturalWidth;
-        canvas.height = this.naturalHeight;
-        canvas.getContext("2d").drawImage(this, 0, 0);
-        callback(canvas.toDataURL("image/png"));
-        canvas.remove();
-      };
-      image.src = url;
-    },
+    // _getDataUri: function (url, callback) {
+    //     var image = new Image();
+    //     image.onload = function () {
+    //         var canvas = document.createElement("canvas");
+    //         canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
+    //         canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
+    //         canvas.getContext("2d").drawImage(this, 0, 0);
+    //         callback(canvas.toDataURL("image/png"));
+    //         canvas.remove();
+    //     };
+    //     image.src = url;
+    // },
     _getImgDataURL: function(svgRoot) {
       var images, len, canvas, ctx, ur, i2;
       images = svgRoot.getElementsByTagName("image");
@@ -47034,7 +48277,7 @@ jxg_default.extend(
         if (!ignoreTexts) {
           this.foreignObjLayer.setAttribute("display", "inline");
           while (svgRoot.nextSibling) {
-            values = values.concat(this._getValuesOfDOMElements(svgRoot.nextSibling));
+            type_default.concat(values, this._getValuesOfDOMElements(svgRoot.nextSibling));
             this.foreignObjLayer.appendChild(svgRoot.nextSibling);
           }
         }
@@ -48238,7 +49481,7 @@ jxg_default.CanvasRenderer = function(container, dim) {
       this.canvasRoot = jxg_default.createCanvas(500, 500);
       this.context = this.canvasRoot.getContext("2d");
     } catch (err) {
-      throw new Error('JXG.createCanvas not available.\nInstall the npm package `canvas`\nand call:\n    import { createCanvas } from "canvas";\n    JXG.createCanvas = createCanvas;\n');
+      throw new Error('JXG.createCanvas not available.\nInstall the npm package `canvas`\nand call:\n    import { createCanvas } from "canvas.js";\n    JXG.createCanvas = createCanvas;\n');
     }
   }
 };
@@ -50284,10 +51527,8 @@ jxg_default.JSXGraph = {
       if (bbox[3] < attr.maxboundingbox[3]) {
         bbox[3] = attr.maxboundingbox[3];
       }
-      dimensions.width = "1";
-      dimensions.height = "1";
-      w = Math.max(parseInt(dimensions.width, 10), math_default.eps);
-      h = Math.max(parseInt(dimensions.height, 10), math_default.eps);
+      w = parseInt(dimensions.width, 10);
+      h = parseInt(dimensions.height, 10);
       if (type_default.exists(bbox) && attr.keepaspectratio) {
         unitX = w / (bbox[2] - bbox[0]);
         unitY = h / (bbox[1] - bbox[3]);
@@ -51004,40 +52245,59 @@ jxg_default.createIntersectionPoint = function(board, parents, attributes) {
   return el;
 };
 jxg_default.createOtherIntersectionPoint = function(board, parents, attributes) {
-  var el, el1, el2, other;
-  if (parents.length !== 3 || !type_default.isPoint(parents[2]) || parents[0].elementClass !== constants_default.OBJECT_CLASS_LINE && parents[0].elementClass !== constants_default.OBJECT_CLASS_CIRCLE || parents[1].elementClass !== constants_default.OBJECT_CLASS_LINE && parents[1].elementClass !== constants_default.OBJECT_CLASS_CIRCLE) {
+  var el, el1, el2, i2, others, func, input, isGood = true, attr = type_default.copyAttributes(attributes, board.options, "otherintersection");
+  if (parents.length !== 3) {
+    isGood = false;
+  } else {
+    el1 = board.select(parents[0]);
+    el2 = board.select(parents[1]);
+    if (type_default.isArray(parents[2])) {
+      others = parents[2];
+    } else {
+      others = [parents[2]];
+    }
+    for (i2 = 0; i2 < others.length; i2++) {
+      others[i2] = board.select(others[i2]);
+      if (!type_default.isPoint(others[i2])) {
+        isGood = false;
+        break;
+      }
+    }
+    if (isGood) {
+      input = [el1, el2];
+      input.sort(function(a, b) {
+        return b.elementClass - a.elementClass;
+      });
+      if ([constants_default.OBJECT_CLASS_CIRCLE, constants_default.OBJECT_CLASS_CURVE].indexOf(input[0].elementClass) < 0) {
+        isGood = false;
+      } else if ([constants_default.OBJECT_CLASS_CIRCLE, constants_default.OBJECT_CLASS_CURVE, constants_default.OBJECT_CLASS_LINE].indexOf(input[1].elementClass) < 0) {
+        isGood = false;
+      }
+    }
+  }
+  if (!isGood) {
     throw new Error(
-      "JSXGraph: Can't create 'other intersection point' with parent types '" + typeof parents[0] + "',  '" + typeof parents[1] + "'and  '" + typeof parents[2] + "'.\nPossible parent types: [circle|line,circle|line,point]"
+      "JSXGraph: Can't create 'other intersection point' with parent types '" + typeof parents[0] + "',  '" + typeof parents[1] + "'and  '" + typeof parents[2] + "'.\nPossible parent types: [circle|curve|line,circle|curve|line, point], not two lines"
     );
   }
-  el1 = board.select(parents[0]);
-  el2 = board.select(parents[1]);
-  other = board.select(parents[2]);
-  el = board.create(
-    "point",
-    [
-      function() {
-        var c = geometry_default.meet(el1.stdform, el2.stdform, 0, el1.board);
-        if (Math.abs(other.X() - c.usrCoords[1]) > math_default.eps || Math.abs(other.Y() - c.usrCoords[2]) > math_default.eps || Math.abs(other.Z() - c.usrCoords[0]) > math_default.eps) {
-          return c;
-        }
-        return geometry_default.meet(el1.stdform, el2.stdform, 1, el1.board);
-      }
-    ],
-    attributes
-  );
+  el = board.create("point", [0, 0, 0], attr);
+  func = geometry_default.otherIntersectionFunction(input, others, el.visProp.alwaysintersect, el.visProp.precision);
+  el.addConstraint([func]);
   el.type = constants_default.OBJECT_TYPE_INTERSECTION;
   el.elType = "otherintersection";
-  el.setParents([el1.id, el2.id, other]);
+  el.setParents([el1.id, el2.id]);
+  el.addParents(others);
   el1.addChild(el);
   el2.addChild(el);
-  el.generatePolynomial = function() {
-    var poly1 = el1.generatePolynomial(el), poly2 = el2.generatePolynomial(el);
-    if (poly1.length === 0 || poly2.length === 0) {
-      return [];
-    }
-    return [poly1[0], poly2[0]];
-  };
+  if (el1.elementClass === constants_default.OBJECT_CLASS_CIRCLE) {
+    el.generatePolynomial = function() {
+      var poly1 = el1.generatePolynomial(el), poly2 = el2.generatePolynomial(el);
+      if (poly1.length === 0 || poly2.length === 0) {
+        return [];
+      }
+      return [poly1[0], poly2[0]];
+    };
+  }
   return el;
 };
 jxg_default.createPolePoint = function(board, parents, attributes) {
@@ -51249,7 +52509,7 @@ jxg_default.extend(
         return this;
       }
       d = this.point1.Dist(this.point2);
-      d_new = Math.abs(this.fixedLength());
+      d_new = type_default.evaluate(this.visProp.nonnegativeonly) ? Math.max(0, this.fixedLength()) : Math.abs(this.fixedLength());
       d1 = this.fixedLengthOldCoords[0].distance(
         constants_default.COORDS_BY_USER,
         this.point1.coords
@@ -51508,7 +52768,7 @@ jxg_default.extend(
     },
     // documented in geometry element
     getLabelAnchor: function() {
-      var x, y, fs = 0, c1 = new coords_default(constants_default.COORDS_BY_USER, this.point1.coords.usrCoords, this.board), c2 = new coords_default(constants_default.COORDS_BY_USER, this.point2.coords.usrCoords, this.board), ev_sf = type_default.evaluate(this.visProp.straightfirst), ev_sl = type_default.evaluate(this.visProp.straightlast);
+      var x, y, pos, xy, lbda, dx, dy, d, dist = 1.5, fs = 0, c1 = new coords_default(constants_default.COORDS_BY_USER, this.point1.coords.usrCoords, this.board), c2 = new coords_default(constants_default.COORDS_BY_USER, this.point2.coords.usrCoords, this.board), ev_sf = type_default.evaluate(this.visProp.straightfirst), ev_sl = type_default.evaluate(this.visProp.straightlast);
       if (ev_sf || ev_sl) {
         geometry_default.calcStraight(this, c1, c2, 0);
       }
@@ -51517,40 +52777,72 @@ jxg_default.extend(
       if (!type_default.exists(this.label)) {
         return new coords_default(constants_default.COORDS_BY_SCREEN, [NaN, NaN], this.board);
       }
-      switch (type_default.evaluate(this.label.visProp.position)) {
-        case "last":
-          x = c2[1];
-          y = c2[2];
-          break;
-        case "first":
-          x = c1[1];
-          y = c1[2];
-          break;
-        case "lft":
-        case "llft":
-        case "ulft":
-          if (c1[1] <= c2[1]) {
-            x = c1[1];
-            y = c1[2];
-          } else {
+      pos = type_default.evaluate(this.label.visProp.position);
+      if (!type_default.isString(pos)) {
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [NaN, NaN], this.board);
+      }
+      if (pos.indexOf("right") < 0 && pos.indexOf("left") < 0) {
+        switch (pos) {
+          case "last":
             x = c2[1];
             y = c2[2];
-          }
-          break;
-        case "rt":
-        case "lrt":
-        case "urt":
-          if (c1[1] > c2[1]) {
+            break;
+          case "first":
             x = c1[1];
             y = c1[2];
-          } else {
-            x = c2[1];
-            y = c2[2];
+            break;
+          case "lft":
+          case "llft":
+          case "ulft":
+            if (c1[1] <= c2[1]) {
+              x = c1[1];
+              y = c1[2];
+            } else {
+              x = c2[1];
+              y = c2[2];
+            }
+            break;
+          case "rt":
+          case "lrt":
+          case "urt":
+            if (c1[1] > c2[1]) {
+              x = c1[1];
+              y = c1[2];
+            } else {
+              x = c2[1];
+              y = c2[2];
+            }
+            break;
+          default:
+            x = 0.5 * (c1[1] + c2[1]);
+            y = 0.5 * (c1[2] + c2[2]);
+        }
+      } else {
+        xy = type_default.parsePosition(pos);
+        lbda = type_default.parseNumber(xy.pos, 1, 1);
+        dx = c2[1] - c1[1];
+        dy = c2[2] - c1[2];
+        d = math_default.hypot(dx, dy);
+        if (xy.pos.indexOf("px") >= 0 || xy.pos.indexOf("fr") >= 0 || xy.pos.indexOf("%") >= 0) {
+          if (xy.pos.indexOf("px") >= 0) {
+            lbda /= d;
           }
-          break;
-        default:
-          x = 0.5 * (c1[1] + c2[1]);
-          y = 0.5 * (c1[2] + c2[2]);
+          x = c1[1] + lbda * dx;
+          y = c1[2] + lbda * dy;
+        } else {
+          x = c1[1] + lbda * this.board.unitX * dx / d;
+          y = c1[2] + lbda * this.board.unitY * dy / d;
+        }
+        if (xy.side === "left") {
+          dx *= -1;
+        } else {
+          dy *= -1;
+        }
+        if (type_default.exists(this.label)) {
+          dist = 0.5 * type_default.evaluate(this.label.visProp.distance) / d;
+        }
+        x += dy * this.label.size[0] * dist;
+        y += dx * this.label.size[1] * dist;
       }
       if (ev_sf || ev_sl) {
         if (type_default.exists(this.label)) {
@@ -51724,6 +53016,8 @@ jxg_default.extend(
         return this;
       }
       this.fixedLength = type_default.createFunction(l, this.board);
+      this.hasFixedLength = true;
+      this.addParentsFromJCFunctions([this.fixedLength]);
       this.board.update();
       return this;
     },
@@ -51940,14 +53234,21 @@ jxg_default.createSegment = function(board, parents, attributes) {
   attr = type_default.copyAttributes(attributes, board.options, "segment");
   el = board.create("line", parents.slice(0, 2), attr);
   if (parents.length === 3) {
-    el.hasFixedLength = true;
-    if (type_default.isNumber(parents[2])) {
-      el.fixedLength = function() {
-        return parents[2];
-      };
-    } else if (type_default.isFunction(parents[2])) {
-      el.fixedLength = type_default.createFunction(parents[2], this.board);
-    } else {
+    try {
+      el.hasFixedLength = true;
+      el.fixedLengthOldCoords = [];
+      el.fixedLengthOldCoords[0] = new coords_default(
+        constants_default.COORDS_BY_USER,
+        el.point1.coords.usrCoords.slice(1, 3),
+        board
+      );
+      el.fixedLengthOldCoords[1] = new coords_default(
+        constants_default.COORDS_BY_USER,
+        el.point2.coords.usrCoords.slice(1, 3),
+        board
+      );
+      el.setFixedLength(parents[2]);
+    } catch (err) {
       throw new Error(
         "JSXGraph: Can't create segment with third parent type '" + typeof parents[2] + "'.\nPossible third parent types: number or function"
       );
@@ -51955,17 +53256,6 @@ jxg_default.createSegment = function(board, parents, attributes) {
     el.getParents = function() {
       return this.parents.concat(this.fixedLength());
     };
-    el.fixedLengthOldCoords = [];
-    el.fixedLengthOldCoords[0] = new coords_default(
-      constants_default.COORDS_BY_USER,
-      el.point1.coords.usrCoords.slice(1, 3),
-      board
-    );
-    el.fixedLengthOldCoords[1] = new coords_default(
-      constants_default.COORDS_BY_USER,
-      el.point2.coords.usrCoords.slice(1, 3),
-      board
-    );
   }
   el.elType = "segment";
   return el;
@@ -52212,12 +53502,12 @@ jxg_default.createTangent = function(board, parents, attributes) {
       p = parents[1];
     } else {
       throw new Error(
-        "JSXGraph: Can't create tangent with parent types '" + typeof parents[0] + "' and '" + typeof parents[1] + "'.\nPossible parent types: [glider], [point,line|curve|circle|conic]"
+        "JSXGraph: Can't create tangent with parent types '" + typeof parents[0] + "' and '" + typeof parents[1] + "'.\nPossible parent types: [glider|point], [point,line|curve|circle|conic]"
       );
     }
   } else {
     throw new Error(
-      "JSXGraph: Can't create tangent with parent types '" + typeof parents[0] + "' and '" + typeof parents[1] + "'.\nPossible parent types: [glider], [point,line|curve|circle|conic]"
+      "JSXGraph: Can't create tangent with parent types '" + typeof parents[0] + "' and '" + typeof parents[1] + "'.\nPossible parent types: [glider|point], [point,line|curve|circle|conic]"
     );
   }
   attr = type_default.copyAttributes(attributes, board.options, "tangent");
@@ -52230,14 +53520,19 @@ jxg_default.createTangent = function(board, parents, attributes) {
         "line",
         [
           function() {
-            var g = c.X, f = c.Y;
-            return -p.X() * numerics_default.D(f)(p.position) + p.Y() * numerics_default.D(g)(p.position);
-          },
-          function() {
-            return numerics_default.D(c.Y)(p.position);
-          },
-          function() {
-            return -numerics_default.D(c.X)(p.position);
+            var g = c.X, f = c.Y, t;
+            if (p.type === constants_default.OBJECT_TYPE_GLIDER) {
+              t = p.position;
+            } else if (type_default.evaluate(c.visProp.curvetype) === "functiongraph") {
+              t = p.X();
+            } else {
+              t = geometry_default.projectPointToCurve(p, c, board)[1];
+            }
+            return [
+              -p.X() * numerics_default.D(f)(t) + p.Y() * numerics_default.D(g)(t),
+              numerics_default.D(c.Y)(t),
+              -numerics_default.D(c.X)(t)
+            ];
           }
         ],
         attr
@@ -52294,20 +53589,25 @@ jxg_default.createTangent = function(board, parents, attributes) {
             return p2[2] - p1[2];
           case 2:
             return p1[1] - p2[1];
+          default:
+            return [
+              p1[2] * p2[1] - p1[1] * p2[2],
+              p2[2] - p1[2],
+              p1[1] - p2[1]
+            ];
         }
-        return 0;
       };
       tangent = board.create(
         "line",
         [
           function() {
-            return getCurveTangentDir(p.position, c, 0);
-          },
-          function() {
-            return getCurveTangentDir(p.position, c, 1);
-          },
-          function() {
-            return getCurveTangentDir(p.position, c, 2);
+            var t;
+            if (p.type === constants_default.OBJECT_TYPE_GLIDER) {
+              t = p.position;
+            } else {
+              t = geometry_default.projectPointToCurve(p, c, board)[1];
+            }
+            return getCurveTangentDir(t, c);
           }
         ],
         attr
@@ -52320,7 +53620,13 @@ jxg_default.createTangent = function(board, parents, attributes) {
       "line",
       [
         function() {
-          var i2 = Math.floor(p.position);
+          var i2, t;
+          if (p.type === constants_default.OBJECT_TYPE_GLIDER) {
+            t = p.position;
+          } else {
+            t = geometry_default.projectPointToTurtle(p, c, board)[1];
+          }
+          i2 = Math.floor(t);
           for (j = 0; j < c.objects.length; j++) {
             el = c.objects[j];
             if (el.type === constants_default.OBJECT_TYPE_CURVE) {
@@ -52334,47 +53640,13 @@ jxg_default.createTangent = function(board, parents, attributes) {
             i2--;
           }
           if (i2 < 0) {
-            return 1;
+            return [1, 0, 0];
           }
-          return el.Y(i2) * el.X(i2 + 1) - el.X(i2) * el.Y(i2 + 1);
-        },
-        function() {
-          var i2 = Math.floor(p.position);
-          for (j = 0; j < c.objects.length; j++) {
-            el = c.objects[j];
-            if (el.type === constants_default.OBJECT_TYPE_CURVE) {
-              if (i2 < el.numberPoints) {
-                break;
-              }
-              i2 -= el.numberPoints;
-            }
-          }
-          if (i2 === el.numberPoints - 1) {
-            i2--;
-          }
-          if (i2 < 0) {
-            return 0;
-          }
-          return el.Y(i2 + 1) - el.Y(i2);
-        },
-        function() {
-          var i2 = Math.floor(p.position);
-          for (j = 0; j < c.objects.length; j++) {
-            el = c.objects[j];
-            if (el.type === constants_default.OBJECT_TYPE_CURVE) {
-              if (i2 < el.numberPoints) {
-                break;
-              }
-              i2 -= el.numberPoints;
-            }
-          }
-          if (i2 === el.numberPoints - 1) {
-            i2--;
-          }
-          if (i2 < 0) {
-            return 0;
-          }
-          return el.X(i2) - el.X(i2 + 1);
+          return [
+            el.Y(i2) * el.X(i2 + 1) - el.X(i2) * el.Y(i2 + 1),
+            el.Y(i2 + 1) - el.Y(i2),
+            el.X(i2) - el.X(i2 + 1)
+          ];
         }
       ],
       attr
@@ -52386,13 +53658,7 @@ jxg_default.createTangent = function(board, parents, attributes) {
       "line",
       [
         function() {
-          return math_default.matVecMult(c.quadraticform, p.coords.usrCoords)[0];
-        },
-        function() {
-          return math_default.matVecMult(c.quadraticform, p.coords.usrCoords)[1];
-        },
-        function() {
-          return math_default.matVecMult(c.quadraticform, p.coords.usrCoords)[2];
+          return math_default.matVecMult(c.quadraticform, p.coords.usrCoords);
         }
       ],
       attr
@@ -53327,7 +54593,7 @@ jxg_default.extend(
         return this.radius;
       }
       if (this.method === "pointRadius") {
-        return Math.abs(this.updateRadius());
+        return type_default.evaluate(this.visProp.nonnegativeonly) ? Math.max(0, this.updateRadius()) : Math.abs(this.updateRadius());
       }
       return NaN;
     },
@@ -53352,40 +54618,70 @@ jxg_default.extend(
     },
     // documented in geometry element
     getLabelAnchor: function() {
-      var x, y, r = this.Radius(), c = this.center.coords.usrCoords, SQRTH = 0.7071067811865;
-      switch (type_default.evaluate(this.visProp.label.position)) {
-        case "lft":
-          x = c[1] - r;
-          y = c[2];
-          break;
-        case "llft":
-          x = c[1] - SQRTH * r;
-          y = c[2] - SQRTH * r;
-          break;
-        case "rt":
-          x = c[1] + r;
-          y = c[2];
-          break;
-        case "lrt":
-          x = c[1] + SQRTH * r;
-          y = c[2] - SQRTH * r;
-          break;
-        case "urt":
-          x = c[1] + SQRTH * r;
-          y = c[2] + SQRTH * r;
-          break;
-        case "top":
-          x = c[1];
-          y = c[2] + r;
-          break;
-        case "bot":
-          x = c[1];
-          y = c[2] - r;
-          break;
-        default:
-          x = c[1] - SQRTH * r;
-          y = c[2] + SQRTH * r;
-          break;
+      var x, y, pos, xy, lbda, sgn, dist = 1.5, r = this.Radius(), c = this.center.coords.usrCoords, SQRTH = 0.7071067811865;
+      if (!type_default.exists(this.label)) {
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [NaN, NaN], this.board);
+      }
+      pos = type_default.evaluate(this.label.visProp.position);
+      if (!type_default.isString(pos)) {
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [NaN, NaN], this.board);
+      }
+      if (pos.indexOf("right") < 0 && pos.indexOf("left") < 0) {
+        switch (type_default.evaluate(this.visProp.label.position)) {
+          case "lft":
+            x = c[1] - r;
+            y = c[2];
+            break;
+          case "llft":
+            x = c[1] - SQRTH * r;
+            y = c[2] - SQRTH * r;
+            break;
+          case "rt":
+            x = c[1] + r;
+            y = c[2];
+            break;
+          case "lrt":
+            x = c[1] + SQRTH * r;
+            y = c[2] - SQRTH * r;
+            break;
+          case "urt":
+            x = c[1] + SQRTH * r;
+            y = c[2] + SQRTH * r;
+            break;
+          case "top":
+            x = c[1];
+            y = c[2] + r;
+            break;
+          case "bot":
+            x = c[1];
+            y = c[2] - r;
+            break;
+          default:
+            x = c[1] - SQRTH * r;
+            y = c[2] + SQRTH * r;
+            break;
+        }
+      } else {
+        c = this.center.coords.scrCoords;
+        xy = type_default.parsePosition(pos);
+        lbda = type_default.parseNumber(xy.pos, 2 * Math.PI, 1);
+        if (xy.pos.indexOf("fr") < 0 && xy.pos.indexOf("%") < 0) {
+          if (xy.pos.indexOf("px") >= 0) {
+            lbda = 0;
+          } else {
+            lbda *= Math.PI / 180;
+          }
+        }
+        sgn = 1;
+        if (xy.side === "left") {
+          sgn = -1;
+        }
+        if (type_default.exists(this.label)) {
+          dist = sgn * 0.5 * type_default.evaluate(this.label.visProp.distance);
+        }
+        x = c[1] + (r * this.board.unitX + this.label.size[0] * dist) * Math.cos(lbda);
+        y = c[2] - (r * this.board.unitY + this.label.size[1] * dist) * Math.sin(lbda);
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [x, y], this.board);
       }
       return new coords_default(constants_default.COORDS_BY_USER, [x, y], this.board);
     },
@@ -53549,12 +54845,12 @@ jxg_default.createCircle = function(board, parents, attributes) {
   for (i2 = 0; i2 < parents.length; i2++) {
     if (type_default.isPointType(board, parents[i2])) {
       if (parents.length < 3) {
-        p = p.concat(
-          type_default.providePoints(board, [parents[i2]], attributes, "circle", [point_style[i2]])
+        p.push(
+          type_default.providePoints(board, [parents[i2]], attributes, "circle", [point_style[i2]])[0]
         );
       } else {
-        p = p.concat(
-          type_default.providePoints(board, [parents[i2]], attributes, "point")
+        p.push(
+          type_default.providePoints(board, [parents[i2]], attributes, "point")[0]
         );
       }
       if (p[p.length - 1] === false) {
@@ -54602,13 +55898,13 @@ jxg_default.extend(
      *
      */
     addPoints: function(p) {
-      var idx, args2 = Array.prototype.slice.call(arguments);
+      var idx, args = Array.prototype.slice.call(arguments);
       if (this.elType === "polygonalchain") {
         idx = this.vertices.length - 1;
       } else {
         idx = this.vertices.length - 2;
       }
-      return this.insertPoints.apply(this, [idx].concat(args2));
+      return this.insertPoints.apply(this, [idx].concat(args));
     },
     /**
      * Insert points to the vertex list of the polygon after index <tt>idx</tt>.
@@ -55115,7 +56411,7 @@ jxg_default.createParallelogram = function(board, parents, attributes) {
       "JSXGraph: Can't create parallelogram with parent types other than 'point' and 'coordinate arrays' or a function returning an array of coordinates."
     );
   }
-  attr_pp = type_default.copyAttributes(attributes, board.options, "parallelogram", ["parallelpoint"]);
+  attr_pp = type_default.copyAttributes(attributes, board.options, "parallelogram", "parallelpoint");
   pp = board.create("parallelpoint", points, attr_pp);
   attr = type_default.copyAttributes(attributes, board.options, "parallelogram");
   el = board.create("polygon", [points[0], points[1], pp, points[2]], attr);
@@ -55916,39 +57212,81 @@ jxg_default.extend(
     },
     // documented in geometry element
     getLabelAnchor: function() {
-      var c, x, y, ax = 0.05 * this.board.canvasWidth, ay = 0.05 * this.board.canvasHeight, bx = 0.95 * this.board.canvasWidth, by = 0.95 * this.board.canvasHeight;
-      switch (type_default.evaluate(this.visProp.label.position)) {
-        case "ulft":
-          x = ax;
-          y = ay;
-          break;
-        case "llft":
-          x = ax;
-          y = by;
-          break;
-        case "rt":
-          x = bx;
-          y = 0.5 * by;
-          break;
-        case "lrt":
-          x = bx;
-          y = by;
-          break;
-        case "urt":
-          x = bx;
-          y = ay;
-          break;
-        case "top":
-          x = 0.5 * bx;
-          y = ay;
-          break;
-        case "bot":
-          x = 0.5 * bx;
-          y = by;
-          break;
-        default:
-          x = ax;
-          y = 0.5 * by;
+      var x, y, pos, xy, lbda, e, t, dx, dy, d, dist = 1.5, c, ax = 0.05 * this.board.canvasWidth, ay = 0.05 * this.board.canvasHeight, bx = 0.95 * this.board.canvasWidth, by = 0.95 * this.board.canvasHeight;
+      if (!type_default.exists(this.label)) {
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [NaN, NaN], this.board);
+      }
+      pos = type_default.evaluate(this.label.visProp.position);
+      if (!type_default.isString(pos)) {
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [NaN, NaN], this.board);
+      }
+      if (pos.indexOf("right") < 0 && pos.indexOf("left") < 0) {
+        switch (type_default.evaluate(this.visProp.label.position)) {
+          case "ulft":
+            x = ax;
+            y = ay;
+            break;
+          case "llft":
+            x = ax;
+            y = by;
+            break;
+          case "rt":
+            x = bx;
+            y = 0.5 * by;
+            break;
+          case "lrt":
+            x = bx;
+            y = by;
+            break;
+          case "urt":
+            x = bx;
+            y = ay;
+            break;
+          case "top":
+            x = 0.5 * bx;
+            y = ay;
+            break;
+          case "bot":
+            x = 0.5 * bx;
+            y = by;
+            break;
+          default:
+            x = ax;
+            y = 0.5 * by;
+        }
+      } else {
+        xy = type_default.parsePosition(pos);
+        lbda = type_default.parseNumber(xy.pos, this.maxX() - this.minX(), 1);
+        if (xy.pos.indexOf("fr") < 0 && xy.pos.indexOf("%") < 0) {
+          lbda = 0;
+        }
+        t = this.minX() + lbda;
+        x = this.X(t);
+        y = this.Y(t);
+        c = new coords_default(constants_default.COORDS_BY_USER, [x, y], this.board).scrCoords;
+        e = math_default.eps;
+        if (t < this.minX() + e) {
+          dx = (this.X(t + e) - this.X(t)) / e;
+          dy = (this.Y(t + e) - this.Y(t)) / e;
+        } else if (t > this.maxX() - e) {
+          dx = (this.X(t) - this.X(t - e)) / e;
+          dy = (this.Y(t) - this.Y(t - e)) / e;
+        } else {
+          dx = 0.5 * (this.X(t + e) - this.X(t - e)) / e;
+          dy = 0.5 * (this.Y(t + e) - this.Y(t - e)) / e;
+        }
+        d = math_default.hypot(dx, dy);
+        if (xy.side === "left") {
+          dy *= -1;
+        } else {
+          dx *= -1;
+        }
+        if (type_default.exists(this.label)) {
+          dist = 0.5 * type_default.evaluate(this.label.visProp.distance) / d;
+        }
+        x = c[1] + dy * this.label.size[0] * dist;
+        y = c[2] - dx * this.label.size[1] * dist;
+        return new coords_default(constants_default.COORDS_BY_SCREEN, [x, y], this.board);
       }
       c = new coords_default(constants_default.COORDS_BY_SCREEN, [x, y], this.board, false);
       return geometry_default.projectCoordsToCurve(
@@ -56072,6 +57410,7 @@ jxg_default.extend(
           delta = [where[0] - p.usrCoords[1], where[1] - p.usrCoords[2]];
         }
         this.setPosition(constants_default.COORDS_BY_USER, delta);
+        return this.board.update(this);
       }
       return this;
     },
@@ -56464,6 +57803,9 @@ jxg_default.createRiemannsum = function(board, parents, attributes) {
     throw new Error(
       "JSXGraph: JXG.createRiemannsum: argument '2' n has to be number or function.\nPossible parent types: [function,n:number|function,type,start:number|function,end:number|function]"
     );
+  }
+  if (typeof parents[2] === "string") {
+    parents[2] = "'" + parents[2] + "'";
   }
   type = type_default.createFunction(parents[2], board, "");
   if (!type_default.exists(type)) {
@@ -57088,6 +58430,12 @@ jxg_default.createSector = function(board, parents, attributes) {
     } else {
       el.direction2 = parents[3] >= 0 ? 1 : -1;
     }
+    el.methodMap = jxg_default.deepCopy(el.methodMap, {
+      arc: "arc",
+      center: "center",
+      line1: "line1",
+      line2: "line2"
+    });
     el.updateDataArray = function() {
       var r, l1, l2, A = [0, 0, 0], B = [0, 0, 0], C = [0, 0, 0], ar;
       l1 = this.line1;
@@ -57178,6 +58526,7 @@ jxg_default.createSector = function(board, parents, attributes) {
   attr = type_default.copyAttributes(attributes, board.options, "arc");
   attr = type_default.copyAttributes(attr, board.options, "sector", "arc");
   attr.withLabel = false;
+  attr.selection = el.visProp.selection;
   attr.name += "_arc";
   if (type === "2lines") {
     el.updateDataArray();
@@ -59085,8 +60434,7 @@ jxg_default.registerElement("inequality", jxg_default.createInequality);
 
 // node_modules/jsxgraph/src/element/grid.js
 jxg_default.createGrid = function(board, parents, attributes) {
-  const eps = math_default.eps, maxLines = 5e3;
-  var majorGrid, minorGrid, parentAxes, attrGrid, attrMajor, attrMinor, majorStep, majorSize = [], majorRadius = [], createDataArrayForFace;
+  var eps = math_default.eps, maxLines = 5e3, majorGrid, minorGrid, parentAxes, attrGrid, attrMajor, attrMinor, majorStep, majorSize = [], majorRadius = [], createDataArrayForFace;
   parentAxes = parents;
   if (parentAxes.length > 2 || parentAxes.length >= 1 && parentAxes[0].elType !== "axis" || parentAxes.length >= 2 && parentAxes[1].elType !== "axis") {
     throw new Error(
@@ -59105,6 +60453,7 @@ jxg_default.createGrid = function(board, parents, attributes) {
       case ".":
       case "point":
         grid.visProp.linecap = "round";
+        grid.visProp.strokewidth = radiusX * grid.board.unitX + radiusY * grid.board.unitY;
         return [
           [x, x, NaN],
           [y, y, NaN]
@@ -59245,20 +60594,21 @@ jxg_default.createGrid = function(board, parents, attributes) {
     }
   };
   attrGrid = type_default.copyAttributes(attributes, board.options, "grid");
-  type_default.mergeAttr(board.options.grid, attrGrid.themes[attrGrid.theme], false);
-  attrGrid = type_default.copyAttributes(attributes, board.options, "grid");
-  attrMajor = type_default.copyAttributes(attributes, board.options, "grid", "major");
-  type_default.mergeAttr(attrMajor, attrGrid, true);
+  type_default.mergeAttr(attrGrid, attrGrid.themes[attrGrid.theme], false);
+  attrMajor = {};
+  type_default.mergeAttr(attrMajor, attrGrid, true, true);
+  type_default.mergeAttr(attrMajor, attrGrid.major, true, true);
   majorGrid = board.create("curve", [[null], [null]], attrMajor);
   majorGrid.elType = "grid";
   majorGrid.type = constants_default.OBJECT_TYPE_GRID;
-  attrMinor = type_default.copyAttributes(attributes, board.options, "grid", "minor");
-  type_default.mergeAttr(attrMinor, attrGrid, true);
+  attrMinor = {};
+  type_default.mergeAttr(attrMinor, attrGrid, true, true);
+  type_default.mergeAttr(attrMinor, attrGrid.minor, true, true);
   if (attrMinor.id === attrMajor.id) {
-    attrMinor.id = attrMajor.id + "_minor";
+    attrMinor.id = majorGrid.id + "_minor";
   }
   if (attrMinor.name === attrMajor.name) {
-    attrMinor.name = attrMajor.name + "_minor";
+    attrMinor.name = majorGrid.name + "_minor";
   }
   minorGrid = board.create("curve", [[null], [null]], attrMinor);
   minorGrid.elType = "grid";
@@ -59273,7 +60623,7 @@ jxg_default.createGrid = function(board, parents, attributes) {
   };
   majorGrid.inherits.push(minorGrid);
   majorGrid.updateDataArray = function() {
-    var bbox = this.board.getBoundingBox(), startX, startY, x, y, dataArr, finite, gridX = type_default.evaluate(this.visProp.gridx), gridY = type_default.evaluate(this.visProp.gridy), face = type_default.evaluate(this.visProp.face), drawZero = type_default.evaluate(this.visProp.drawzero), drawZeroOrigin = drawZero === true || type_default.isObject(drawZero) && type_default.evaluate(drawZero.origin) === true, drawZeroX = drawZero === true || type_default.isObject(drawZero) && type_default.evaluate(drawZero.x) === true, drawZeroY = drawZero === true || type_default.isObject(drawZero) && type_default.evaluate(drawZero.y) === true, includeBoundaries = type_default.evaluate(this.visProp.includeboundaries), forceSquare = type_default.evaluate(this.visProp.forcesquare);
+    var bbox = this.board.getBoundingBox(), startX, startY, x, y, m, dataArr, finite, delta, gridX = type_default.evaluate(this.visProp.gridx), gridY = type_default.evaluate(this.visProp.gridy), face = type_default.evaluate(this.visProp.face), drawZero = type_default.evaluate(this.visProp.drawzero), drawZeroOrigin = drawZero === true || type_default.isObject(drawZero) && type_default.evaluate(drawZero.origin) === true, drawZeroX = drawZero === true || type_default.isObject(drawZero) && type_default.evaluate(drawZero.x) === true, drawZeroY = drawZero === true || type_default.isObject(drawZero) && type_default.evaluate(drawZero.y) === true, includeBoundaries = type_default.evaluate(this.visProp.includeboundaries), forceSquare = type_default.evaluate(this.visProp.forcesquare);
     this.dataX = [];
     this.dataY = [];
     majorStep = type_default.evaluate(this.visProp.majorstep);
@@ -59292,7 +60642,8 @@ jxg_default.createGrid = function(board, parents, attributes) {
       majorStep[1] = gridY;
     }
     if (majorStep[0] === "auto") {
-      majorStep[0] = 1;
+      delta = Math.pow(10, Math.floor(Math.log(50 / this.board.unitX) / Math.LN10));
+      majorStep[0] = delta;
       if (type_default.exists(parentAxes[0])) {
         majorStep[0] = parentAxes[0].ticks[0].getDistanceMajorTicks();
       }
@@ -59300,7 +60651,8 @@ jxg_default.createGrid = function(board, parents, attributes) {
       majorStep[0] = type_default.parseNumber(majorStep[0], Math.abs(bbox[1] - bbox[3]), 1 / this.board.unitX);
     }
     if (majorStep[1] === "auto") {
-      majorStep[1] = 1;
+      delta = Math.pow(10, Math.floor(Math.log(50 / this.board.unitY) / Math.LN10));
+      majorStep[1] = delta;
       if (type_default.exists(parentAxes[1])) {
         majorStep[1] = parentAxes[1].ticks[0].getDistanceMajorTicks();
       }
@@ -59327,32 +60679,58 @@ jxg_default.createGrid = function(board, parents, attributes) {
     if (majorSize.length < 2) {
       majorSize = [majorSize[0], majorSize[0]];
     }
-    if (type_default.isNumber(majorSize[0], true) || majorSize[0].indexOf("abs") > -1) {
-      majorSize[0] = ("" + majorSize[0]).replace(/\s+abs\s+/, "") + "px";
+    if (type_default.isNumber(majorSize[0], true)) {
+      majorSize[0] = majorSize[0] + "px";
     }
-    if (type_default.isNumber(majorSize[1], true) || majorSize[1].indexOf("abs") > -1) {
-      majorSize[1] = ("" + majorSize[1]).replace(/\s+abs\s+/, "") + "px";
+    if (type_default.isNumber(majorSize[1], true)) {
+      majorSize[1] = majorSize[1] + "px";
     }
     majorSize[0] = type_default.parseNumber(majorSize[0], majorStep[0], 1 / this.board.unitX);
-    majorRadius[0] = majorSize[0] / 2;
     majorSize[1] = type_default.parseNumber(majorSize[1], majorStep[1], 1 / this.board.unitY);
+    majorRadius[0] = majorSize[0] / 2;
     majorRadius[1] = majorSize[1] / 2;
     startX = math_default.roundToStep(bbox[0], majorStep[0]);
     startY = math_default.roundToStep(bbox[1], majorStep[1]);
     finite = isFinite(startX) && isFinite(startY) && isFinite(bbox[2]) && isFinite(bbox[3]) && Math.abs(bbox[2]) < Math.abs(majorStep[0] * maxLines) && Math.abs(bbox[3]) < Math.abs(majorStep[1] * maxLines);
-    for (y = startY; finite && y >= bbox[3]; y -= majorStep[1]) {
-      for (x = startX; finite && x <= bbox[2]; x += majorStep[0]) {
-        if (!drawZeroOrigin && Math.abs(y) < eps && Math.abs(x) < eps || !drawZeroX && Math.abs(y) < eps && Math.abs(x) >= eps || !drawZeroY && Math.abs(x) < eps && Math.abs(y) >= eps || !includeBoundaries && (x <= bbox[0] + majorRadius[0] || x >= bbox[2] - majorRadius[0] || y <= bbox[3] + majorRadius[1] || y >= bbox[1] - majorRadius[1])) {
+    if (face.toLowerCase() === "line") {
+      m = type_default.evaluate(majorGrid.visProp.margin);
+      for (y = startY; finite && y >= bbox[3]; y -= majorStep[1]) {
+        if (!drawZeroOrigin && Math.abs(y) < eps || !drawZeroY && Math.abs(y) < eps || !includeBoundaries && (y <= bbox[3] + majorRadius[1] || y >= bbox[1] - majorRadius[1])) {
           continue;
         }
-        dataArr = createDataArrayForFace(face, majorGrid, x, y, majorRadius[0], majorRadius[1], bbox);
-        this.dataX = this.dataX.concat(dataArr[0]);
-        this.dataY = this.dataY.concat(dataArr[1]);
+        dataArr = [
+          [bbox[0] - m / majorGrid.board.unitX, bbox[2] + m / majorGrid.board.unitX, NaN],
+          [y, y, NaN]
+        ];
+        type_default.concat(this.dataX, dataArr[0]);
+        type_default.concat(this.dataY, dataArr[1]);
+      }
+      for (x = startX; finite && x <= bbox[2]; x += majorStep[0]) {
+        if (!drawZeroOrigin && Math.abs(x) < eps || !drawZeroX && Math.abs(x) < eps || !includeBoundaries && (x <= bbox[0] + majorRadius[0] || x >= bbox[2] - majorRadius[0])) {
+          continue;
+        }
+        dataArr = [
+          [x, x, NaN],
+          [bbox[1] + m / majorGrid.board.unitY, bbox[3] - m / majorGrid.board.unitY, NaN]
+        ];
+        type_default.concat(this.dataX, dataArr[0]);
+        type_default.concat(this.dataY, dataArr[1]);
+      }
+    } else {
+      for (y = startY; finite && y >= bbox[3]; y -= majorStep[1]) {
+        for (x = startX; finite && x <= bbox[2]; x += majorStep[0]) {
+          if (!drawZeroOrigin && Math.abs(y) < eps && Math.abs(x) < eps || !drawZeroX && Math.abs(y) < eps && Math.abs(x) >= eps || !drawZeroY && Math.abs(x) < eps && Math.abs(y) >= eps || !includeBoundaries && (x <= bbox[0] + majorRadius[0] || x >= bbox[2] - majorRadius[0] || y <= bbox[3] + majorRadius[1] || y >= bbox[1] - majorRadius[1])) {
+            continue;
+          }
+          dataArr = createDataArrayForFace(face, majorGrid, x, y, majorRadius[0], majorRadius[1], bbox);
+          type_default.concat(this.dataX, dataArr[0]);
+          type_default.concat(this.dataY, dataArr[1]);
+        }
       }
     }
   };
   minorGrid.updateDataArray = function() {
-    var bbox = this.board.getBoundingBox(), startX, startY, x, y, dataArr, finite, minorStep = [], minorRadius = [], XdisTo0, XdisFrom0, YdisTo0, YdisFrom0, dis0To, dis1To, dis2To, dis3To, dis0From, dis1From, dis2From, dis3From, minorElements = type_default.evaluate(this.visProp.minorelements), minorSize = type_default.evaluate(this.visProp.size), minorFace = type_default.evaluate(this.visProp.face), minorDrawZero = type_default.evaluate(this.visProp.drawzero), minorDrawZeroX = minorDrawZero === true || type_default.isObject(minorDrawZero) && type_default.evaluate(minorDrawZero.x) === true, minorDrawZeroY = minorDrawZero === true || type_default.isObject(minorDrawZero) && type_default.evaluate(minorDrawZero.y) === true, majorFace = type_default.evaluate(this.majorGrid.visProp.face), majorDrawZero = type_default.evaluate(this.majorGrid.visProp.drawzero), majorDrawZeroOrigin = majorDrawZero === true || type_default.isObject(majorDrawZero) && type_default.evaluate(majorDrawZero.origin) === true, majorDrawZeroX = majorDrawZero === true || type_default.isObject(majorDrawZero) && type_default.evaluate(majorDrawZero.x) === true, majorDrawZeroY = majorDrawZero === true || type_default.isObject(majorDrawZero) && type_default.evaluate(majorDrawZero.y) === true, includeBoundaries = type_default.evaluate(this.visProp.includeboundaries);
+    var bbox = this.board.getBoundingBox(), startX, startY, x, y, m, dataArr, finite, minorStep = [], minorRadius = [], XdisTo0, XdisFrom0, YdisTo0, YdisFrom0, dis0To, dis1To, dis2To, dis3To, dis0From, dis1From, dis2From, dis3From, minorElements = type_default.evaluate(this.visProp.minorelements), minorSize = type_default.evaluate(this.visProp.size), minorFace = type_default.evaluate(this.visProp.face), minorDrawZero = type_default.evaluate(this.visProp.drawzero), minorDrawZeroX = minorDrawZero === true || type_default.isObject(minorDrawZero) && type_default.evaluate(minorDrawZero.x) === true, minorDrawZeroY = minorDrawZero === true || type_default.isObject(minorDrawZero) && type_default.evaluate(minorDrawZero.y) === true, majorFace = type_default.evaluate(this.majorGrid.visProp.face), majorDrawZero = type_default.evaluate(this.majorGrid.visProp.drawzero), majorDrawZeroOrigin = majorDrawZero === true || type_default.isObject(majorDrawZero) && type_default.evaluate(majorDrawZero.origin) === true, majorDrawZeroX = majorDrawZero === true || type_default.isObject(majorDrawZero) && type_default.evaluate(majorDrawZero.x) === true, majorDrawZeroY = majorDrawZero === true || type_default.isObject(majorDrawZero) && type_default.evaluate(majorDrawZero.y) === true, includeBoundaries = type_default.evaluate(this.visProp.includeboundaries);
     this.dataX = [];
     this.dataY = [];
     if (!type_default.isArray(minorElements)) {
@@ -59364,7 +60742,7 @@ jxg_default.createGrid = function(board, parents, attributes) {
     if (type_default.isNumber(minorElements[0], true)) {
       minorElements[0] = parseFloat(minorElements[0]);
     } else {
-      minorElements[0] = 0;
+      minorElements[0] = 3;
       if (type_default.exists(parentAxes[0])) {
         minorElements[0] = type_default.evaluate(parentAxes[0].getAttribute("ticks").minorticks);
       }
@@ -59373,7 +60751,7 @@ jxg_default.createGrid = function(board, parents, attributes) {
     if (type_default.isNumber(minorElements[1], true)) {
       minorElements[1] = parseFloat(minorElements[1]);
     } else {
-      minorElements[1] = 0;
+      minorElements[1] = 3;
       if (type_default.exists(parentAxes[1])) {
         minorElements[1] = type_default.evaluate(parentAxes[1].getAttribute("ticks").minorticks);
       }
@@ -59385,6 +60763,12 @@ jxg_default.createGrid = function(board, parents, attributes) {
     if (minorSize.length < 2) {
       minorSize = [minorSize[0], minorSize[0]];
     }
+    if (type_default.isNumber(minorSize[0], true)) {
+      minorSize[0] = minorSize[0] + "px";
+    }
+    if (type_default.isNumber(minorSize[1], true)) {
+      minorSize[1] = minorSize[1] + "px";
+    }
     minorSize[0] = type_default.parseNumber(minorSize[0], minorStep[0], 1 / this.board.unitX);
     minorSize[1] = type_default.parseNumber(minorSize[1], minorStep[1], 1 / this.board.unitY);
     minorRadius[0] = minorSize[0] * 0.5;
@@ -59392,26 +60776,63 @@ jxg_default.createGrid = function(board, parents, attributes) {
     startX = math_default.roundToStep(bbox[0], minorStep[0]);
     startY = math_default.roundToStep(bbox[1], minorStep[1]);
     finite = isFinite(startX) && isFinite(startY) && isFinite(bbox[2]) && isFinite(bbox[3]) && Math.abs(bbox[2]) <= Math.abs(minorStep[0] * maxLines) && Math.abs(bbox[3]) < Math.abs(minorStep[1] * maxLines);
-    for (y = startY; finite && y >= bbox[3]; y -= minorStep[1]) {
-      for (x = startX; finite && x <= bbox[2]; x += minorStep[0]) {
-        XdisTo0 = math_default.roundToStep(Math.abs(x), majorStep[0]);
-        XdisTo0 = Math.abs(XdisTo0 - Math.abs(x));
-        XdisFrom0 = majorStep[0] - XdisTo0;
+    if (minorFace.toLowerCase() !== "line") {
+      for (y = startY; finite && y >= bbox[3]; y -= minorStep[1]) {
+        for (x = startX; finite && x <= bbox[2]; x += minorStep[0]) {
+          XdisTo0 = math_default.roundToStep(Math.abs(x), majorStep[0]);
+          XdisTo0 = Math.abs(XdisTo0 - Math.abs(x));
+          XdisFrom0 = majorStep[0] - XdisTo0;
+          YdisTo0 = math_default.roundToStep(Math.abs(y), majorStep[1]);
+          YdisTo0 = Math.abs(YdisTo0 - Math.abs(y));
+          YdisFrom0 = majorStep[1] - YdisTo0;
+          if (majorFace === "line") {
+            if (XdisTo0 - minorRadius[0] - majorRadius[0] < eps || XdisFrom0 - minorRadius[0] - majorRadius[0] < eps || YdisTo0 - minorRadius[1] - majorRadius[1] < eps || YdisFrom0 - minorRadius[1] - majorRadius[1] < eps) {
+              continue;
+            }
+          } else {
+            if ((XdisTo0 - minorRadius[0] - majorRadius[0] < eps || XdisFrom0 - minorRadius[0] - majorRadius[0] < eps) && (YdisTo0 - minorRadius[1] - majorRadius[1] < eps || YdisFrom0 - minorRadius[1] - majorRadius[1] < eps)) {
+              if ((majorDrawZeroOrigin || majorRadius[1] - Math.abs(y) + minorRadius[1] < eps || majorRadius[0] - Math.abs(x) + minorRadius[0] < eps) && (majorDrawZeroX || majorRadius[1] - Math.abs(y) + minorRadius[1] < eps || majorRadius[0] + Math.abs(x) - minorRadius[0] < eps) && (majorDrawZeroY || majorRadius[0] - Math.abs(x) + minorRadius[0] < eps || majorRadius[1] + Math.abs(y) - minorRadius[1] < eps)) {
+                continue;
+              }
+            }
+          }
+          if (!minorDrawZeroY && Math.abs(x) < eps || !minorDrawZeroX && Math.abs(y) < eps) {
+            continue;
+          }
+          dis0To = Math.abs(bbox[0] % majorStep[0]);
+          dis1To = Math.abs(bbox[1] % majorStep[1]);
+          dis2To = Math.abs(bbox[2] % majorStep[0]);
+          dis3To = Math.abs(bbox[3] % majorStep[1]);
+          dis0From = majorStep[0] - dis0To;
+          dis1From = majorStep[1] - dis1To;
+          dis2From = majorStep[0] - dis2To;
+          dis3From = majorStep[1] - dis3To;
+          if (!includeBoundaries && (x - minorRadius[0] - bbox[0] - majorRadius[0] + dis0From < eps && dis0From - majorRadius[0] < eps || x - minorRadius[0] - bbox[0] - majorRadius[0] - dis0To < eps && dis0To - majorRadius[0] < eps || -x - minorRadius[0] + bbox[2] - majorRadius[0] + dis2From < eps && dis2From - majorRadius[0] < eps || -x - minorRadius[0] + bbox[2] - majorRadius[0] - dis2To < eps && dis2To - majorRadius[0] < eps || -y - minorRadius[1] + bbox[1] - majorRadius[1] + dis1From < eps && dis1From - majorRadius[1] < eps || -y - minorRadius[1] + bbox[1] - majorRadius[1] - dis1To < eps && dis1To - majorRadius[1] < eps || y - minorRadius[1] - bbox[3] - majorRadius[1] + dis3From < eps && dis3From - majorRadius[1] < eps || y - minorRadius[1] - bbox[3] - majorRadius[1] - dis3To < eps && dis3To - majorRadius[1] < eps || -y - minorRadius[1] + bbox[1] < eps || x - minorRadius[0] - bbox[0] < eps || y - minorRadius[1] - bbox[3] < eps || -x - minorRadius[0] + bbox[2] < eps)) {
+            continue;
+          }
+          dataArr = createDataArrayForFace(minorFace, minorGrid, x, y, minorRadius[0], minorRadius[1], bbox);
+          type_default.concat(this.dataX, dataArr[0]);
+          type_default.concat(this.dataY, dataArr[1]);
+        }
+      }
+    } else {
+      m = type_default.evaluate(minorGrid.visProp.margin);
+      for (y = startY; finite && y >= bbox[3]; y -= minorStep[1]) {
         YdisTo0 = math_default.roundToStep(Math.abs(y), majorStep[1]);
         YdisTo0 = Math.abs(YdisTo0 - Math.abs(y));
         YdisFrom0 = majorStep[1] - YdisTo0;
         if (majorFace === "line") {
-          if (XdisTo0 - minorRadius[0] - majorRadius[0] < eps || XdisFrom0 - minorRadius[0] - majorRadius[0] < eps || YdisTo0 - minorRadius[1] - majorRadius[1] < eps || YdisFrom0 - minorRadius[1] - majorRadius[1] < eps) {
+          if (YdisTo0 - minorRadius[1] - majorRadius[1] < eps || YdisFrom0 - minorRadius[1] - majorRadius[1] < eps) {
             continue;
           }
         } else {
-          if ((XdisTo0 - minorRadius[0] - majorRadius[0] < eps || XdisFrom0 - minorRadius[0] - majorRadius[0] < eps) && (YdisTo0 - minorRadius[1] - majorRadius[1] < eps || YdisFrom0 - minorRadius[1] - majorRadius[1] < eps)) {
-            if ((majorDrawZeroOrigin || majorRadius[1] - Math.abs(y) + minorRadius[1] < eps || majorRadius[0] - Math.abs(x) + minorRadius[0] < eps) && (majorDrawZeroX || majorRadius[1] - Math.abs(y) + minorRadius[1] < eps || majorRadius[0] + Math.abs(x) - minorRadius[0] < eps) && (majorDrawZeroY || majorRadius[0] - Math.abs(x) + minorRadius[0] < eps || majorRadius[1] + Math.abs(y) - minorRadius[1] < eps)) {
+          if (YdisTo0 - minorRadius[1] - majorRadius[1] < eps || YdisFrom0 - minorRadius[1] - majorRadius[1] < eps) {
+            if ((majorDrawZeroOrigin || majorRadius[1] - Math.abs(y) + minorRadius[1] < eps) && (majorDrawZeroX || majorRadius[1] - Math.abs(y) + minorRadius[1] < eps) && (majorDrawZeroY || majorRadius[1] + Math.abs(y) - minorRadius[1] < eps)) {
               continue;
             }
           }
         }
-        if (!minorDrawZeroY && Math.abs(x) < eps || !minorDrawZeroX && Math.abs(y) < eps) {
+        if (!minorDrawZeroX && Math.abs(y) < eps) {
           continue;
         }
         dis0To = Math.abs(bbox[0] % majorStep[0]);
@@ -59422,12 +60843,51 @@ jxg_default.createGrid = function(board, parents, attributes) {
         dis1From = majorStep[1] - dis1To;
         dis2From = majorStep[0] - dis2To;
         dis3From = majorStep[1] - dis3To;
-        if (!includeBoundaries && (x - minorRadius[0] - bbox[0] - majorRadius[0] + dis0From < eps && dis0From - majorRadius[0] < eps || x - minorRadius[0] - bbox[0] - majorRadius[0] - dis0To < eps && dis0To - majorRadius[0] < eps || -x - minorRadius[0] + bbox[2] - majorRadius[0] + dis2From < eps && dis2From - majorRadius[0] < eps || -x - minorRadius[0] + bbox[2] - majorRadius[0] - dis2To < eps && dis2To - majorRadius[0] < eps || -y - minorRadius[1] + bbox[1] - majorRadius[1] + dis1From < eps && dis1From - majorRadius[1] < eps || -y - minorRadius[1] + bbox[1] - majorRadius[1] - dis1To < eps && dis1To - majorRadius[1] < eps || y - minorRadius[1] - bbox[3] - majorRadius[1] + dis3From < eps && dis3From - majorRadius[1] < eps || y - minorRadius[1] - bbox[3] - majorRadius[1] - dis3To < eps && dis3To - majorRadius[1] < eps || -y - minorRadius[1] + bbox[1] < eps || x - minorRadius[0] - bbox[0] < eps || y - minorRadius[1] - bbox[3] < eps || -x - minorRadius[0] + bbox[2] < eps)) {
+        if (!includeBoundaries && (-y - minorRadius[1] + bbox[1] - majorRadius[1] + dis1From < eps && dis1From - majorRadius[1] < eps || -y - minorRadius[1] + bbox[1] - majorRadius[1] - dis1To < eps && dis1To - majorRadius[1] < eps || y - minorRadius[1] - bbox[3] - majorRadius[1] + dis3From < eps && dis3From - majorRadius[1] < eps || y - minorRadius[1] - bbox[3] - majorRadius[1] - dis3To < eps && dis3To - majorRadius[1] < eps || -y - minorRadius[1] + bbox[1] < eps || y - minorRadius[1] - bbox[3] < eps)) {
           continue;
         }
-        dataArr = createDataArrayForFace(minorFace, minorGrid, x, y, minorRadius[0], minorRadius[1], bbox);
-        this.dataX = this.dataX.concat(dataArr[0]);
-        this.dataY = this.dataY.concat(dataArr[1]);
+        dataArr = [
+          [bbox[0] - m / minorGrid.board.unitX, bbox[2] + m / minorGrid.board.unitX, NaN],
+          [y, y, NaN]
+        ];
+        type_default.concat(this.dataX, dataArr[0]);
+        type_default.concat(this.dataY, dataArr[1]);
+      }
+      for (x = startX; finite && x <= bbox[2]; x += minorStep[0]) {
+        XdisTo0 = math_default.roundToStep(Math.abs(x), majorStep[0]);
+        XdisTo0 = Math.abs(XdisTo0 - Math.abs(x));
+        XdisFrom0 = majorStep[0] - XdisTo0;
+        if (majorFace === "line") {
+          if (XdisTo0 - minorRadius[0] - majorRadius[0] < eps || XdisFrom0 - minorRadius[0] - majorRadius[0] < eps) {
+            continue;
+          }
+        } else {
+          if (XdisTo0 - minorRadius[0] - majorRadius[0] < eps || XdisFrom0 - minorRadius[0] - majorRadius[0] < eps) {
+            if ((majorDrawZeroOrigin || majorRadius[0] - Math.abs(x) + minorRadius[0] < eps) && (majorDrawZeroX || majorRadius[0] + Math.abs(x) - minorRadius[0] < eps) && (majorDrawZeroY || majorRadius[0] - Math.abs(x) + minorRadius[0] < eps)) {
+              continue;
+            }
+          }
+        }
+        if (!minorDrawZeroY && Math.abs(x) < eps) {
+          continue;
+        }
+        dis0To = Math.abs(bbox[0] % majorStep[0]);
+        dis1To = Math.abs(bbox[1] % majorStep[1]);
+        dis2To = Math.abs(bbox[2] % majorStep[0]);
+        dis3To = Math.abs(bbox[3] % majorStep[1]);
+        dis0From = majorStep[0] - dis0To;
+        dis1From = majorStep[1] - dis1To;
+        dis2From = majorStep[0] - dis2To;
+        dis3From = majorStep[1] - dis3To;
+        if (!includeBoundaries && (x - minorRadius[0] - bbox[0] - majorRadius[0] + dis0From < eps && dis0From - majorRadius[0] < eps || x - minorRadius[0] - bbox[0] - majorRadius[0] - dis0To < eps && dis0To - majorRadius[0] < eps || -x - minorRadius[0] + bbox[2] - majorRadius[0] + dis2From < eps && dis2From - majorRadius[0] < eps || -x - minorRadius[0] + bbox[2] - majorRadius[0] - dis2To < eps && dis2To - majorRadius[0] < eps || x - minorRadius[0] - bbox[0] < eps || -x - minorRadius[0] + bbox[2] < eps)) {
+          continue;
+        }
+        dataArr = [
+          [x, x, NaN],
+          [bbox[1] + m / minorGrid.board.unitY, bbox[3] - m / minorGrid.board.unitY, NaN]
+        ];
+        type_default.concat(this.dataX, dataArr[0]);
+        type_default.concat(this.dataY, dataArr[1]);
       }
     }
   };
@@ -59767,7 +61227,7 @@ jxg_default.createSlider = function(board, parents, attributes) {
   s = sw === -1 ? start : Math.round(start / sw) * sw;
   startx = pos0[0] + (pos1[0] - pos0[0]) * (s - smin) / (smax - smin);
   starty = pos0[1] + (pos1[1] - pos0[1]) * (s - smin) / (smax - smin);
-  attr.withLabel = false;
+  attr.withlabel = false;
   p3 = board.create("glider", [startx, starty, l1], attr);
   p3.setAttribute({ snapwidth: snapWidth, snapvalues: snapValues, snapvaluedistance: snapValueDistance });
   l2 = board.create("segment", [p1, p3], attr.highline);
@@ -59913,6 +61373,8 @@ jxg_default.createSlider = function(board, parents, attributes) {
     highLine: l2
   };
   p3.inherits.push(p1, p2, l1, l2);
+  l1.inherits = [];
+  l2.inherits = [];
   if (withTicks) {
     ti.dump = false;
     p3.subs.ticks = ti;
@@ -60004,6 +61466,9 @@ jxg_default.PrefixParser = {
         fun2 = term[0];
         if (fun2 === "V") {
           fun2 = "Value";
+        }
+        if (fun2 === "Coords") {
+          term[2] = "true";
         }
         if (!type_default.exists(term[1][fun2])) {
           throw new Error("PrefixParser.parse: " + fun2 + " is not a method of " + term[1]);
@@ -60181,13 +61646,13 @@ jxg_default.PrefixParser = {
     res = [];
     for (i2 = 1; i2 < le; i2++) {
       if (type_default.isInArray(["+", "-", "*", "/"], method)) {
-        res = res.concat(this.getParents(term[i2]));
+        type_default.concat(res, this.getParents(term[i2]));
       } else {
         if (method === "V" && term[i2].type === type_default.OBJECT_TYPE_MEASUREMENT) {
-          res = res.concat(term[i2].getParents());
+          type_default.concat(res, term[i2].getParents());
         } else if (method === "exec") {
           if (i2 > 1) {
-            res = res.concat(this.getParents(term[i2]));
+            type_default.concat(res, this.getParents(term[i2]));
           }
         } else {
           res.push(term[i2]);
@@ -60208,8 +61673,8 @@ jxg_default.createTapemeasure = function(board, parents, attributes) {
   p1 = board.create("point", pos0, attr);
   attr = type_default.copyAttributes(attributes, board.options, "tapemeasure", "point2");
   p2 = board.create("point", pos1, attr);
-  p1.setAttribute({ ignoredSnapToPoints: [p2] });
-  p2.setAttribute({ ignoredSnapToPoints: [p1] });
+  p1.setAttribute({ ignoredSnapToPoints: [p2.id] });
+  p2.setAttribute({ ignoredSnapToPoints: [p1.id] });
   attr = type_default.copyAttributes(attributes, board.options, "tapemeasure");
   withTicks = attr.withticks;
   withText = attr.withlabel;
@@ -60299,7 +61764,7 @@ jxg_default.createMeasurement = function(board, parents, attributes) {
     return prefix_default.dimension(term);
   };
   el.Unit = function() {
-    let unit = "", units = type_default.evaluate(el.visProp.units), dim = el.Dimension();
+    var unit = "", units = type_default.evaluate(el.visProp.units), dim = el.Dimension();
     if (type_default.isObject(units) && type_default.exists(units[dim]) && units[dim] !== false) {
       unit = type_default.evaluate(units[dim]);
     } else if (type_default.isObject(units) && type_default.exists(units["dim" + dim]) && units["dim" + dim] !== false) {
@@ -60316,6 +61781,13 @@ jxg_default.createMeasurement = function(board, parents, attributes) {
   };
   el.getTerm = function() {
     return term;
+  };
+  el.getMethod = function() {
+    var method = term[0];
+    if (method === "V") {
+      method = "Value";
+    }
+    return method;
   };
   el.toPrefix = function() {
     return prefix_default.toPrefix(term);
@@ -60397,8 +61869,8 @@ jxg_default.createMeasurement = function(board, parents, attributes) {
     Unit: "Unit",
     getTerm: "getTerm",
     Term: "getTerm",
-    getTermPrefix: "getTermPrefix",
-    TermPrefix: "getTermPrefix",
+    getMethod: "getMethod",
+    Method: "getMethod",
     getParents: "getParents",
     Parents: "getParents"
   });
@@ -60687,7 +62159,7 @@ jxg_default.extend(
      * @returns {Array}    Array of JXG polygons defining the bars
      */
     drawBar: function(board, x, y, attributes) {
-      var i2, strwidth, text, w, xp0, xp1, xp2, yp, colors, pols = [], p = [], attr, attrSub, makeXpFun = function(i3, f) {
+      var i2, text, w, xp0, xp1, xp2, yp, colors, pols = [], p = [], attr, attrSub, makeXpFun = function(i3, f) {
         return function() {
           return x[i3]() - f * w;
         };
@@ -60810,23 +62282,23 @@ jxg_default.extend(
      * @returns {Object}  with keys: "{sectors, points, midpoint}"
      */
     drawPie: function(board, y, attributes) {
-      var i2, center, p = [], sector = [], s = statistics_default.sum(y), colorArray = attributes.colors, highlightColorArray = attributes.highlightcolors, labelArray = attributes.labels, r = attributes.radius || 4, radius = r, cent = attributes.center || [0, 0], xc = cent[0], yc = cent[1], makeRadPointFun = function(j, fun2, xc2) {
+      var i2, center, p = [], sector = [], colorArray = attributes.colors, highlightColorArray = attributes.highlightcolors, labelArray = attributes.labels, r = attributes.radius || 4, radius = r, cent = attributes.center || [0, 0], xc = cent[0], yc = cent[1], makeRadPointFun = function(j, fun2, xc2) {
         return function() {
-          var s2, i3, rad, t = 0;
+          var s, i3, rad, t = 0;
           for (i3 = 0; i3 <= j; i3++) {
             t += parseFloat(type_default.evaluate(y[i3]));
           }
-          s2 = t;
+          s = t;
           for (i3 = j + 1; i3 < y.length; i3++) {
-            s2 += parseFloat(type_default.evaluate(y[i3]));
+            s += parseFloat(type_default.evaluate(y[i3]));
           }
-          rad = s2 !== 0 ? 2 * Math.PI * t / s2 : 0;
+          rad = s !== 0 ? 2 * Math.PI * t / s : 0;
           return radius() * Math[fun2](rad) + xc2;
         };
-      }, highlightHandleLabel = function(f, s2) {
+      }, highlightHandleLabel = function(f, s) {
         var dx = -this.point1.coords.usrCoords[1] + this.point2.coords.usrCoords[1], dy = -this.point1.coords.usrCoords[2] + this.point2.coords.usrCoords[2];
         if (type_default.exists(this.label)) {
-          this.label.rendNode.style.fontSize = s2 * type_default.evaluate(this.label.visProp.fontsize) + "px";
+          this.label.rendNode.style.fontSize = s * type_default.evaluate(this.label.visProp.fontsize) + "px";
           this.label.fullUpdate();
         }
         this.point2.coords = new coords_default(
@@ -60937,7 +62409,7 @@ jxg_default.extend(
      * @returns {Object} with keys "{circles, lines, points, midpoint, polygons}"
      */
     drawRadar: function(board, parents, attributes) {
-      var i2, j, paramArray, numofparams, maxes, mins, la, pdata, ssa, esa, ssratio, esratio, sshifts, eshifts, starts, ends, labelArray, colorArray, highlightColorArray, radius, myAtts, cent, xc, yc, center, start_angle, rad, p, line, t, xcoord, ycoord, polygons, legend_position, circles, lxoff, lyoff, cla, clabelArray, ncircles, pcircles, angle, dr, sw, data, len = parents.length, get_anchor = function() {
+      var i2, j, paramArray, numofparams, maxes, mins, la, pdata, ssa, esa, ssratio, esratio, sshifts, eshifts, starts, ends, labelArray, colorArray, radius, myAtts, cent, xc, yc, center, start_angle, rad, p, line, t, xcoord, ycoord, polygons, legend_position, circles, lxoff, lyoff, cla, clabelArray, ncircles, pcircles, angle, dr, sw, data, len = parents.length, get_anchor = function() {
         var x1, x2, y1, y2, relCoords = type_default.evaluate(this.visProp.label.offset).slice(0);
         x1 = this.point1.X();
         x2 = this.point2.X();
@@ -61054,7 +62526,6 @@ jxg_default.extend(
       }
       labelArray = attributes.labelarray || la;
       colorArray = attributes.colors;
-      highlightColorArray = attributes.highlightcolors;
       radius = attributes.radius || 10;
       sw = attributes.strokewidth || 1;
       if (!type_default.exists(attributes.highlightonsector)) {
@@ -65402,14 +66873,14 @@ jxg_default.createVectorField = function(board, parents, attributes) {
         v = this.F(x, y);
         v[0] *= scale;
         v[1] *= scale;
-        this.dataX = this.dataX.concat([x, x + v[0], NaN]);
-        this.dataY = this.dataY.concat([y, y + v[1], NaN]);
+        type_default.concat(this.dataX, [x, x + v[0], NaN]);
+        type_default.concat(this.dataY, [y, y + v[1], NaN]);
         if (showArrow && Math.abs(v[0]) + Math.abs(v[1]) > 0) {
           theta = Math.atan2(v[1], v[0]);
           phi1 = theta + alpha;
           phi2 = theta - alpha;
-          this.dataX = this.dataX.concat([x + v[0] - Math.cos(phi1) * leg_x, x + v[0], x + v[0] - Math.cos(phi2) * leg_x, NaN]);
-          this.dataY = this.dataY.concat([y + v[1] - Math.sin(phi1) * leg_y, y + v[1], y + v[1] - Math.sin(phi2) * leg_y, NaN]);
+          type_default.concat(this.dataX, [x + v[0] - Math.cos(phi1) * leg_x, x + v[0], x + v[0] - Math.cos(phi2) * leg_x, NaN]);
+          type_default.concat(this.dataY, [y + v[1] - Math.sin(phi1) * leg_y, y + v[1], y + v[1] - Math.sin(phi2) * leg_y, NaN]);
         }
       }
     }
@@ -65936,21 +67407,21 @@ jxg_default.extend(options_default, {
      * @type Line3D
      * @name View3D#xAxis
      */
-    xAxis: { visible: true, point2: { name: "x" } },
+    xAxis: { visible: true, point2: { name: "x" }, strokeColor: jxg_default.palette.red },
     /**
      * Attributes of the 3D y-axis.
      *
      * @type Line3D
      * @name View3D#yAxis
      */
-    yAxis: { visible: true, point2: { name: "y" } },
+    yAxis: { visible: true, point2: { name: "y" }, strokeColor: jxg_default.palette.green },
     /**
      * Attributes of the 3D z-axis.
      *
      * @type Line3D
      * @name View3D#zAxis
      */
-    zAxis: { visible: true, point2: { name: "z" } },
+    zAxis: { visible: true, point2: { name: "z" }, strokeColor: jxg_default.palette.blue },
     // Planes
     /**
      * Attributes of the 3D plane orthogonal to the x-axis at the "rear" of the cube.
@@ -66113,6 +67584,7 @@ jxg_default.extend(options_default, {
   },
   axis3d: {
     highlight: false,
+    fixed: true,
     strokecolor: "black",
     strokeWidth: 1,
     tabindex: null,
@@ -66129,19 +67601,10 @@ jxg_default.extend(options_default, {
     numberPointsHigh: 200
     /**#@-*/
   },
-  mesh3d: {
-    /**#@+
-     * @visprop
-     */
-    strokeWidth: 1,
-    strokeColor: "#9a9a9a",
-    strokeOpacity: 0.6,
-    highlight: false,
-    fillColor: "#9a9a9a",
-    fillOpacity: 0.1,
-    tabindex: null,
-    visible: "inherit"
-    /**#@-*/
+  intersectionline3d: {
+    point1: { visible: false, name: "" },
+    // Used in point/point
+    point2: { visible: false, name: "" }
   },
   line3d: {
     strokeWidth: 1,
@@ -66155,6 +67618,20 @@ jxg_default.extend(options_default, {
     point1: { visible: false, name: "" },
     // Used in point/point
     point2: { visible: false, name: "" }
+  },
+  mesh3d: {
+    /**#@+
+     * @visprop
+     */
+    strokeWidth: 1,
+    strokeColor: "#9a9a9a",
+    strokeOpacity: 0.6,
+    highlight: false,
+    fillColor: "#9a9a9a",
+    fillOpacity: 0.1,
+    tabindex: null,
+    visible: "inherit"
+    /**#@-*/
   },
   plane3d: {
     strokeWidth: 0,
@@ -66176,6 +67653,31 @@ jxg_default.extend(options_default, {
     gradientSecondColor: "#555555",
     fillColor: "yellow",
     highlightStrokeColor: "#555555"
+  },
+  polygon3d: {
+    /**#@+
+     * @visprop
+     */
+    highlight: false,
+    tabindex: -1,
+    strokeWidth: 1,
+    fillColor: "none"
+    /**#@-*/
+  },
+  sphere3d: {
+    /**#@+
+     * @visprop
+     */
+    highlight: false,
+    strokeWidth: 1,
+    strokeColor: "#00ff80",
+    fillColor: "white",
+    gradient: "radial",
+    gradientSecondColor: "#00ff80",
+    gradientFX: 0.7,
+    gradientFY: 0.3,
+    fillOpacity: 0.4
+    /**#@-*/
   },
   surface3d: {
     /**#@+
@@ -66237,7 +67739,12 @@ jxg_default.extend(options_default, {
      */
     needsRegularUpdate: true,
     /**
-     * Choose the projection is to be used: `parallel` or `central`.
+     * Choose the projection type to be used: `parallel` or `central`.
+     * <ul>
+     * <li> `parallel` is parallel projection, also called orthographic projection
+     * <li> `central` is central projection, also called perspective projection
+     * </ul>
+     *
      *
      * @name View3D#projection
      * @type String
@@ -66320,7 +67827,7 @@ jxg_default.extend(options_default, {
       },
       continuous: true,
       slider: {
-        visible: true,
+        visible: "inherit",
         style: 6,
         point1: { frozen: true },
         point2: { frozen: true },
@@ -66387,7 +67894,7 @@ jxg_default.extend(options_default, {
       },
       continuous: true,
       slider: {
-        visible: true,
+        visible: "inherit",
         style: 6,
         point1: { frozen: true },
         point2: { frozen: true },
@@ -66395,6 +67902,79 @@ jxg_default.extend(options_default, {
         max: 2 * Math.PI,
         start: 0.3
       }
+    },
+    /**
+     * Specify the user handling of the bank angle.
+     * <ul>
+     *  <li><tt>pointer</tt> sub-attributes:
+     *      <ul>
+     *          <li><tt>enabled</tt>: Boolean that specifies whether pointer navigation is allowed by elevation.
+     *          <li><tt>speed</tt>: Number indicating how many passes the range of the el_slider makes when the cursor crosses the entire board once in the horizontal direction.
+     *          <li><tt>outside</tt>: Boolean that specifies whether the pointer navigation is continued when the cursor leaves the board.
+     *          <li><tt>button</tt>: Which button of the pointer should be used? (<tt>'-1'</tt> (=no button), <tt>'0'</tt> or <tt>'2'</tt>)
+     *          <li><tt>key</tt>: Should an additional key be pressed? (<tt>'none'</tt>, <tt>'shift'</tt> or <tt>'ctrl'</tt>)
+     *      </ul>
+     *  <li><tt>keyboard</tt> sub-attributes:
+     *      <ul>
+     *          <li><tt>enabled</tt>: Boolean that specifies whether the keyboard (arrow keys) can be used to navigate the board.
+     *          <li><tt>step</tt>: Size of the step per keystroke.
+     *          <li><tt>key</tt>: Should an additional key be pressed? (<tt>'none'</tt>, <tt>'shift'</tt> or <tt>'ctrl'</tt>)
+     *      </ul>
+     *  <li><tt>continuous</tt>: Boolean that specifies whether the el_slider starts again from the beginning when its end is reached.
+     *  <li><tt>slider</tt> attributes of the el_slider ({@link Slider}) with additional
+     *      <ul>
+     *          <li><tt>min</tt>: Minimum value.
+     *          <li><tt>max</tt>: Maximum value.
+     *          <li><tt>start</tt>: Start value.
+     *      </ul>
+     * </ul>
+     *
+     * @name View3D#bank
+     * @type Object
+     * @default <pre>{
+     *      pointer: {enabled: true, speed: 1, outside: true, button: -1, key: 'none'},
+     *      keyboard: {enabled: true, step: 10, key: 'ctrl'},
+     *      continuous: true,
+     *      slider: {
+     *          visible: true,
+     *          style: 6,
+     *          point1: {frozen: true},
+     *          point2: {frozen: true},
+     *          min: 0,
+     *          max: 2 * Math.PI,
+     *          start: 0.3
+     *      },
+     * }<pre>
+     */
+    bank: {
+      pointer: {
+        enabled: true,
+        speed: 0.08,
+        outside: true,
+        button: -1,
+        key: "none"
+      },
+      keyboard: {
+        enabled: true,
+        step: 10,
+        key: "ctrl"
+      },
+      continuous: true,
+      slider: {
+        visible: "inherit",
+        style: 6,
+        point1: { frozen: true },
+        point2: { frozen: true },
+        min: -Math.PI,
+        max: Math.PI,
+        start: 0
+      }
+    },
+    trackball: {
+      enabled: false,
+      outside: true,
+      button: -1,
+      key: "none"
     },
     /**
      * Distance of the camera to the center of the view.
@@ -66411,6 +67991,14 @@ jxg_default.extend(options_default, {
      * @default 2/5*Math.PI
      */
     fov: 1 / 5 * 2 * Math.PI,
+    /**
+     * When this option is enabled, points closer to the screen are drawn
+     * over points further from the screen within each layer.
+     *
+     * @name View3D#depthOrderPoints
+     * @default false
+     */
+    depthOrderPoints: false,
     /**
      * Fixed values for the view, which can be changed using keyboard keys `picture-up` and `picture-down`.
      * Array of the form: [[el0, az0, r0], [el1, az1, r1, ...[eln, azn, rn]]
@@ -66444,18 +68032,33 @@ var options3d_default = jxg_default.Options;
 jxg_default.View3D = function(board, parents, attributes) {
   this.constructor(board, attributes, constants_default.OBJECT_TYPE_VIEW3D, constants_default.OBJECT_CLASS_3D);
   this.objects = {};
+  this.points = this.visProp.depthorderpoints ? [] : null;
   this.elementsByName = {};
   this.defaultAxes = null;
+  this.angles = {
+    az: null,
+    el: null,
+    bank: null
+  };
+  this.matrix3DRot = [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]
+  ];
   this.matrix3D = [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
     [0, 0, 1, 0]
   ];
+  this.boxToCam = [];
   this.llftCorner = parents[0];
   this.size = parents[1];
   this.bbox3D = parents[2];
   this.r = -1;
+  this.focalDist = -1;
   this.projectionType = "parallel";
+  this.trackballEnabled = false;
   this.timeoutAzimuth = null;
   this.id = this.board.setId(this, "V");
   this.board.finalizeAdding(this);
@@ -66541,76 +68144,276 @@ jxg_default.extend(
       }
       return s;
     },
-    updateParallelProjection: function() {
-      var r, a, e, f, mat = [
+    // set the Tait-Bryan angles to specify the current view rotation matrix
+    setAnglesFromRotation: function() {
+      var rem = this.matrix3DRot, rBank, cosBank, sinBank, cosEl, sinEl, cosAz, sinAz;
+      rBank = Math.sqrt(rem[1][3] * rem[1][3] + rem[2][3] * rem[2][3]);
+      if (rBank > math_default.eps) {
+        cosBank = rem[2][3] / rBank;
+        sinBank = rem[1][3] / rBank;
+      } else {
+        cosBank = Math.cos(this.angles.bank);
+        sinBank = Math.sin(this.angles.bank);
+      }
+      rem = math_default.matMatMult([
+        [1, 0, 0, 0],
+        [0, cosBank, -sinBank, 0],
+        [0, sinBank, cosBank, 0],
+        [0, 0, 0, 1]
+      ], rem);
+      this.angles.bank = Math.atan2(sinBank, cosBank);
+      cosEl = rem[2][3];
+      sinEl = rem[3][3];
+      rem = math_default.matMatMult([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
-        [0, 0, 1, 0]
+        [0, 0, cosEl, sinEl],
+        [0, 0, -sinEl, cosEl]
+      ], rem);
+      this.angles.el = Math.atan2(sinEl, cosEl);
+      cosAz = -rem[1][1];
+      sinAz = rem[3][1];
+      this.angles.az = Math.atan2(sinAz, cosAz);
+      if (this.angles.az < 0)
+        this.angles.az += 2 * Math.PI;
+      this.setSlidersFromAngles();
+    },
+    anglesHaveMoved: function() {
+      return this._hasMoveAz || this._hasMoveEl || Math.abs(this.angles.az - this.az_slide.Value()) > math_default.eps || Math.abs(this.angles.el - this.el_slide.Value()) > math_default.eps || Math.abs(this.angles.bank - this.bank_slide.Value()) > math_default.eps;
+    },
+    getAnglesFromSliders: function() {
+      this.angles.az = this.az_slide.Value();
+      this.angles.el = this.el_slide.Value();
+      this.angles.bank = this.bank_slide.Value();
+    },
+    setSlidersFromAngles: function() {
+      this.az_slide.setValue(this.angles.az);
+      this.el_slide.setValue(this.angles.el);
+      this.bank_slide.setValue(this.angles.bank);
+    },
+    // return the rotation matrix specified by the current Tait-Bryan angles
+    getRotationFromAngles: function() {
+      var a, e, b, f, cosBank, sinBank, mat = [
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
       ];
-      e = this.el_slide.Value();
-      r = this.r;
-      a = this.az_slide.Value();
-      f = r * Math.sin(e);
-      mat[1][1] = r * Math.cos(a);
-      mat[1][2] = -r * Math.sin(a);
+      a = this.angles.az;
+      e = this.angles.el;
+      b = this.angles.bank;
+      f = -Math.sin(e);
+      mat[1][1] = -Math.cos(a);
+      mat[1][2] = Math.sin(a);
+      mat[1][3] = 0;
       mat[2][1] = f * Math.sin(a);
       mat[2][2] = f * Math.cos(a);
       mat[2][3] = Math.cos(e);
+      mat[3][1] = Math.cos(e) * Math.sin(a);
+      mat[3][2] = Math.cos(e) * Math.cos(a);
+      mat[3][3] = Math.sin(e);
+      cosBank = Math.cos(b);
+      sinBank = Math.sin(b);
+      mat = math_default.matMatMult([
+        [1, 0, 0, 0],
+        [0, cosBank, sinBank, 0],
+        [0, -sinBank, cosBank, 0],
+        [0, 0, 0, 1]
+      ], mat);
       return mat;
+    },
+    /**
+     * Project 2D point (x,y) to the virtual trackpad sphere,
+     * see Bell's virtual trackpad, and return z-component of the
+     * number.
+     *
+     * @param {Number} r
+     * @param {Number} x
+     * @param {Number} y
+     * @returns Number
+     * @private
+     */
+    _projectToSphere: function(r, x, y) {
+      var d = math_default.hypot(x, y), t, z;
+      if (d < r * 0.7071067811865475) {
+        z = Math.sqrt(r * r - d * d);
+      } else {
+        t = r / 1.414213562373095;
+        z = t * t / d;
+      }
+      return z;
+    },
+    /**
+     * Determine 4x4 rotation matrix with Bell's virtual trackball.
+     *
+     * @returns {Array} 4x4 rotation matrix
+     * @private
+     */
+    updateProjectionTrackball: function(Pref) {
+      var R = 100, dx, dy, dr2, p1, p2, x, y, theta, t, d, c, s, n, mat = [
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+      ];
+      if (!type_default.exists(this._trackball)) {
+        return this.matrix3DRot;
+      }
+      dx = this._trackball.dx;
+      dy = this._trackball.dy;
+      dr2 = dx * dx + dy * dy;
+      if (dr2 > math_default.eps) {
+        R = (this.size[0] * this.board.unitX + this.size[1] * this.board.unitY) * 0.25;
+        x = this._trackball.x;
+        y = this._trackball.y;
+        p2 = [x, y, this._projectToSphere(R, x, y)];
+        x -= dx;
+        y -= dy;
+        p1 = [x, y, this._projectToSphere(R, x, y)];
+        n = math_default.crossProduct(p1, p2);
+        d = math_default.hypot(n[0], n[1], n[2]);
+        n[0] /= d;
+        n[1] /= d;
+        n[2] /= d;
+        t = geometry_default.distance(p2, p1, 3) / (2 * R);
+        t = t > 1 ? 1 : t;
+        t = t < -1 ? -1 : t;
+        theta = 2 * Math.asin(t);
+        c = Math.cos(theta);
+        t = 1 - c;
+        s = Math.sin(theta);
+        mat[1][1] = c + n[0] * n[0] * t;
+        mat[2][1] = n[1] * n[0] * t + n[2] * s;
+        mat[3][1] = n[2] * n[0] * t - n[1] * s;
+        mat[1][2] = n[0] * n[1] * t - n[2] * s;
+        mat[2][2] = c + n[1] * n[1] * t;
+        mat[3][2] = n[2] * n[1] * t + n[0] * s;
+        mat[1][3] = n[0] * n[2] * t + n[1] * s;
+        mat[2][3] = n[1] * n[2] * t - n[0] * s;
+        mat[3][3] = c + n[2] * n[2] * t;
+      }
+      mat = math_default.matMatMult(mat, this.matrix3DRot);
+      return mat;
+    },
+    updateAngleSliderBounds: function() {
+      var az_smax, az_smin, el_smax, el_smin, el_cover, el_smid, el_equiv, el_flip_equiv, el_equiv_loss, el_flip_equiv_loss, el_interval_loss, bank_smax, bank_smin;
+      this.trackballEnabled = type_default.evaluate(this.visProp.trackball.enabled);
+      if (this.trackballEnabled) {
+        this.az_slide.setMin(0);
+        this.az_slide.setMax(2 * Math.PI);
+        this.el_slide.setMin(-0.5 * Math.PI);
+        this.el_slide.setMax(0.5 * Math.PI);
+        this.bank_slide.setMin(-Math.PI);
+        this.bank_slide.setMax(Math.PI);
+      } else {
+        this.az_slide.setMin(this.visProp.az.slider.min);
+        this.az_slide.setMax(this.visProp.az.slider.max);
+        this.el_slide.setMin(this.visProp.el.slider.min);
+        this.el_slide.setMax(this.visProp.el.slider.max);
+        this.bank_slide.setMin(this.visProp.bank.slider.min);
+        this.bank_slide.setMax(this.visProp.bank.slider.max);
+      }
+      az_smax = this.az_slide._smax;
+      az_smin = this.az_slide._smin;
+      el_smax = this.el_slide._smax;
+      el_smin = this.el_slide._smin;
+      bank_smax = this.bank_slide._smax;
+      bank_smin = this.bank_slide._smin;
+      if (this.trackballEnabled) {
+        el_cover = math_default.mod(this.angles.el, 2 * Math.PI);
+        if (0.5 * Math.PI < el_cover && el_cover < 1.5 * Math.PI) {
+          this.angles.el = Math.PI - el_cover;
+          this.angles.az = math_default.wrap(this.angles.az + Math.PI, az_smin, az_smax);
+          this.angles.bank = math_default.wrap(this.angles.bank + Math.PI, bank_smin, bank_smax);
+        }
+        this.angles.az = math_default.wrap(this.angles.az, az_smin, az_smax);
+        this.angles.el = math_default.wrap(this.angles.el, el_smin, el_smax);
+        this.angles.bank = math_default.wrap(this.angles.bank, bank_smin, bank_smax);
+      } else {
+        el_interval_loss = function(t) {
+          if (t < el_smin) {
+            return el_smin - t;
+          } else if (el_smax < t) {
+            return t - el_smax;
+          } else {
+            return 0;
+          }
+        };
+        el_smid = 0.5 * (el_smin + el_smax);
+        el_equiv = math_default.wrap(
+          this.angles.el,
+          el_smid - Math.PI,
+          el_smid + Math.PI
+        );
+        el_flip_equiv = math_default.wrap(
+          Math.PI - this.angles.el,
+          el_smid - Math.PI,
+          el_smid + Math.PI
+        );
+        el_equiv_loss = el_interval_loss(el_equiv);
+        el_flip_equiv_loss = el_interval_loss(el_flip_equiv);
+        if (el_equiv_loss <= el_flip_equiv_loss) {
+          this.angles.el = math_default.clamp(el_equiv, el_smin, el_smax);
+        } else {
+          this.angles.el = math_default.clamp(el_flip_equiv, el_smin, el_smax);
+          this.angles.az = math_default.wrap(this.angles.az + Math.PI, az_smin, az_smax);
+          this.angles.bank = math_default.wrap(this.angles.bank + Math.PI, bank_smin, bank_smax);
+        }
+        this.angles.az = math_default.wrapAndClamp(this.angles.az, az_smin, az_smax, 2 * Math.PI);
+        this.angles.bank = math_default.wrapAndClamp(this.angles.bank, bank_smin, bank_smax, 2 * Math.PI);
+        this.matrix3DRot = this.getRotationFromAngles();
+      }
+      this.setSlidersFromAngles();
     },
     /**
      * @private
      * @returns {Array}
      */
     _updateCentralProjection: function() {
-      var r, e, a, up, az, ax, ay, v, nrm, Tcam1, eye, d, foc = 1 / Math.tan(0.5 * type_default.evaluate(this.visProp.fov)), zf = 20, zn = 8, Pref = [
-        0.5 * (this.bbox3D[0][0] + this.bbox3D[0][1]),
-        0.5 * (this.bbox3D[0][0] + this.bbox3D[0][1]),
-        0.5 * (this.bbox3D[0][0] + this.bbox3D[0][1])
-      ], A = [
-        [0, 0, 0, -1],
-        [0, foc, 0, 0],
-        [0, 0, foc, 0],
-        [2 * zf * zn / (zn - zf), 0, 0, (zf + zn) / (zn - zf)]
-      ], func_sphere;
-      func_sphere = function(az2, el, r2) {
-        return [
-          r2 * Math.cos(az2) * Math.cos(el),
-          -r2 * Math.sin(az2) * Math.cos(el),
-          r2 * Math.sin(el)
-        ];
-      };
-      a = this.az_slide.Value() + 3 * Math.PI * 0.5;
-      e = this.el_slide.Value() * 2;
+      var zf = 20, zn = 8, r, A;
       r = type_default.evaluate(this.visProp.r);
       if (r === "auto") {
-        r = Math.sqrt(
-          Math.pow(this.bbox3D[0][0] - this.bbox3D[0][1], 2) + Math.pow(this.bbox3D[1][0] - this.bbox3D[1][1], 2) + Math.pow(this.bbox3D[2][0] - this.bbox3D[2][1], 2)
+        r = math_default.hypot(
+          this.bbox3D[0][0] - this.bbox3D[0][1],
+          this.bbox3D[1][0] - this.bbox3D[1][1],
+          this.bbox3D[2][0] - this.bbox3D[2][1]
         ) * 1.01;
       }
-      up = func_sphere(a, e + Math.PI / 2, 1);
-      eye = func_sphere(a, e, r);
-      d = [eye[0] - Pref[0], eye[1] - Pref[1], eye[2] - Pref[2]];
-      nrm = math_default.norm(d, 3);
-      az = [d[0] / nrm, d[1] / nrm, d[2] / nrm];
-      nrm = math_default.norm(up, 3);
-      v = [up[0] / nrm, up[1] / nrm, up[2] / nrm];
-      ax = math_default.crossProduct(v, az);
-      ay = math_default.crossProduct(az, ax);
-      v = math_default.matVecMult([ax, ay, az], eye);
-      Tcam1 = [
-        [1, 0, 0, 0],
-        [-v[0], ax[0], ax[1], ax[2]],
-        [-v[1], ay[0], ay[1], ay[2]],
-        [-v[2], az[0], az[1], az[2]]
+      this.boxToCam = this.matrix3DRot.map((row) => row.slice());
+      this.boxToCam[3][0] = -r;
+      this.focalDist = 1 / Math.tan(0.5 * type_default.evaluate(this.visProp.fov));
+      A = [
+        [0, 0, 0, -1],
+        [0, this.focalDist, 0, 0],
+        [0, 0, this.focalDist, 0],
+        [2 * zf * zn / (zn - zf), 0, 0, (zf + zn) / (zn - zf)]
       ];
-      A = math_default.matMatMult(A, Tcam1);
-      return A;
+      return math_default.matMatMult(A, this.boxToCam);
+    },
+    /**
+     * Comparison function for 3D points. It is used to sort points according to their z-index.
+     * @param {Point3D} a
+     * @param {Point3D} b
+     * @returns Integer
+     */
+    compareDepth: function(a, b) {
+      var worldDiff = [
+        0,
+        a.coords[1] - b.coords[1],
+        a.coords[2] - b.coords[2],
+        a.coords[3] - b.coords[3]
+      ], oriBoxDiff = math_default.matVecMult(this.matrix3DRot, math_default.matVecMult(this.shift, worldDiff));
+      return oriBoxDiff[3];
     },
     // Update 3D-to-2D transformation matrix with the actual azimuth and elevation angles.
     update: function() {
-      var mat2D, shift, size2;
-      if (!type_default.exists(this.el_slide) || !type_default.exists(this.az_slide) || !this.needsUpdate) {
+      var r = this.r, stretch = [
+        [1, 0, 0, 0],
+        [0, -r, 0, 0],
+        [0, 0, -r, 0],
+        [0, 0, 0, 1]
+      ], mat2D, objectToClip, size2, dx, dy, objectsList;
+      if (!type_default.exists(this.el_slide) || !type_default.exists(this.az_slide) || !type_default.exists(this.bank_slide) || !this.needsUpdate) {
         return this;
       }
       mat2D = [
@@ -66619,30 +68422,57 @@ jxg_default.extend(
         [0, 0, 1]
       ];
       this.projectionType = type_default.evaluate(this.visProp.projection).toLowerCase();
+      if (this.trackballEnabled !== type_default.evaluate(this.visProp.trackball.enabled)) {
+        this.updateAngleSliderBounds();
+      }
+      if (this._hasMoveTrackball) {
+        this.matrix3DRot = this.updateProjectionTrackball();
+        this.setAnglesFromRotation();
+      } else if (this.anglesHaveMoved()) {
+        this.getAnglesFromSliders();
+        this.matrix3DRot = this.getRotationFromAngles();
+      }
+      this.shift = [
+        [1, 0, 0, 0],
+        [-0.5 * (this.bbox3D[0][0] + this.bbox3D[0][1]), 1, 0, 0],
+        [-0.5 * (this.bbox3D[1][0] + this.bbox3D[1][1]), 0, 1, 0],
+        [-0.5 * (this.bbox3D[2][0] + this.bbox3D[2][1]), 0, 0, 1]
+      ];
       switch (this.projectionType) {
         case "central":
-          this.matrix3D = this._updateCentralProjection();
-          size2 = 0.4;
-          mat2D[1][1] = this.size[0] / (2 * size2);
-          mat2D[2][2] = this.size[1] / (2 * size2);
-          mat2D[1][0] = this.llftCorner[0] + mat2D[1][1] * 0.5 * (2 * size2);
-          mat2D[2][0] = this.llftCorner[1] + mat2D[2][2] * 0.5 * (2 * size2);
+          size2 = 2 * 0.4;
+          mat2D[1][1] = this.size[0] / size2;
+          mat2D[2][2] = this.size[1] / size2;
+          mat2D[1][0] = this.llftCorner[0] + mat2D[1][1] * 0.5 * size2;
+          mat2D[2][0] = this.llftCorner[1] + mat2D[2][2] * 0.5 * size2;
           this.viewPortTransform = mat2D;
+          objectToClip = this._updateCentralProjection();
+          this.matrix3D = math_default.matMatMult(objectToClip, this.shift);
           break;
         case "parallel":
         default:
-          shift = [
-            [1, 0, 0, 0],
-            [-0.5 * (this.bbox3D[0][0] + this.bbox3D[0][1]), 1, 0, 0],
-            [-0.5 * (this.bbox3D[1][0] + this.bbox3D[1][1]), 0, 1, 0],
-            [-0.5 * (this.bbox3D[2][0] + this.bbox3D[2][1]), 0, 0, 1]
-          ];
-          mat2D[1][1] = this.size[0] / (this.bbox3D[0][1] - this.bbox3D[0][0]);
-          mat2D[2][2] = this.size[1] / (this.bbox3D[1][1] - this.bbox3D[1][0]);
-          mat2D[1][0] = this.llftCorner[0] + mat2D[1][1] * 0.5 * (this.bbox3D[0][1] - this.bbox3D[0][0]);
-          mat2D[2][0] = this.llftCorner[1] + mat2D[2][2] * 0.5 * (this.bbox3D[1][1] - this.bbox3D[1][0]);
-          this.matrix3D = this.updateParallelProjection();
-          this.matrix3D = math_default.matMatMult(mat2D, math_default.matMatMult(this.matrix3D, shift));
+          dx = this.bbox3D[0][1] - this.bbox3D[0][0];
+          dy = this.bbox3D[1][1] - this.bbox3D[1][0];
+          mat2D[1][1] = this.size[0] / dx;
+          mat2D[2][2] = this.size[1] / dy;
+          mat2D[1][0] = this.llftCorner[0] + mat2D[1][1] * 0.5 * dx;
+          mat2D[2][0] = this.llftCorner[1] + mat2D[2][2] * 0.5 * dy;
+          this.matrix3D = math_default.matMatMult(
+            mat2D,
+            math_default.matMatMult(math_default.matMatMult(this.matrix3DRot, stretch), this.shift).slice(0, 3)
+          );
+      }
+      if (this.visProp.depthorderpoints && this.points === null) {
+        objectsList = Object.values(this.objects);
+        this.points = objectsList.filter(
+          (el) => el.type === constants_default.OBJECT_TYPE_POINT3D
+        );
+      }
+      if (!this.visProp.depthorderpoints && this.points !== null) {
+        this.points = null;
+      }
+      if (this.visProp.depthorderpoints && this.board.renderer && this.board.renderer.type === "svg") {
+        this.points.filter((pt) => type_default.evaluate(pt.element2D.visProp.visible)).sort(this.compareDepth.bind(this)).forEach((pt) => this.board.renderer.setLayer(pt.element2D, pt.element2D.visProp.layer));
       }
       return this;
     },
@@ -66671,6 +68501,27 @@ jxg_default.extend(
       return this;
     },
     /**
+     * Map world coordinates to focal coordinates. These coordinate systems
+     * are explained in the {@link JXG.View3D#boxToCam} matrix
+     * documentation.
+     *
+     * @param {Array} pWorld A world space point, in homogeneous coordinates.
+     * @param {Boolean} [homog=true] Whether to return homogeneous coordinates.
+     * If false, projects down to ordinary coordinates.
+     */
+    worldToFocal: function(pWorld, homog = true) {
+      var k, pView = math_default.matVecMult(this.boxToCam, math_default.matVecMult(this.shift, pWorld));
+      pView[3] -= pView[0] * this.focalDist;
+      if (homog) {
+        return pView;
+      } else {
+        for (k = 1; k < 4; k++) {
+          pView[k] /= pView[0];
+        }
+        return pView.slice(1, 4);
+      }
+    },
+    /**
      * Project 3D coordinates to 2D board coordinates
      * The 3D coordinates are provides as three numbers x, y, z or one array of length 3.
      *
@@ -66686,7 +68537,8 @@ jxg_default.extend(
         vec = [1, x, y, z];
       } else {
         if (x.length === 3) {
-          vec = [1].concat(x);
+          vec = x.slice();
+          vec.unshift(1);
         } else {
           vec = x;
         }
@@ -66705,6 +68557,25 @@ jxg_default.extend(
       }
     },
     /**
+     * We know that v2d * w0 = mat * (1, x, y, d)^T where v2d = (1, b, c, h)^T with unknowns w0, h, x, y.
+     * Setting R = mat^(-1) gives
+     *   1/ w0 * (1, x, y, d)^T = R * v2d.
+     * The first and the last row of this equation allows to determine 1/w0 and h.
+     *
+     * @param {Array} mat
+     * @param {Array} v2d
+     * @param {Number} d
+     * @returns Array
+     * @private
+     */
+    _getW0: function(mat, v2d, d) {
+      var R = math_default.inverse(mat), R1 = R[0][0] + v2d[1] * R[0][1] + v2d[2] * R[0][2], R2 = R[3][0] + v2d[1] * R[3][1] + v2d[2] * R[3][2], w, h, det;
+      det = d * R[0][3] - R[3][3];
+      w = (R2 * R[0][3] - R1 * R[3][3]) / det;
+      h = (R2 - R1 * d) / det;
+      return [1 / w, h];
+    },
+    /**
      * Project a 2D coordinate to the plane defined by point "foot"
      * and the normal vector `normal`.
      *
@@ -66715,22 +68586,93 @@ jxg_default.extend(
      * point in homogeneous coordinates.
      */
     project2DTo3DPlane: function(point2d, normal, foot) {
-      var mat, rhs, d, le, n = normal.slice(1), sol;
+      var mat, rhs, d, le, sol, n = normal.slice(1), v2d, w0, res;
       foot = foot || [1, 0, 0, 0];
       le = math_default.norm(n, 3);
       d = math_default.innerProduct(foot.slice(1), n, 3) / le;
-      mat = this.matrix3D.slice(0, 3);
-      mat.push([0].concat(n));
-      rhs = point2d.coords.usrCoords.concat([d]);
-      try {
-        if (mat[2][3] === 1) {
-          mat[2][1] = mat[2][2] = math_default.eps * 1e-3;
+      if (this.projectionType === "parallel") {
+        mat = this.matrix3D.slice(0, 3);
+        mat.push([0, n[0], n[1], n[2]]);
+        rhs = point2d.coords.usrCoords.slice();
+        rhs.push(d);
+        try {
+          if (mat[2][3] === 1) {
+            mat[2][1] = mat[2][2] = math_default.eps * 1e-3;
+          }
+          sol = math_default.Numerics.Gauss(mat, rhs);
+        } catch (e) {
+          sol = [0, NaN, NaN, NaN];
         }
-        sol = math_default.Numerics.Gauss(mat, rhs);
-      } catch (err) {
-        sol = [0, NaN, NaN, NaN];
+      } else {
+        mat = this.matrix3D;
+        rhs = point2d.coords.usrCoords.slice();
+        v2d = math_default.Numerics.Gauss(this.viewPortTransform, rhs);
+        res = this._getW0(mat, v2d, d);
+        w0 = res[0];
+        rhs = [
+          v2d[0] * w0,
+          v2d[1] * w0,
+          v2d[2] * w0,
+          res[1] * w0
+        ];
+        try {
+          if (mat[2][3] === 1) {
+            mat[2][1] = mat[2][2] = math_default.eps * 1e-3;
+          }
+          sol = math_default.Numerics.Gauss(mat, rhs);
+          sol[1] /= sol[0];
+          sol[2] /= sol[0];
+          sol[3] /= sol[0];
+          sol[0] /= sol[0];
+        } catch (err) {
+          sol = [0, NaN, NaN, NaN];
+        }
       }
       return sol;
+    },
+    /**
+     * Project a point on the screen to the nearest point, in screen
+     * distance, on a line segment in 3d space. The inputs must be in
+     * ordinary coordinates, but the output is in homogeneous coordinates.
+     *
+     * @param {Array} pScr The screen coordinates of the point to project.
+     * @param {Array} end0 The world space coordinates of one end of the
+     * line segment.
+     * @param {Array} end1 The world space coordinates of the other end of
+     * the line segment.
+     */
+    projectScreenToSegment: function(pScr, end0, end1) {
+      var end0_2d = this.project3DTo2D(end0).slice(1, 3), end1_2d = this.project3DTo2D(end1).slice(1, 3), dir_2d = [
+        end1_2d[0] - end0_2d[0],
+        end1_2d[1] - end0_2d[1]
+      ], dir_2d_norm_sq = math_default.innerProduct(dir_2d, dir_2d), diff = [
+        pScr[0] - end0_2d[0],
+        pScr[1] - end0_2d[1]
+      ], s = math_default.innerProduct(diff, dir_2d) / dir_2d_norm_sq, mid, mid_2d, mid_diff, m, t, t_clamped, t_clamped_co;
+      if (this.projectionType === "central") {
+        mid = [
+          0.5 * (end0[0] + end1[0]),
+          0.5 * (end0[1] + end1[1]),
+          0.5 * (end0[2] + end1[2])
+        ];
+        mid_2d = this.project3DTo2D(mid).slice(1, 3);
+        mid_diff = [
+          mid_2d[0] - end0_2d[0],
+          mid_2d[1] - end0_2d[1]
+        ];
+        m = math_default.innerProduct(mid_diff, dir_2d) / dir_2d_norm_sq;
+        t = (1 - m) * s / ((1 - 2 * m) * s + m);
+      } else {
+        t = s;
+      }
+      t_clamped = Math.min(Math.max(t, 0), 1);
+      t_clamped_co = 1 - t_clamped;
+      return [
+        1,
+        t_clamped_co * end0[0] + t_clamped * end1[0],
+        t_clamped_co * end0[1] + t_clamped * end1[1],
+        t_clamped_co * end0[2] + t_clamped * end1[2]
+      ];
     },
     /**
      * Project a 2D coordinate to a new 3D position by keeping
@@ -66738,18 +68680,13 @@ jxg_default.extend(
      * All horizontal moves of the 2D point are ignored.
      *
      * @param {JXG.Point} point2d
-     * @param {Array} coords3D
+     * @param {Array} base_c3d
      * @returns {Array} of length 4 containing the projected
      * point in homogeneous coordinates.
      */
-    project2DTo3DVertical: function(point2d, coords3D) {
-      var m3D = this.matrix3D[2], b = m3D[3], rhs = point2d.coords.usrCoords[2];
-      rhs -= m3D[0] * coords3D[0] + m3D[1] * coords3D[1] + m3D[2] * coords3D[2];
-      if (Math.abs(b) < math_default.eps) {
-        return coords3D;
-      } else {
-        return coords3D.slice(0, 3).concat([rhs / b]);
-      }
+    project2DTo3DVertical: function(point2d, base_c3d) {
+      var pScr = point2d.coords.usrCoords.slice(1, 3), end0 = [base_c3d[1], base_c3d[2], this.bbox3D[2][0]], end1 = [base_c3d[1], base_c3d[2], this.bbox3D[2][1]];
+      return this.projectScreenToSegment(pScr, end0, end1);
     },
     /**
      * Limit 3D coordinates to the bounding cube.
@@ -66787,20 +68724,20 @@ jxg_default.extend(
      * @returns Affine ratio of the intersection of the line with the cube.
      */
     intersectionLineCube: function(p, d, r) {
-      var rnew, i2, r0, r1;
-      rnew = r;
+      var r_n, i2, r0, r1;
+      r_n = r;
       for (i2 = 0; i2 < 3; i2++) {
         if (d[i2] !== 0) {
           r0 = (this.bbox3D[i2][0] - p[i2]) / d[i2];
           r1 = (this.bbox3D[i2][1] - p[i2]) / d[i2];
           if (r < 0) {
-            rnew = Math.max(rnew, Math.min(r0, r1));
+            r_n = Math.max(r_n, Math.min(r0, r1));
           } else {
-            rnew = Math.min(rnew, Math.max(r0, r1));
+            r_n = Math.min(r_n, Math.max(r0, r1));
           }
         }
       }
-      return rnew;
+      return r_n;
     },
     /**
      * Test if coordinates are inside of the bounding cube.
@@ -67018,26 +68955,26 @@ jxg_default.extend(
      *
      * @private
      *
-     * @param {event} event either the keydown or the pointer event
+     * @param {event} evt either the keydown or the pointer event
      * @returns view
      */
-    _azEventHandler: function(event) {
-      var smax = this.az_slide._smax, smin = this.az_slide._smin, speed = (smax - smin) / this.board.canvasWidth * type_default.evaluate(this.visProp.az.pointer.speed), delta = event.movementX, az = this.az_slide.Value(), el = this.el_slide.Value();
+    _azEventHandler: function(evt) {
+      var smax = this.az_slide._smax, smin = this.az_slide._smin, speed = (smax - smin) / this.board.canvasWidth * type_default.evaluate(this.visProp.az.pointer.speed), delta = evt.movementX, az = this.az_slide.Value(), el = this.el_slide.Value();
       if (this.board.mode === this.board.BOARD_MODE_DRAG) {
         return this;
       }
       if (type_default.evaluate(this.visProp.az.keyboard.enabled)) {
-        if (event.key === "ArrowRight") {
+        if (evt.key === "ArrowRight") {
           az = az + type_default.evaluate(this.visProp.az.keyboard.step) * Math.PI / 180;
-        } else if (event.key === "ArrowLeft") {
+        } else if (evt.key === "ArrowLeft") {
           az = az - type_default.evaluate(this.visProp.az.keyboard.step) * Math.PI / 180;
         }
       }
-      if (type_default.evaluate(this.visProp.az.pointer.enabled) && delta !== 0 && event.key == null) {
+      if (type_default.evaluate(this.visProp.az.pointer.enabled) && delta !== 0 && evt.key == null) {
         az += delta * speed;
       }
       if (type_default.evaluate(this.visProp.az.continuous)) {
-        az = (az % smax + smax) % smax;
+        az = math_default.wrap(az, smin, smax);
       } else {
         if (az > 0) {
           az = Math.min(smax, az);
@@ -67053,26 +68990,26 @@ jxg_default.extend(
      *
      * @private
      *
-     * @param {event} event either the keydown or the pointer event
+     * @param {event} evt either the keydown or the pointer event
      * @returns view
      */
-    _elEventHandler: function(event) {
-      var smax = this.el_slide._smax, smin = this.el_slide._smin, speed = (smax - smin) / this.board.canvasHeight * type_default.evaluate(this.visProp.el.pointer.speed), delta = event.movementY, az = this.az_slide.Value(), el = this.el_slide.Value();
+    _elEventHandler: function(evt) {
+      var smax = this.el_slide._smax, smin = this.el_slide._smin, speed = (smax - smin) / this.board.canvasHeight * type_default.evaluate(this.visProp.el.pointer.speed), delta = evt.movementY, az = this.az_slide.Value(), el = this.el_slide.Value();
       if (this.board.mode === this.board.BOARD_MODE_DRAG) {
         return this;
       }
       if (type_default.evaluate(this.visProp.el.keyboard.enabled)) {
-        if (event.key === "ArrowUp") {
+        if (evt.key === "ArrowUp") {
           el = el - type_default.evaluate(this.visProp.el.keyboard.step) * Math.PI / 180;
-        } else if (event.key === "ArrowDown") {
+        } else if (evt.key === "ArrowDown") {
           el = el + type_default.evaluate(this.visProp.el.keyboard.step) * Math.PI / 180;
         }
       }
-      if (type_default.evaluate(this.visProp.el.pointer.enabled) && delta !== 0 && event.key == null) {
+      if (type_default.evaluate(this.visProp.el.pointer.enabled) && delta !== 0 && evt.key == null) {
         el += delta * speed;
       }
-      if (type_default.evaluate(this.visProp.el.continuous)) {
-        el = (el % smax + smax) % smax;
+      if (type_default.evaluate(this.visProp.el.continuous) && !this.trackballEnabled) {
+        el = math_default.wrap(el, smin, smax);
       } else {
         if (el > 0) {
           el = Math.min(smax, el);
@@ -67082,11 +69019,132 @@ jxg_default.extend(
       }
       this.setView(az, el);
       return this;
+    },
+    /**
+     * Controls the navigation in bank direction using either the keyboard or a pointer.
+     *
+     * @private
+     *
+     * @param {event} evt either the keydown or the pointer event
+     * @returns view
+     */
+    _bankEventHandler: function(evt) {
+      var smax = this.bank_slide._smax, smin = this.bank_slide._smin, step, speed, delta = evt.deltaY, bank = this.bank_slide.Value();
+      if (this.board.mode === this.board.BOARD_MODE_DRAG) {
+        return this;
+      }
+      if (type_default.evaluate(this.visProp.bank.keyboard.enabled)) {
+        step = type_default.evaluate(this.visProp.bank.keyboard.step) * Math.PI / 180;
+        if (evt.key === "." || evt.key === "<") {
+          bank -= step;
+        } else if (evt.key === "," || evt.key === ">") {
+          bank += step;
+        }
+      }
+      if (type_default.evaluate(this.visProp.bank.pointer.enabled) && delta !== 0 && evt.key == null) {
+        speed = (smax - smin) / this.board.canvasHeight * type_default.evaluate(this.visProp.bank.pointer.speed);
+        bank += delta * speed;
+        evt.preventDefault();
+      }
+      if (type_default.evaluate(this.visProp.bank.continuous)) {
+        bank = math_default.wrap(bank, smin, smax);
+      } else {
+        bank = math_default.clamp(bank, smin, smax);
+      }
+      this.bank_slide.setValue(bank);
+      this.board.update();
+      return this;
+    },
+    _trackballHandler: function(evt) {
+      var pos = this.board.getMousePosition(evt), x, y, center;
+      center = new coords_default(constants_default.COORDS_BY_USER, [this.llftCorner[0] + this.size[0] * 0.5, this.llftCorner[1] + this.size[1] * 0.5], this.board);
+      x = pos[0] - center.scrCoords[1];
+      y = pos[1] - center.scrCoords[2];
+      this._trackball = {
+        dx: evt.movementX,
+        dy: -evt.movementY,
+        x,
+        y: -y
+      };
+      this.board.update();
+      return this;
+    },
+    pointerDownHandler: function(evt) {
+      var neededButton, neededKey, target;
+      this._hasMoveAz = false;
+      this._hasMoveEl = false;
+      this._hasMoveBank = false;
+      this._hasMoveTrackball = false;
+      if (this.board.mode !== this.board.BOARD_MODE_NONE) {
+        return;
+      }
+      if (type_default.evaluate(this.visProp.trackball.enabled)) {
+        neededButton = type_default.evaluate(this.visProp.trackball.button);
+        neededKey = type_default.evaluate(this.visProp.trackball.key);
+        if ((neededButton === -1 || neededButton === evt.button) && (neededKey === "none" || neededKey.indexOf("shift") > -1 && evt.shiftKey || neededKey.indexOf("ctrl") > -1 && evt.ctrlKey)) {
+          target = type_default.evaluate(this.visProp.trackball.outside) ? document : this.board.containerObj;
+          env_default.addEvent(target, "pointermove", this._trackballHandler, this);
+          this._hasMoveTrackball = true;
+        }
+      } else {
+        if (type_default.evaluate(this.visProp.az.pointer.enabled)) {
+          neededButton = type_default.evaluate(this.visProp.az.pointer.button);
+          neededKey = type_default.evaluate(this.visProp.az.pointer.key);
+          if ((neededButton === -1 || neededButton === evt.button) && (neededKey === "none" || neededKey.indexOf("shift") > -1 && evt.shiftKey || neededKey.indexOf("ctrl") > -1 && evt.ctrlKey)) {
+            target = type_default.evaluate(this.visProp.az.pointer.outside) ? document : this.board.containerObj;
+            env_default.addEvent(target, "pointermove", this._azEventHandler, this);
+            this._hasMoveAz = true;
+          }
+        }
+        if (type_default.evaluate(this.visProp.el.pointer.enabled)) {
+          neededButton = type_default.evaluate(this.visProp.el.pointer.button);
+          neededKey = type_default.evaluate(this.visProp.el.pointer.key);
+          if ((neededButton === -1 || neededButton === evt.button) && (neededKey === "none" || neededKey.indexOf("shift") > -1 && evt.shiftKey || neededKey.indexOf("ctrl") > -1 && evt.ctrlKey)) {
+            target = type_default.evaluate(this.visProp.el.pointer.outside) ? document : this.board.containerObj;
+            env_default.addEvent(target, "pointermove", this._elEventHandler, this);
+            this._hasMoveEl = true;
+          }
+        }
+        if (type_default.evaluate(this.visProp.bank.pointer.enabled)) {
+          neededButton = type_default.evaluate(this.visProp.bank.pointer.button);
+          neededKey = type_default.evaluate(this.visProp.bank.pointer.key);
+          if ((neededButton === -1 || neededButton === evt.button) && (neededKey === "none" || neededKey.indexOf("shift") > -1 && evt.shiftKey || neededKey.indexOf("ctrl") > -1 && evt.ctrlKey)) {
+            target = type_default.evaluate(this.visProp.bank.pointer.outside) ? document : this.board.containerObj;
+            env_default.addEvent(target, "wheel", this._bankEventHandler, this, { passive: false });
+            this._hasMoveBank = true;
+          }
+        }
+      }
+      env_default.addEvent(document, "pointerup", this.pointerUpHandler, this);
+    },
+    pointerUpHandler: function(evt) {
+      var target;
+      if (this._hasMoveAz) {
+        target = type_default.evaluate(this.visProp.az.pointer.outside) ? document : this.board.containerObj;
+        env_default.removeEvent(target, "pointermove", this._azEventHandler, this);
+        this._hasMoveAz = false;
+      }
+      if (this._hasMoveEl) {
+        target = type_default.evaluate(this.visProp.el.pointer.outside) ? document : this.board.containerObj;
+        env_default.removeEvent(target, "pointermove", this._elEventHandler, this);
+        this._hasMoveEl = false;
+      }
+      if (this._hasMoveBank) {
+        target = type_default.evaluate(this.visProp.bank.pointer.outside) ? document : this.board.containerObj;
+        env_default.removeEvent(target, "wheel", this._bankEventHandler, this);
+        this._hasMoveBank = false;
+      }
+      if (this._hasMoveTrackball) {
+        target = type_default.evaluate(this.visProp.az.pointer.outside) ? document : this.board.containerObj;
+        env_default.removeEvent(target, "pointermove", this._trackballHandler, this);
+        this._hasMoveTrackball = false;
+      }
+      env_default.removeEvent(document, "pointerup", this.pointerUpHandler, this);
     }
   }
 );
 jxg_default.createView3D = function(board, parents, attributes) {
-  var view, attr, attr_az, attr_el, x, y, w, h, coords = parents[0], size2 = parents[1];
+  var view, attr, attr_az, attr_el, attr_bank, x, y, w, h, coords = parents[0], size2 = parents[1];
   attr = type_default.copyAttributes(attributes, board.options, "view3d");
   view = new jxg_default.View3D(board, parents, attr);
   view.defaultAxes = view.create("axes3d", parents, attributes);
@@ -67098,6 +69156,8 @@ jxg_default.createView3D = function(board, parents, attributes) {
   attr_az.name = "az";
   attr_el = type_default.copyAttributes(attributes, board.options, "view3d", "el", "slider");
   attr_el.name = "el";
+  attr_bank = type_default.copyAttributes(attributes, board.options, "view3d", "bank", "slider");
+  attr_bank.name = "bank";
   view.az_slide = board.create(
     "slider",
     [
@@ -67111,6 +69171,7 @@ jxg_default.createView3D = function(board, parents, attributes) {
     ],
     attr_az
   );
+  view.inherits.push(view.az_slide);
   view.el_slide = board.create(
     "slider",
     [
@@ -67124,6 +69185,21 @@ jxg_default.createView3D = function(board, parents, attributes) {
     ],
     attr_el
   );
+  view.inherits.push(view.el_slide);
+  view.bank_slide = board.create(
+    "slider",
+    [
+      [x - 1, y + h + 2],
+      [x + w + 1, y + h + 2],
+      [
+        type_default.evaluate(attr_bank.min),
+        type_default.evaluate(attr_bank.start),
+        type_default.evaluate(attr_bank.max)
+      ]
+    ],
+    attr_bank
+  );
+  view.inherits.push(view.bank_slide);
   view.board.highlightInfobox = function(x2, y2, el) {
     var d, i2, c3d, foot, pre = '<span style="color:black; font-size:200%">\u21C4 &nbsp;</span>', brd = el.board, arr, infobox, p = null;
     if (view.isVerticalDrag()) {
@@ -67137,6 +69213,7 @@ jxg_default.createView3D = function(board, parents, attributes) {
     }
     if (p) {
       foot = [1, 0, 0, p.coords[3]];
+      view._w0 = math_default.innerProduct(view.matrix3D[0], foot, 4);
       c3d = view.project2DTo3DPlane(p.element2D, [1, 0, 0, 1], foot);
       if (!view.isInCube(c3d)) {
         view.board.highlightCustomInfobox("", p);
@@ -67164,78 +69241,43 @@ jxg_default.createView3D = function(board, parents, attributes) {
   };
   view.BOARD_MODE_NONE = 0;
   env_default.addEvent(board.containerObj, "keydown", function(event) {
-    var neededKey;
+    var neededKey, catchEvt = false;
     if (type_default.evaluate(view.visProp.el.keyboard.enabled) && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
       neededKey = type_default.evaluate(view.visProp.el.keyboard.key);
       if (neededKey === "none" || neededKey.indexOf("shift") > -1 && event.shiftKey || neededKey.indexOf("ctrl") > -1 && event.ctrlKey) {
         view._elEventHandler(event);
+        catchEvt = true;
       }
     }
     if (type_default.evaluate(view.visProp.el.keyboard.enabled) && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
       neededKey = type_default.evaluate(view.visProp.az.keyboard.key);
       if (neededKey === "none" || neededKey.indexOf("shift") > -1 && event.shiftKey || neededKey.indexOf("ctrl") > -1 && event.ctrlKey) {
         view._azEventHandler(event);
+        catchEvt = true;
+      }
+    }
+    if (type_default.evaluate(view.visProp.bank.keyboard.enabled) && (event.key === "," || event.key === "<" || event.key === "." || event.key === ">")) {
+      neededKey = type_default.evaluate(view.visProp.bank.keyboard.key);
+      if (neededKey === "none" || neededKey.indexOf("shift") > -1 && event.shiftKey || neededKey.indexOf("ctrl") > -1 && event.ctrlKey) {
+        view._bankEventHandler(event);
+        catchEvt = true;
       }
     }
     if (event.key === "PageUp") {
       view.nextView();
+      catchEvt = true;
     } else if (event.key === "PageDown") {
       view.previousView();
+      catchEvt = true;
     }
-    event.preventDefault();
+    if (catchEvt) {
+      event.preventDefault();
+    }
   }, view);
-  board.containerObj.addEventListener("pointerdown", function(event) {
-    var neededButton, neededKey, target;
-    if (type_default.evaluate(view.visProp.az.pointer.enabled)) {
-      neededButton = type_default.evaluate(view.visProp.az.pointer.button);
-      neededKey = type_default.evaluate(view.visProp.az.pointer.key);
-      if ((neededButton === -1 || neededButton === event.button) && (neededKey === "none" || neededKey.indexOf("shift") > -1 && event.shiftKey || neededKey.indexOf("ctrl") > -1 && event.ctrlKey)) {
-        if (type_default.evaluate(view.visProp.az.pointer.outside)) {
-          target = document;
-        } else {
-          target = board.containerObj;
-        }
-        env_default.addEvent(target, "pointermove", view._azEventHandler, view);
-        view._hasMoveAz = true;
-      }
-    }
-    if (type_default.evaluate(view.visProp.el.pointer.enabled)) {
-      neededButton = type_default.evaluate(view.visProp.el.pointer.button);
-      neededKey = type_default.evaluate(view.visProp.el.pointer.key);
-      if ((neededButton === -1 || neededButton === event.button) && (neededKey === "none" || neededKey.indexOf("shift") > -1 && event.shiftKey || neededKey.indexOf("ctrl") > -1 && event.ctrlKey)) {
-        if (type_default.evaluate(view.visProp.el.pointer.outside)) {
-          target = document;
-        } else {
-          target = board.containerObj;
-        }
-        env_default.addEvent(target, "pointermove", view._elEventHandler, view);
-        view._hasMoveEl = true;
-      }
-    }
-    function handlePointerUp() {
-      var target2;
-      if (view._hasMoveAz) {
-        if (type_default.evaluate(view.visProp.az.pointer.outside)) {
-          target2 = document;
-        } else {
-          target2 = view.board.containerObj;
-        }
-        env_default.removeEvent(target2, "pointermove", view._azEventHandler, view);
-        view._hasMoveAz = false;
-      }
-      if (view._hasMoveEl) {
-        if (type_default.evaluate(view.visProp.el.pointer.outside)) {
-          target2 = document;
-        } else {
-          target2 = view.board.containerObj;
-        }
-        env_default.removeEvent(target2, "pointermove", view._elEventHandler, view);
-        view._hasMoveEl = false;
-      }
-      env_default.removeEvent(document, "pointerup", handlePointerUp, view);
-    }
-    env_default.addEvent(document, "pointerup", handlePointerUp, view);
-  });
+  env_default.addEvent(board.containerObj, "pointerdown", view.pointerDownHandler, view);
+  view.getAnglesFromSliders();
+  view.matrix3DRot = view.getRotationFromAngles();
+  view.updateAngleSliderBounds();
   view.board.update();
   return view;
 };
@@ -67356,6 +69398,7 @@ jxg_default.createAxes3D = function(board, parents, attributes) {
       to = [0, 0, 0];
       to[i2] = front[i2];
       axes[na] = view.create("axis3d", [from, to], attr[na.toLowerCase()]);
+      axes[na].view = view;
     } else {
       na += "Border";
       from = rear.slice();
@@ -67381,6 +69424,7 @@ jxg_default.createAxes3D = function(board, parents, attributes) {
         ticks_attr.tickEndings = [1, 0];
       }
       axes[na + "Ticks"] = view.create("ticks", [axes[na], 1], ticks_attr);
+      axes[na + "Ticks"].view = view;
     }
   }
   axes.O = view.create(
@@ -67392,6 +69436,7 @@ jxg_default.createAxes3D = function(board, parents, attributes) {
       withLabel: false
     }
   );
+  axes.O.view = view;
   for (i2 = 0; i2 < directions.length; i2++) {
     i1 = (i2 + 1) % 3;
     i22 = (i2 + 2) % 3;
@@ -67426,6 +69471,7 @@ jxg_default.createAxes3D = function(board, parents, attributes) {
         to[i1] = front[i1];
         attr = type_default.copyAttributes(attributes, board.options, "axes3d", na);
         axes[na] = view.create("axis3d", [from, to], attr);
+        axes[na].view = view;
         axes[na_parent].addChild(axes[na]);
         axes[na_parent].element2D.inherits.push(axes[na]);
       }
@@ -67479,7 +69525,7 @@ jxg_default.createMesh3D = function(board, parents, attr) {
   var view = parents[0], point = parents[1], dir1 = parents[2], range1 = parents[3], dir2 = parents[4], range2 = parents[5], el;
   el = view.create("curve", [[], []], attr);
   el.updateDataArray = function() {
-    var s1 = range1[0], e1 = range1[1], s2 = range2[0], e2 = range2[1], l1, l2, res, i2, sol, v1 = [0, 0, 0], v2 = [0, 0, 0], step = 1, q = [0, 0, 0];
+    var s1 = range1[0], e1 = range1[1], s2 = range2[0], e2 = range2[1], l1, l2, res, i2, v1 = [0, 0, 0], v2 = [0, 0, 0], step = 1, q = [0, 0, 0];
     this.dataX = [];
     this.dataY = [];
     if (type_default.isFunction(point)) {
@@ -67521,11 +69567,152 @@ jxg_default.createMesh3D = function(board, parents, attr) {
 };
 jxg_default.registerElement("mesh3d", jxg_default.createMesh3D);
 
+// node_modules/jsxgraph/src/3d/circle3d.js
+jxg_default.Circle3D = function(view, center, normal, radius, attributes) {
+  var altFrame1;
+  this.constructor(view.board, attributes, constants_default.OBJECT_TYPE_CIRCLE3D, constants_default.OBJECT_CLASS_3D);
+  this.constructor3D(view, "circle3d");
+  this.center = this.board.select(center);
+  this.normal = [0, 0, 0];
+  this.curve;
+  this.frame1;
+  this.frame2;
+  this.updateNormal = function() {
+    var i2, len;
+    for (i2 = 0; i2 < 3; i2++) {
+      this.normal[i2] = type_default.evaluate(normal[i2]);
+    }
+    len = math_default.norm(this.normal);
+    if (Math.abs(len) > math_default.eps) {
+      for (i2 = 0; i2 < 3; i2++) {
+        this.normal[i2] /= len;
+      }
+    }
+  };
+  if (type_default.exists(this.center._is_new)) {
+    this.addChild(this.center);
+    delete this.center._is_new;
+  } else {
+    this.center.addChild(this);
+  }
+  this.updateRadius = type_default.createFunction(radius, this.board);
+  this.addParentsFromJCFunctions([this.updateRadius]);
+  this.updateNormal();
+  this.frame1 = math_default.crossProduct(this.normal, [1, 0, 0]);
+  altFrame1 = math_default.crossProduct(this.normal, [-0.5, 0.8660254037844386, 0]);
+  if (math_default.norm(altFrame1) > math_default.norm(this.frame1)) {
+    this.frame1 = altFrame1;
+  }
+  this.frame2 = math_default.crossProduct(this.normal, this.frame1);
+  this.normalizeFrame();
+  this.curve = view.create(
+    "curve3d",
+    [
+      (t) => this.center.X() + this.Radius() * (Math.cos(t) * this.frame1[0] + Math.sin(t) * this.frame2[0]),
+      (t) => this.center.Y() + this.Radius() * (Math.cos(t) * this.frame1[1] + Math.sin(t) * this.frame2[1]),
+      (t) => this.center.Z() + this.Radius() * (Math.cos(t) * this.frame1[2] + Math.sin(t) * this.frame2[2]),
+      [0, 2 * Math.PI]
+      // parameter range
+    ],
+    attributes
+  );
+};
+jxg_default.Circle3D.prototype = new jxg_default.GeometryElement();
+type_default.copyPrototypeMethods(jxg_default.Circle3D, jxg_default.GeometryElement3D, "constructor3D");
+jxg_default.extend(
+  jxg_default.Circle3D.prototype,
+  /** @lends JXG.Circle3D.prototype */
+  {
+    update: function() {
+      this.updateNormal();
+      this.updateFrame();
+      this.curve.visProp.visible = !isNaN(this.Radius());
+      return this;
+    },
+    updateRenderer: function() {
+      this.needsUpdate = false;
+      return this;
+    },
+    /**
+     * Set a new radius, then update the board.
+     * @param {String|Number|function} r A string, function or number describing the new radius
+     * @returns {JXG.Circle3D} Reference to this sphere
+     */
+    setRadius: function(r) {
+      this.updateRadius = type_default.createFunction(r, this.board);
+      this.addParentsFromJCFunctions([this.updateRadius]);
+      this.board.update();
+      return this;
+    },
+    /**
+     * Calculates the radius of the circle.
+     * @param {String|Number|function} [value] Set new radius
+     * @returns {Number} The radius of the circle
+     */
+    Radius: function(value) {
+      if (type_default.exists(value)) {
+        this.setRadius(value);
+        return this.Radius();
+      }
+      return Math.abs(this.updateRadius());
+    },
+    normalizeFrame: function() {
+      var len1 = math_default.norm(this.frame1), len2 = math_default.norm(this.frame2), i2;
+      for (i2 = 0; i2 < 3; i2++) {
+        this.frame1[i2] /= len1;
+        this.frame2[i2] /= len2;
+      }
+    },
+    updateFrame: function() {
+      this.frame1 = math_default.crossProduct(this.frame2, this.normal);
+      this.frame2 = math_default.crossProduct(this.normal, this.frame1);
+      this.normalizeFrame();
+    },
+    projectCoords: function(p, params) {
+      return this.curve.projectCoords(p, params);
+    },
+    projectScreenCoords: function(pScr, params) {
+      return this.curve.projectScreenCoords(pScr, params);
+    }
+  }
+);
+jxg_default.createCircle3D = function(board, parents, attributes) {
+  var view = parents[0], attr = type_default.copyAttributes(attributes, board.options, "circle3d"), center = type_default.providePoints3D(view, [parents[1]], attributes, "line3d", ["point"])[0], normal = parents[2], radius = parents[3], el;
+  el = new jxg_default.Circle3D(view, center, normal, radius, attr);
+  el.center.addChild(el);
+  el.addChild(el.curve);
+  el.update();
+  return el;
+};
+jxg_default.registerElement("circle3d", jxg_default.createCircle3D);
+jxg_default.createIntersectionCircle3D = function(board, parents, attributes) {
+  var view = parents[0], el1 = parents[1], el2 = parents[2], ixnCircle, center, func, attr = type_default.copyAttributes(attributes, board.options, "intersectioncircle3d");
+  func = geometry_default.intersectionFunction3D(view, el1, el2);
+  center = view.create("point3d", func[0], { visible: false });
+  ixnCircle = view.create("circle3d", [center, func[1], func[2]], attr);
+  try {
+    el1.addChild(ixnCircle);
+    el2.addChild(ixnCircle);
+  } catch (e) {
+    throw new Error(
+      "JSXGraph: Can't create 'intersection' with parent types '" + typeof parents[0] + "' and '" + typeof parents[1] + "'."
+    );
+  }
+  ixnCircle.type = constants_default.OBJECT_TYPE_INTERSECTION_CIRCLE3D;
+  ixnCircle.elType = "intersectioncircle3d";
+  ixnCircle.setParents([el1.id, el2.id]);
+  return ixnCircle;
+};
+jxg_default.registerElement("intersectioncircle3d", jxg_default.createIntersectionCircle3D);
+
 // node_modules/jsxgraph/src/3d/point3d.js
 jxg_default.Point3D = function(view, F, slide, attributes) {
   this.constructor(view.board, attributes, constants_default.OBJECT_TYPE_POINT3D, constants_default.OBJECT_CLASS_3D);
   this.constructor3D(view, "point3d");
   this.board.finalizeAdding(this);
+  if (view.visProp.depthorderpoints) {
+    view.points.push(this);
+  }
   this.coords = [0, 0, 0, 0];
   this.F = F;
   this.slide = slide;
@@ -67538,7 +69725,7 @@ jxg_default.Point3D = function(view, F, slide, attributes) {
   this.Z = function() {
     return this.coords[3];
   };
-  this._params = null;
+  this._params = [];
   this._c2d = null;
   this.methodMap = type_default.deepCopy(this.methodMap, {
     // TODO
@@ -67564,7 +69751,8 @@ jxg_default.extend(
     updateCoords: function() {
       var i2;
       if (type_default.isFunction(this.F)) {
-        this.coords = [1].concat(type_default.evaluate(this.F));
+        this.coords = type_default.evaluate(this.F);
+        this.coords.unshift(1);
       } else {
         this.coords[0] = 1;
         for (i2 = 0; i2 < 3; i2++) {
@@ -67584,7 +69772,8 @@ jxg_default.extend(
     initCoords: function() {
       var i2;
       if (type_default.isFunction(this.F)) {
-        this.coords = [1].concat(type_default.evaluate(this.F));
+        this.coords = type_default.evaluate(this.F);
+        this.coords.unshift(1);
       } else {
         this.coords[0] = 1;
         for (i2 = 0; i2 < 3; i2++) {
@@ -67627,7 +69816,7 @@ jxg_default.extend(
      *    p.setPosition([1, 3, 4]);
      */
     setPosition: function(coords, noevent) {
-      var c = this.coords, oc = this.coords.slice();
+      var c = this.coords;
       if (coords.length === 3) {
         c[0] = 1;
         c[1] = coords[0];
@@ -67646,7 +69835,14 @@ jxg_default.extend(
       var c3d, foot;
       if (this.element2D.draggable() && geometry_default.distance(this._c2d, this.element2D.coords.usrCoords) !== 0) {
         if (this.slide) {
-          this.projectCoords2Surface();
+          this.coords = this.slide.projectScreenCoords(
+            [this.element2D.X(), this.element2D.Y()],
+            this._params
+          );
+          this.element2D.coords.setCoordinates(
+            constants_default.COORDS_BY_USER,
+            this.view.project3DTo2D(this.coords)
+          );
         } else {
           if (this.view.isVerticalDrag()) {
             c3d = this.view.project2DTo3DVertical(this.element2D, this.coords);
@@ -67660,6 +69856,12 @@ jxg_default.extend(
         }
       } else {
         this.updateCoords();
+        if (this.slide) {
+          this.coords = this.slide.projectCoords(
+            [this.X(), this.Y(), this.Z()],
+            this._params
+          );
+        }
         this.element2D.coords.setCoordinates(
           constants_default.COORDS_BY_USER,
           this.view.project3DTo2D([1, this.X(), this.Y(), this.Z()])
@@ -67672,32 +69874,29 @@ jxg_default.extend(
       this.needsUpdate = false;
       return this;
     },
-    projectCoords2Surface: function() {
-      var n = 2, m = 2, x = [0, 0], rhobeg = 5, rhoend = 1e-6, iprint = 0, maxfun = 200, surface = this.slide, that2 = this, r, c3d, c2d, _minFunc;
-      if (surface === null) {
-        return;
+    /**
+     * Check whether a point's homogeneous coordinate vector is zero.
+     * @returns {Boolean} True if the coordinate vector is zero; false otherwise.
+     */
+    isIllDefined: function() {
+      return type_default.cmpArrays(this.coords, [0, 0, 0, 0]);
+    },
+    /**
+     * Calculate the distance from one point to another. If one of the points is on the plane at infinity, return positive infinity.
+     * @param {JXG.Point3D} pt The point to which the distance is calculated.
+     * @returns {Number} The distance
+     */
+    distance: function(pt) {
+      var eps_sq = math_default.eps * math_default.eps, c_this = this.coords, c_pt = pt.coords;
+      if (c_this[0] * c_this[0] > eps_sq && c_pt[0] * c_pt[0] > eps_sq) {
+        return math_default.hypot(
+          c_pt[1] - c_this[1],
+          c_pt[2] - c_this[2],
+          c_pt[3] - c_this[3]
+        );
+      } else {
+        return Number.POSITIVE_INFINITY;
       }
-      _minFunc = function(n2, m2, x2, con) {
-        var c3d2 = [
-          1,
-          surface.X(x2[0], x2[1]),
-          surface.Y(x2[0], x2[1]),
-          surface.Z(x2[0], x2[1])
-        ], c2d2 = that2.view.project3DTo2D(c3d2);
-        con[0] = that2.element2D.X() - c2d2[1];
-        con[1] = that2.element2D.Y() - c2d2[2];
-        return con[0] * con[0] + con[1] * con[1];
-      };
-      if (type_default.exists(this._params)) {
-        x = this._params.slice();
-      }
-      r = math_default.Nlp.FindMinimum(_minFunc, n, m, x, rhobeg, rhoend, iprint, maxfun);
-      c3d = [1, surface.X(x[0], x[1]), surface.Y(x[0], x[1]), surface.Z(x[0], x[1])];
-      c2d = this.view.project3DTo2D(c3d);
-      this._params = x;
-      this.coords = c3d;
-      this.element2D.coords.setCoordinates(constants_default.COORDS_BY_USER, c2d);
-      this._c2d = c2d;
     },
     // Not yet working
     __evt__update3D: function(oc) {
@@ -67726,9 +69925,14 @@ jxg_default.createPoint3D = function(board, parents, attributes) {
   c2d = view.project3DTo2D(el.coords);
   attr = el.setAttr2D(attr);
   el.element2D = view.create("point", c2d, attr);
+  el.element2D.view = view;
   el.addChild(el.element2D);
   el.inherits.push(el.element2D);
   el.element2D.setParents(el);
+  if (el.slide) {
+    el.slide.addChild(el);
+    el.setParents(el.slide);
+  }
   el._c2d = el.element2D.coords.usrCoords.slice();
   return el;
 };
@@ -67815,6 +70019,19 @@ jxg_default.extend(
     updateRenderer: function() {
       this.needsUpdate = false;
       return this;
+    },
+    initParamsIfNeeded: function(params) {
+      if (params.length === 0) {
+        params.unshift(0.5 * (this.range[0] + this.range[1]));
+      }
+    },
+    projectCoords: function(p, params) {
+      this.initParamsIfNeeded(params);
+      return geometry_default.projectCoordsToParametric(p, this, params);
+    },
+    projectScreenCoords: function(pScr, params) {
+      this.initParamsIfNeeded(params);
+      return geometry_default.projectScreenCoordsToParametric(pScr, this, params);
     }
   }
 );
@@ -67837,6 +70054,7 @@ jxg_default.createCurve3D = function(board, parents, attributes) {
   el = new jxg_default.Curve3D(view, F, X, Y, Z, range, attr);
   attr = el.setAttr2D(attr);
   el.element2D = view.create("curve", [[], []], attr);
+  el.element2D.view = view;
   el.element2D.updateDataArray = function() {
     var ret = el.updateDataArray2D();
     this.dataX = ret.X;
@@ -67918,28 +70136,28 @@ jxg_default.createVectorfield3D = function(board, parents, attributes) {
           v[0] *= scale;
           v[1] *= scale;
           v[2] *= scale;
-          this.dataX = this.dataX.concat([x, x + v[0], NaN]);
-          this.dataY = this.dataY.concat([y, y + v[1], NaN]);
-          this.dataZ = this.dataZ.concat([z, z + v[2], NaN]);
+          type_default.concat(this.dataX, [x, x + v[0], NaN]);
+          type_default.concat(this.dataY, [y, y + v[1], NaN]);
+          type_default.concat(this.dataZ, [z, z + v[2], NaN]);
           if (showArrow) {
             nrm *= scale;
             phi = Math.atan2(v[1], v[0]);
             theta = Math.asin(v[2] / nrm);
             theta1 = theta - alpha;
             theta2 = theta + alpha;
-            this.dataX = this.dataX.concat([
+            type_default.concat(this.dataX, [
               x + v[0] - leg_x * Math.cos(phi) * Math.cos(theta1),
               x + v[0],
               x + v[0] - leg_x * Math.cos(phi) * Math.cos(theta2),
               NaN
             ]);
-            this.dataY = this.dataY.concat([
+            type_default.concat(this.dataY, [
               y + v[1] - leg_y * Math.sin(phi) * Math.cos(theta1),
               y + v[1],
               y + v[1] - leg_y * Math.sin(phi) * Math.cos(theta2),
               NaN
             ]);
-            this.dataZ = this.dataZ.concat([
+            type_default.concat(this.dataZ, [
               z + v[2] - leg_z * Math.sin(theta2),
               z + v[2],
               z + v[2] - leg_z * Math.sin(theta1),
@@ -67995,10 +70213,8 @@ jxg_default.extend(
         }
       }
       r0 = type_default.evaluate(r);
-      if (Math.abs(r0) === Infinity) {
-        r = this.view.intersectionLineCube(p, d, r0);
-      }
-      return [p[0] + d[0] * r0, p[1] + d[1] * r0, p[2] + d[2] * r0];
+      r = this.view.intersectionLineCube(p, d, r0);
+      return [p[0] + d[0] * r, p[1] + d[1] * r, p[2] + d[2] * r];
     },
     update: function() {
       return this;
@@ -68006,11 +70222,29 @@ jxg_default.extend(
     updateRenderer: function() {
       this.needsUpdate = false;
       return this;
+    },
+    projectCoords: function(p) {
+      var p0_coords = this.getPointCoords(0), p1_coords = this.getPointCoords(1), dir = [
+        p1_coords[0] - p0_coords[0],
+        p1_coords[1] - p0_coords[1],
+        p1_coords[2] - p0_coords[2]
+      ], diff = [
+        p[0] - p0_coords[0],
+        p[1] - p0_coords[1],
+        p[2] - p0_coords[2]
+      ], t = math_default.innerProduct(diff, dir) / math_default.innerProduct(dir, dir), t_clamped = Math.min(Math.max(t, this.range[0]), this.range[1]), c3d;
+      c3d = this.getPointCoords(t_clamped).slice();
+      c3d.unshift(1);
+      return c3d;
+    },
+    projectScreenCoords: function(pScr) {
+      var end0 = this.getPointCoords(0), end1 = this.getPointCoords(1);
+      return this.view.projectScreenToSegment(pScr, end0, end1);
     }
   }
 );
 jxg_default.createLine3D = function(board, parents, attributes) {
-  var view = parents[0], attr, points, point, direction, range, point1, point2, el;
+  var view = parents[0], attr, points, point, direction, range, point1, point2, endpoints, el;
   attr = type_default.copyAttributes(attributes, board.options, "line3d");
   if (type_default.isPoint3D(parents[2]) || parents.length === 3 && (type_default.isArray(parents[2]) || type_default.isFunction(parents[2]))) {
     point1 = type_default.providePoints3D(view, [parents[1]], attributes, "line3d", ["point1"])[0];
@@ -68020,6 +70254,41 @@ jxg_default.createLine3D = function(board, parents, attributes) {
     };
     range = [0, 1];
     el = new jxg_default.Line3D(view, point1, direction, range, attr);
+    endpoints = type_default.providePoints3D(
+      view,
+      [
+        [0, 0, 0],
+        [0, 0, 0]
+      ],
+      { visible: false },
+      "line3d",
+      ["point1", "point2"]
+    );
+    endpoints[0].F = function() {
+      var r = 0;
+      if (type_default.evaluate(el.visProp.straightfirst)) {
+        r = -Infinity;
+      }
+      return el.getPointCoords(r);
+    };
+    endpoints[1].F = function() {
+      var r = 1;
+      if (type_default.evaluate(el.visProp.straightlast)) {
+        r = Infinity;
+      }
+      return el.getPointCoords(r);
+    };
+    endpoints[0].prepareUpdate().update();
+    endpoints[1].prepareUpdate().update();
+    attr = el.setAttr2D(attr);
+    attr.straightfirst = false;
+    attr.straightlast = false;
+    el.element2D = view.create("segment", [endpoints[0].element2D, endpoints[1].element2D], attr);
+    el.element2D.view = view;
+    el.endpoints = endpoints;
+    el.addChild(endpoints[0]);
+    el.addChild(endpoints[1]);
+    el.setParents(endpoints);
   } else {
     point = type_default.providePoints3D(view, [parents[1]], attributes, "line3d", ["point"])[0];
     if (type_default.isFunction(parents[2])) {
@@ -68052,9 +70321,13 @@ jxg_default.createLine3D = function(board, parents, attributes) {
     };
     points[1].prepareUpdate().update();
     point2 = points[1];
+    attr = el.setAttr2D(attr);
+    attr.straightfirst = false;
+    attr.straightlast = false;
+    el.element2D = view.create("segment", [point1.element2D, point2.element2D], attr);
+    el.element2D.view = view;
+    el.endpoints = points;
   }
-  attr = el.setAttr2D(attr);
-  el.element2D = view.create("segment", [point1.element2D, point2.element2D], attr);
   el.addChild(el.element2D);
   el.inherits.push(el.element2D);
   el.element2D.setParents(el);
@@ -68267,6 +70540,7 @@ jxg_default.createPlane3D = function(board, parents, attributes) {
   point.addChild(el);
   attr = el.setAttr2D(attr);
   el.element2D = view.create("curve", [[], []], attr);
+  el.element2D.view = view;
   el.element2D.updateDataArray = function() {
     var ret = el.updateDataArray();
     this.dataX = ret.X;
@@ -68294,6 +70568,7 @@ jxg_default.createPlane3D = function(board, parents, attributes) {
     el.addChild(grid);
     el.inherits.push(grid);
     grid.setParents(el);
+    el.grid.view = view;
   }
   el.element2D.prepareUpdate().update();
   if (!board.isSuspendedUpdate) {
@@ -68302,6 +70577,314 @@ jxg_default.createPlane3D = function(board, parents, attributes) {
   return el;
 };
 jxg_default.registerElement("plane3d", jxg_default.createPlane3D);
+jxg_default.createIntersectionLine3D = function(board, parents, attributes) {
+  var view = parents[0], el1 = parents[1], el2 = parents[2], ixnLine, i2, func, attr = type_default.copyAttributes(attributes, board.options, "intersectionline3d"), pts = [];
+  for (i2 = 0; i2 < 2; i2++) {
+    func = geometry_default.intersectionFunction3D(view, el1, el2, i2);
+    pts[i2] = view.create("point3d", func, attr["point" + (i2 + 1)]);
+  }
+  ixnLine = view.create("line3d", pts, attr);
+  try {
+    el1.addChild(ixnLine);
+    el2.addChild(ixnLine);
+  } catch (_e) {
+    throw new Error(
+      "JSXGraph: Can't create 'intersection' with parent types '" + typeof parents[0] + "' and '" + typeof parents[1] + "'."
+    );
+  }
+  ixnLine.type = constants_default.OBJECT_TYPE_INTERSECTION_LINE3D;
+  ixnLine.elType = "intersectionline3d";
+  ixnLine.setParents([el1.id, el2.id]);
+  return ixnLine;
+};
+jxg_default.registerElement("intersectionline3d", jxg_default.createIntersectionLine3D);
+
+// node_modules/jsxgraph/src/3d/polygon3d.js
+jxg_default.Polygon3D = function(view, vertices, attributes) {
+  var i2;
+  this.constructor(view.board, attributes, constants_default.OBJECT_TYPE_POLYGON3D, constants_default.OBJECT_CLASS_3D);
+  this.constructor3D(view, "polygon3d");
+  this.board.finalizeAdding(this);
+  this.vertices = [];
+  for (i2 = 0; i2 < vertices.length; i2++) {
+    this.vertices[i2] = this.board.select(vertices[i2]);
+    if (this.vertices[i2]._is_new) {
+      delete this.vertices[i2]._is_new;
+      this.vertices[i2]._is_new_pol = true;
+    }
+  }
+};
+jxg_default.Polygon3D.prototype = new jxg_default.GeometryElement();
+type_default.copyPrototypeMethods(jxg_default.Polygon3D, jxg_default.GeometryElement3D, "constructor3D");
+jxg_default.extend(
+  jxg_default.Polygon3D.prototype,
+  /** @lends JXG.Polygon3D.prototype */
+  {
+    update: function() {
+      return this;
+    },
+    updateRenderer: function() {
+      this.needsUpdate = false;
+      return this;
+    }
+  }
+);
+jxg_default.createPolygon3D = function(board, parents, attributes) {
+  var view = parents[0], el, i2, le, obj, points = [], points2d = [], attr, attr_points, is_transform = false;
+  attr = type_default.copyAttributes(attributes, board.options, "polygon3d");
+  obj = board.select(parents[1]);
+  if (obj === null) {
+    obj = parents[1];
+  }
+  if (type_default.isObject(obj) && obj.type === constants_default.OBJECT_TYPE_POLYGON3D && type_default.isTransformationOrArray(parents[2])) {
+    is_transform = true;
+    le = obj.vertices.length - 1;
+    attr_points = type_default.copyAttributes(attributes, board.options, "polygon3d", "vertices");
+    for (i2 = 0; i2 < le; i2++) {
+      if (attr_points.withlabel) {
+        attr_points.name = obj.vertices[i2].name === "" ? "" : obj.vertices[i2].name + "'";
+      }
+      points.push(board.create("point3d", [obj.vertices[i2], parents[2]], attr_points));
+    }
+  } else {
+    points = type_default.providePoints3D(view, parents.slice(1), attributes, "polygon3d", ["vertices"]);
+    if (points === false) {
+      throw new Error(
+        "JSXGraph: Can't create polygon3d with parent types other than 'point' and 'coordinate arrays' or a function returning an array of coordinates. Alternatively, a polygon3d and a transformation can be supplied"
+      );
+    }
+  }
+  el = new jxg_default.Polygon3D(view, points, attr);
+  el.isDraggable = true;
+  attr = el.setAttr2D(attr);
+  for (i2 = 0; i2 < points.length; i2++) {
+    points2d.push(points[i2].element2D);
+  }
+  el.element2D = board.create("polygon", points2d, attr);
+  el.element2D.view = view;
+  el.addChild(el.element2D);
+  el.inherits.push(el.element2D);
+  el.element2D.setParents(el);
+  if (is_transform) {
+    el.prepareUpdate().update().updateVisibility().updateRenderer();
+    le = obj.vertices.length - 1;
+    for (i2 = 0; i2 < le; i2++) {
+      points[i2].prepareUpdate().update().updateVisibility().updateRenderer();
+    }
+  }
+  return el;
+};
+jxg_default.registerElement("polygon3d", jxg_default.createPolygon3D);
+
+// node_modules/jsxgraph/src/3d/sphere3d.js
+jxg_default.Sphere3D = function(view, method, par1, par2, attributes) {
+  this.constructor(view.board, attributes, constants_default.OBJECT_TYPE_SPHERE3D, constants_default.OBJECT_CLASS_3D);
+  this.constructor3D(view, "sphere3d");
+  this.board.finalizeAdding(this);
+  this.method = method;
+  this.center = this.board.select(par1);
+  this.point2 = null;
+  this.points = [];
+  this.element2D = null;
+  this.aux2D = [];
+  this.projectionType = view.projectionType;
+  if (method === "twoPoints") {
+    this.point2 = this.board.select(par2);
+    this.radius = this.Radius();
+  } else if (method === "pointRadius") {
+    this.updateRadius = type_default.createFunction(par2, this.board);
+    this.updateRadius();
+    this.addParentsFromJCFunctions([this.updateRadius]);
+  }
+  if (type_default.exists(this.center._is_new)) {
+    this.addChild(this.center);
+    delete this.center._is_new;
+  } else {
+    this.center.addChild(this);
+  }
+  if (method === "twoPoints") {
+    if (type_default.exists(this.point2._is_new)) {
+      this.addChild(this.point2);
+      delete this.point2._is_new;
+    } else {
+      this.point2.addChild(this);
+    }
+  }
+  this.methodMap = type_default.deepCopy(this.methodMap, {
+    center: "center",
+    point2: "point2",
+    Radius: "Radius"
+  });
+};
+jxg_default.Sphere3D.prototype = new jxg_default.GeometryElement();
+type_default.copyPrototypeMethods(jxg_default.Sphere3D, jxg_default.GeometryElement3D, "constructor3D");
+jxg_default.extend(
+  jxg_default.Sphere3D.prototype,
+  /** @lends JXG.Sphere3D.prototype */
+  {
+    update: function() {
+      if (this.projectionType !== this.view.projectionType) {
+        this.rebuildProjection();
+      }
+      return this;
+    },
+    updateRenderer: function() {
+      this.needsUpdate = false;
+      return this;
+    },
+    /**
+     * Set a new radius, then update the board.
+     * @param {String|Number|function} r A string, function or number describing the new radius
+     * @returns {JXG.Sphere3D} Reference to this sphere
+     */
+    setRadius: function(r) {
+      this.updateRadius = type_default.createFunction(r, this.board);
+      this.addParentsFromJCFunctions([this.updateRadius]);
+      this.board.update();
+      return this;
+    },
+    /**
+     * Calculates the radius of the circle.
+     * @param {String|Number|function} [value] Set new radius
+     * @returns {Number} The radius of the circle
+     */
+    Radius: function(value) {
+      if (type_default.exists(value)) {
+        this.setRadius(value);
+        return this.Radius();
+      }
+      if (this.method === "twoPoints") {
+        if (this.center.isIllDefined() || this.point2.isIllDefined()) {
+          return NaN;
+        }
+        return this.center.distance(this.point2);
+      }
+      if (this.method === "pointRadius") {
+        return Math.abs(this.updateRadius());
+      }
+      return NaN;
+    },
+    // The central projection of a sphere is an ellipse. The front and back
+    // points of the sphere---that is, the points closest to and furthest
+    // from the screen---project to the foci of the ellipse.
+    //
+    // To see this, look at the cone tangent to the sphere whose tip is at
+    // the camera. The image of the sphere is the ellipse where this cone
+    // intersects the screen. By acting on the sphere with scalings centered
+    // on the camera, you can send it to either of the Dandelin spheres that
+    // touch the screen at the foci of the image ellipse.
+    //
+    // This factory method produces two functions, `focusFn(-1)` and
+    // `focusFn(1)`, that evaluate to the projections of the front and back
+    // points of the sphere, respectively.
+    focusFn: function(sgn) {
+      var that2 = this;
+      return function() {
+        var camDir = that2.view.boxToCam[3], r = that2.Radius();
+        return that2.view.project3DTo2D([
+          that2.center.X() + sgn * r * camDir[1],
+          that2.center.Y() + sgn * r * camDir[2],
+          that2.center.Z() + sgn * r * camDir[3]
+        ]).slice(1, 3);
+      };
+    },
+    innerVertexFn: function() {
+      var that2 = this;
+      return function() {
+        var view = that2.view, p = view.worldToFocal(that2.center.coords, false), distOffAxis = math_default.hypot(p[0], p[1]), cam = view.boxToCam, inward = [
+          -(p[0] * cam[1][1] + p[1] * cam[2][1]) / distOffAxis,
+          -(p[0] * cam[1][2] + p[1] * cam[2][2]) / distOffAxis,
+          -(p[0] * cam[1][3] + p[1] * cam[2][3]) / distOffAxis
+        ], r = that2.Radius(), angleOffAxis = Math.atan(-distOffAxis / p[2]), steepness = Math.acos(r / math_default.norm(p)), lean = angleOffAxis + steepness, cos_lean = Math.cos(lean), sin_lean = Math.sin(lean);
+        return view.project3DTo2D([
+          that2.center.X() + r * (sin_lean * inward[0] + cos_lean * cam[3][1]),
+          that2.center.Y() + r * (sin_lean * inward[1] + cos_lean * cam[3][2]),
+          that2.center.Z() + r * (sin_lean * inward[2] + cos_lean * cam[3][3])
+        ]);
+      };
+    },
+    buildCentralProjection: function() {
+      var view = this.view, auxStyle = { visible: false, withLabel: false }, frontFocus = view.create("point", this.focusFn(-1), auxStyle), backFocus = view.create("point", this.focusFn(1), auxStyle), innerVertex = view.create("point", this.innerVertexFn(view), auxStyle);
+      this.aux2D = [frontFocus, backFocus, innerVertex];
+      this.element2D = view.create("ellipse", this.aux2D, this.visProp);
+    },
+    buildParallelProjection: function() {
+      var that2 = this, center2d = function() {
+        var c3d = [1, that2.center.X(), that2.center.Y(), that2.center.Z()];
+        return that2.view.project3DTo2D(c3d);
+      }, radius2d = function() {
+        var boxSize = that2.view.bbox3D[0][1] - that2.view.bbox3D[0][0];
+        return that2.Radius() * that2.view.size[0] / boxSize;
+      };
+      this.aux2D = [];
+      this.element2D = this.view.create(
+        "circle",
+        [center2d, radius2d],
+        this.visProp
+      );
+    },
+    // replace our 2D representation with a new one that's consistent with
+    // the view's current projection type
+    rebuildProjection: function() {
+      var i2;
+      if (this.element2D) {
+        this.view.board.removeObject(this.element2D);
+        for (i2 in this.aux2D) {
+          if (this.aux2D.hasOwnProperty(i2)) {
+            this.view.board.removeObject(this.aux2D[i2]);
+          }
+        }
+      }
+      this.projectionType = this.view.projectionType;
+      if (this.projectionType === "central") {
+        this.buildCentralProjection();
+      } else {
+        this.buildParallelProjection();
+      }
+      this.addChild(this.element2D);
+      this.inherits.push(this.element2D);
+      this.element2D.view = this.view;
+    }
+  }
+);
+jxg_default.createSphere3D = function(board, parents, attributes) {
+  var view = parents[0], attr, p, point_style, provided, el, i2;
+  attr = type_default.copyAttributes(attributes, board.options, "sphere3d");
+  p = [];
+  for (i2 = 1; i2 < parents.length; i2++) {
+    if (type_default.isPointType3D(board, parents[i2])) {
+      if (p.length === 0) {
+        point_style = "center";
+      } else {
+        point_style = "point";
+      }
+      provided = type_default.providePoints3D(view, [parents[i2]], attributes, "sphere3d", [point_style])[0];
+      if (provided === false) {
+        throw new Error(
+          "JSXGraph: Can't create sphere3d from this type. Please provide a point type."
+        );
+      }
+      p.push(provided);
+    } else {
+      p.push(parents[i2]);
+    }
+  }
+  if (type_default.isPoint3D(p[0]) && type_default.isPoint3D(p[1])) {
+    el = new jxg_default.Sphere3D(view, "twoPoints", p[0], p[1], attr);
+  } else if ((type_default.isNumber(p[0]) || type_default.isFunction(p[0]) || type_default.isString(p[0])) && type_default.isPoint3D(p[1])) {
+    el = new jxg_default.Sphere3D(view, "pointRadius", p[1], p[0], attr);
+  } else if ((type_default.isNumber(p[1]) || type_default.isFunction(p[1]) || type_default.isString(p[1])) && type_default.isPoint3D(p[0])) {
+    el = new jxg_default.Sphere3D(view, "pointRadius", p[0], p[1], attr);
+  } else {
+    throw new Error(
+      "JSXGraph: Can't create sphere3d with parent types '" + typeof parents[1] + "' and '" + typeof parents[2] + "'.\nPossible parent types: [point,point], [point,number], [point,function]"
+    );
+  }
+  el.rebuildProjection();
+  el.element2D.prepareUpdate().update().updateRenderer();
+  return el;
+};
+jxg_default.registerElement("sphere3d", jxg_default.createSphere3D);
 
 // node_modules/jsxgraph/src/3d/surface3d.js
 jxg_default.Surface3D = function(view, F, X, Y, Z, range_u, range_v, attributes) {
@@ -68351,7 +70934,9 @@ jxg_default.extend(
       } else {
         func = [this.X, this.Y, this.Z];
       }
-      res = this.view.getMesh(func, r_u.concat([steps_u]), r_v.concat([steps_v]));
+      r_u.push(steps_u);
+      r_v.push(steps_v);
+      res = this.view.getMesh(func, r_u, r_v);
       return { X: res[0], Y: res[1] };
     },
     update: function() {
@@ -68360,6 +70945,22 @@ jxg_default.extend(
     updateRenderer: function() {
       this.needsUpdate = false;
       return this;
+    },
+    initParamsIfNeeded: function(params) {
+      if (params.length === 0) {
+        params.unshift(
+          0.5 * (this.range_u[0] + this.range_u[1]),
+          0.5 * (this.range_v[0] + this.range_v[1])
+        );
+      }
+    },
+    projectCoords: function(p, params) {
+      this.initParamsIfNeeded(params);
+      return geometry_default.projectCoordsToParametric(p, this, params);
+    },
+    projectScreenCoords: function(pScr, params) {
+      this.initParamsIfNeeded(params);
+      return geometry_default.projectScreenCoordsToParametric(pScr, this, params);
     }
   }
 );
@@ -68384,6 +70985,7 @@ jxg_default.createParametricSurface3D = function(board, parents, attributes) {
   el = new jxg_default.Surface3D(view, F, X, Y, Z, range_u, range_v, attr);
   attr = el.setAttr2D(attr);
   el.element2D = view.create("curve", [[], []], attr);
+  el.element2D.view = view;
   el.element2D.updateDataArray = function() {
     var ret = el.updateDataArray();
     this.dataX = ret.X;
@@ -68816,7 +71418,10 @@ var isName = jxg_default.isName;
 var isNode = jxg_default.isNode;
 var isNumber = jxg_default.isNumber;
 var isObject = jxg_default.isObject;
+var isPoint = jxg_default.isPoint;
+var isPoint3D = jxg_default.isPoint3D;
 var isPointType = jxg_default.isPointType;
+var isPointType3D = jxg_default.isPointType3D;
 var isString = jxg_default.isString;
 var isTouchDevice = jxg_default.isTouchDevice;
 var isTransformationOrArray = jxg_default.isTransformationOrArray;
@@ -68875,206 +71480,6 @@ function renderError(error, element) {
   span.innerText = error;
 }
 
-// src/utils.ts
-var import_obsidian = require("obsidian");
-var args = {};
-var argsArray = Object.getOwnPropertyNames(Math);
-var mathFunctions = [];
-function setMathFunctions() {
-  for (const name of Object.getOwnPropertyNames(Math)) {
-    mathFunctions.push(Math[name]);
-  }
-}
-function parseCodeBlock(source) {
-  let graph = {
-    bounds: [0, 0, 0, 0],
-    maxBoundingBox: JXG.Options.board.maxBoundingBox,
-    keepAspectRatio: false,
-    drag: true,
-    showNavigation: true,
-    axis: true,
-    defaultAxes: JXG.Options.board.defaultAxes,
-    elements: []
-  };
-  if (source == null || source == "") {
-    return graph;
-  }
-  try {
-    graph = (0, import_obsidian.parseYaml)(source);
-    if (graph.maxBoundingBox == void 0) {
-      graph.maxBoundingBox = JXG.Options.board.maxBoundingBox;
-    }
-    if (graph.showNavigation == void 0) {
-      graph.showNavigation = true;
-    }
-    if (graph.axis == void 0) {
-      graph.axis = true;
-    }
-    if (graph.defaultAxes == void 0) {
-      graph.defaultAxes = JXG.Options.board.defaultAxes;
-    }
-    if (graph.drag == void 0) {
-      graph.drag = true;
-    }
-    return graph;
-  } catch (e) {
-    throw new SyntaxError(e);
-  }
-}
-function createBoard(graphDiv, graphInfo) {
-  if (graphInfo.bounds == void 0 && graphInfo.elements == void 0 && graphInfo.keepAspectRatio == void 0) {
-    throw new SyntaxError("No info is defined");
-  }
-  validateBounds(graphInfo.bounds);
-  const graph = JSXGraph.initBoard(graphDiv, {
-    boundingBox: graphInfo.bounds,
-    maxBoundingBox: graphInfo.maxBoundingBox,
-    drag: { enabled: graphInfo.drag },
-    axis: graphInfo.axis,
-    showNavigation: graphInfo.showNavigation,
-    defaultAxes: graphInfo.defaultAxes,
-    //@ts-ignore
-    theme: "obsidian",
-    keepAspectRatio: graphInfo.keepAspectRatio
-  });
-  return graph;
-}
-function validateBounds(bounds) {
-  const xmin = bounds[0];
-  const xmax = bounds[2];
-  const ymin = bounds[3];
-  const ymax = bounds[1];
-  if (bounds.length != 4) {
-    throw new SyntaxError("The amount of bounds given is incorrect");
-  }
-  if (xmin >= xmax) {
-    throw new SyntaxError("Bounds Xmin is greater than or equal to Xmax");
-  }
-  if (ymin >= ymax) {
-    throw new SyntaxError("Bounds Ymin is greater than or equal to Ymax");
-  }
-}
-function addElement(board, element, createdElements) {
-  validateElement(element, createdElements);
-  if (element.att == void 0) {
-    const createdElement = board.create(element.type, element.def);
-    createdElements.push({ name: element.type, element: createdElement });
-  } else {
-    const createdElement = board.create(element.type, element.def, element.att);
-    createdElements.push({ name: element.type, element: createdElement });
-  }
-}
-function validateElement(element, createdElements) {
-  if (element.type == void 0 && element.def == void 0) {
-    throw new SyntaxError("Element " + createdElements.length + " type and def is not defined");
-  }
-  if (element.type == void 0) {
-    throw new SyntaxError("Element " + createdElements.length + " type is not defined");
-  }
-  if (element.def == void 0) {
-    throw new SyntaxError("Element " + createdElements.length + " def is not defined");
-  }
-  validateDef(element, createdElements);
-  validateAtt(element, createdElements);
-}
-function validateDef(element, createdElements) {
-  for (let i2 = 0; i2 < element.def.length; i2++) {
-    element.def[i2] = checkComposedElements(element.def[i2], createdElements);
-    element.def[i2] = checkFunction(element.def[i2], createdElements);
-  }
-}
-function checkComposedElements(item, createdElements) {
-  const re = new RegExp("^e[0-9]+$");
-  if (typeof item === "string" && re.test(item)) {
-    const index = Number.parseInt(item.substring(1, item.length));
-    if (index >= createdElements.length) {
-      throw new SyntaxError("Element has invalid composed elements in def.");
-    }
-    return createdElements[index].element;
-  } else if (Array.isArray(item)) {
-    for (let i2 = 0; i2 < item.length; i2++) {
-      item[i2] = checkComposedElements(item[i2], createdElements);
-    }
-  }
-  return item;
-}
-function validateAtt(element, createdElements) {
-  const re = new RegExp("^e[0-9]+$");
-  if (element.att != void 0) {
-    if (typeof element.att.anchor === "string" && re.test(element.att.anchor)) {
-      const index = Number.parseInt(element.att.anchor.substring(1, element.att.anchor.length));
-      if (index >= createdElements.length) {
-        throw new SyntaxError("Element " + element.type + " has invalid composed elements in att.");
-      } else {
-        element.att.anchor = createdElements[index].element;
-      }
-    }
-    if (typeof element.att.fillColor === "string") {
-      element.att.fillColor = changeColorValue(element.att.fillColor);
-    }
-    if (typeof element.att.strokeColor === "string") {
-      element.att.strokeColor = changeColorValue(element.att.strokeColor);
-    }
-    if (typeof element.att.highlightFillColor === "string") {
-      element.att.highlightFillColor = changeColorValue(element.att.highlightFillColor);
-    }
-    if (typeof element.att.highlightStrokeColor === "string") {
-      element.att.highlightStrokeColor = changeColorValue(element.att.highlightStrokeColor);
-    }
-  }
-}
-function changeColorValue(value) {
-  switch (value) {
-    case "red":
-      return "var(--color-red)";
-    case "orange":
-      return "var(--color-orange)";
-    case "yellow":
-      return "var(--color-yellow)";
-    case "green":
-      return "var(--color-green)";
-    case "cyan":
-      return "var(--color-cyan)";
-    case "blue":
-      return "var(--color-blue)";
-    case "purple":
-      return "var(--color-purple)";
-    case "pink":
-      return "var(--color-pink)";
-    default:
-      return value;
-  }
-}
-function checkFunction(item, createdElements) {
-  const f = RegExp("f:");
-  if (typeof item === "string" && f.test(item)) {
-    const re = RegExp(/e[0-9]+/);
-    item = item.replace("f:", "");
-    if (typeof item === "string" && re.test(item)) {
-      let composed = re.exec(item);
-      while (composed != null) {
-        const index = Number.parseInt(composed[0].replace("e", ""));
-        if (index < 0 || index >= createdElements.length) {
-          throw new SyntaxError("Element has invalid composed elements in function.");
-        }
-        if (createdElements[index].name == "slider" /* Slider */ || createdElements[index].name == "riemannsum" /* Riemannsum */ || createdElements[index].name == "integral" /* Integral */) {
-          item = item.replace(re, "createdElements[" + index + "].element.Value()");
-        } else {
-          item = item.replace(re, "createdElements[" + index + "].element");
-        }
-        composed = re.exec(item);
-      }
-    }
-    const equation = item;
-    return new Function(...argsArray, "createdElements", "x", "y", "return " + equation + ";").bind(args, ...mathFunctions, createdElements);
-  } else if (Array.isArray(item)) {
-    for (let i2 = 0; i2 < item.length; i2++) {
-      item[i2] = checkFunction(item[i2], createdElements);
-    }
-  }
-  return item;
-}
-
 // src/theme/obsidian.ts
 var interactiveAccent = "var(--interactive-accent)";
 var interactiveAccentHover = "var(--interactive-accent-hover)";
@@ -69093,6 +71498,42 @@ JXG.themes["obsidian"] = {
   elements: {
     strokeColor: interactiveAccent,
     highlightStrokeColor: interactiveAccentHover
+  },
+  view3d: {
+    xAxis: {
+      strokeColor: "var(--color-orange)"
+    },
+    yAxis: {
+      strokeColor: "var(--color-green)"
+    },
+    zAxis: {
+      strokeColor: "var(--color-blue)"
+    },
+    xPlaneRear: {
+      fillColor: textMuted
+    },
+    yPlaneRear: {
+      fillColor: textMuted
+    },
+    zPlaneRear: {
+      fillColor: textMuted
+    }
+  },
+  point3d: {
+    fillColor: interactiveAccent,
+    strokeColor: interactiveAccent
+  },
+  line3d: {
+    strokeColor: interactiveAccent
+  },
+  sphere3d: {
+    fillColor: interactiveAccent,
+    strokeColor: interactiveAccent,
+    gradient: "radial",
+    gradientSecondColor: interactiveAccent,
+    gradientFX: 0.7,
+    gradientFY: 0.3,
+    fillOpacity: 0.4
   },
   ellipse: {
     strokeColor: interactiveAccent,
@@ -69150,7 +71591,6 @@ JXG.themes["obsidian"] = {
   },
   circumcircle: {
     strokeColor: interactiveAccent,
-    highlightFillColor: interactiveAccentHover,
     highlightStrokeColor: interactiveAccentHover,
     center: {
       fillColor: interactiveAccent,
@@ -69380,21 +71820,318 @@ JXG.themes["obsidian"] = {
 };
 var obsidian_default = JXG;
 
+// src/settings.ts
+var import_obsidian = require("obsidian");
+var DEFAULT_SETTINGS = {
+  height: 300,
+  width: 700,
+  alignment: "0 auto" /* center */
+};
+var ObsidianGraphsSettingsTab = class extends import_obsidian.PluginSettingTab {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+  display() {
+    const { containerEl } = this;
+    containerEl.empty();
+    new import_obsidian.Setting(this.containerEl).setName("Height").setDesc("Height of the graph in pixels").addText(
+      (text) => text.setValue(this.plugin.settings.height.toString()).setPlaceholder("Enter a number").onChange(async (value) => {
+        this.plugin.settings.height = parseInt(value);
+        document.documentElement.style.setProperty("--graph-height", this.plugin.settings.height + "px");
+        await this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian.Setting(this.containerEl).setName("Width").setDesc("Width of the graph in pixels").addText(
+      (text) => text.setValue(this.plugin.settings.width.toString()).setPlaceholder("Enter a number").onChange(async (value) => {
+        this.plugin.settings.width = parseInt(value);
+        document.documentElement.style.setProperty("--graph-width", this.plugin.settings.width + "px");
+        await this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian.Setting(this.containerEl).setName("Alignment").setDesc("The horizontal alignment of the graph").addDropdown((dropdown) => {
+      dropdown.addOption("0 auto 0 0" /* left */, "left").addOption("0 auto" /* center */, "center").addOption("0 0 0 auto" /* right */, "right").setValue(this.plugin.settings.alignment).onChange(async (value) => {
+        this.plugin.settings.alignment = value;
+        document.documentElement.style.setProperty("--graph-alignment", this.plugin.settings.alignment);
+        await this.plugin.saveSettings();
+      });
+    });
+  }
+};
+
+// src/utils.ts
+var import_obsidian2 = require("obsidian");
+var Utils = class {
+  constructor() {
+    this.argsArray = Object.getOwnPropertyNames(Math);
+    this.mathFunctions = [];
+    for (const name of this.argsArray) {
+      this.mathFunctions.push(Math[name]);
+    }
+  }
+  parseCodeBlock(source) {
+    let graph = {
+      bounds: [0, 0, 0, 0],
+      maxBoundingBox: JXG.Options.board.maxBoundingBox,
+      keepAspectRatio: false,
+      drag: true,
+      showNavigation: true,
+      axis: true,
+      defaultAxes: JXG.Options.board.defaultAxes,
+      elements: [],
+      height: void 0,
+      width: void 0,
+      bounds3d: void 0,
+      att3d: void 0
+    };
+    if (source == null || source == "") {
+      return graph;
+    }
+    try {
+      graph = (0, import_obsidian2.parseYaml)(source);
+      if (graph.maxBoundingBox == void 0) {
+        graph.maxBoundingBox = JXG.Options.board.maxBoundingBox;
+      }
+      if (graph.showNavigation == void 0) {
+        graph.showNavigation = true;
+      }
+      if (graph.axis == void 0) {
+        graph.axis = true;
+      }
+      if (graph.defaultAxes == void 0) {
+        graph.defaultAxes = JXG.Options.board.defaultAxes;
+      }
+      if (graph.drag == void 0) {
+        graph.drag = true;
+      }
+      return graph;
+    } catch (e) {
+      throw new SyntaxError(e);
+    }
+  }
+  createBoard(graphDiv, graphInfo) {
+    if (graphInfo.bounds == void 0 && graphInfo.elements == void 0 && graphInfo.keepAspectRatio == void 0) {
+      throw new SyntaxError("No info is defined");
+    }
+    this.validateBounds(graphInfo.bounds);
+    const board = JSXGraph.initBoard(graphDiv, {
+      boundingBox: graphInfo.bounds,
+      maxBoundingBox: graphInfo.maxBoundingBox,
+      drag: { enabled: graphInfo.drag },
+      axis: graphInfo.axis,
+      showNavigation: graphInfo.showNavigation,
+      defaultAxes: graphInfo.defaultAxes,
+      //@ts-ignore
+      theme: "obsidian",
+      keepAspectRatio: graphInfo.keepAspectRatio
+    });
+    const graph = {
+      board,
+      createdElements: [],
+      view3d: void 0
+    };
+    if (graphInfo.height) {
+      graphDiv.style.height = graphInfo.height + "px";
+    }
+    if (graphInfo.width) {
+      graphDiv.style.maxWidth = graphInfo.width + "px";
+    }
+    if (graphInfo.bounds3d != void 0) {
+      this.validate3dBounds(graphInfo.bounds3d);
+      const xLength = Math.abs(graphInfo.bounds[2] - graphInfo.bounds[0]);
+      const yLength = Math.abs(graphInfo.bounds[1] - graphInfo.bounds[3]);
+      const xMin = graphInfo.bounds[0] <= 0 ? graphInfo.bounds[0] + xLength * 0.15 : graphInfo.bounds[0] - xLength * 0.15;
+      const yMin = graphInfo.bounds[3] <= 0 ? graphInfo.bounds[3] + yLength * 0.15 : graphInfo.bounds[3] - yLength * 0.15;
+      const element = {
+        type: "view3d",
+        def: [[xMin, yMin], [xLength - xLength * 0.3, yLength - yLength * 0.3], graphInfo.bounds3d],
+        att: graphInfo.att3d
+      };
+      if (graphInfo.att3d == void 0) {
+        graph.view3d = board.create("view3d", [[xMin, yMin], [xLength - xLength * 0.3, yLength - yLength * 0.3], graphInfo.bounds3d]);
+      } else {
+        this.checkComposedAtts(graphInfo.att3d, graph.createdElements);
+        graph.view3d = board.create(element.type, element.def, element.att);
+      }
+    }
+    return graph;
+  }
+  validateBounds(bounds) {
+    const xmin = bounds[0];
+    const xmax = bounds[2];
+    const ymin = bounds[3];
+    const ymax = bounds[1];
+    if (bounds.length != 4) {
+      throw new SyntaxError("The amount of bounds given is incorrect");
+    }
+    if (xmin >= xmax) {
+      throw new SyntaxError("Bounds Xmin is greater than or equal to Xmax");
+    }
+    if (ymin >= ymax) {
+      throw new SyntaxError("Bounds Ymin is greater than or equal to Ymax");
+    }
+  }
+  validate3dBounds(bounds) {
+    if (bounds.length != 3) {
+      throw new SyntaxError("The amount of 3d bounds given is incorrect");
+    }
+    for (let i2 = 0; i2 < 3; i2++) {
+      if (bounds[i2].length != 2) {
+        throw new SyntaxError("The amount of 3d bounds given is incorrect");
+      }
+      if (bounds[i2][0] >= bounds[i2][1]) {
+        throw new SyntaxError("The amount of 3d bounds given is incorrect");
+      }
+    }
+  }
+  addElement(graph, element) {
+    this.validateElement(element, graph.createdElements);
+    let createdElement;
+    let createOn = graph.board;
+    if (element.type.contains("3d")) {
+      if (graph.view3d != void 0) {
+        createOn = graph.view3d;
+      } else {
+        throw new SyntaxError("Have to set 3d bounds to use 3d elements");
+      }
+    }
+    if (element.att == void 0) {
+      createdElement = createOn.create(element.type, element.def);
+    } else {
+      createdElement = createOn.create(element.type, element.def, element.att);
+    }
+    graph.createdElements.push({ name: element.type, element: createdElement });
+  }
+  validateElement(element, createdElements) {
+    if (element.type == void 0 && element.def == void 0) {
+      throw new SyntaxError("Element " + createdElements.length + " type and def is not defined");
+    }
+    if (element.type == void 0) {
+      throw new SyntaxError("Element " + createdElements.length + " type is not defined");
+    }
+    if (element.def == void 0) {
+      throw new SyntaxError("Element " + createdElements.length + " def is not defined");
+    }
+    this.validateDef(element.def, createdElements);
+    this.checkComposedAtts(element.att, createdElements);
+  }
+  validateDef(def2, createdElements) {
+    for (let i2 = 0; i2 < def2.length; i2++) {
+      if (Array.isArray(def2[i2])) {
+        this.validateDef(def2[i2], createdElements);
+      }
+      const index = this.checkComposedElements(def2[i2], createdElements);
+      if (index >= 0) {
+        def2[i2] = createdElements[index].element;
+      }
+      def2[i2] = this.checkFunction(def2[i2], createdElements);
+    }
+  }
+  checkComposedElements(item, createdElements) {
+    const re = new RegExp("^e[0-9]+$");
+    if (typeof item === "string" && re.test(item)) {
+      const index = Number.parseInt(item.substring(1, item.length));
+      if (index >= createdElements.length) {
+        throw new SyntaxError("Element has invalid composed element.");
+      }
+      return index;
+    }
+    return -1;
+  }
+  checkComposedAtts(att, createdElements) {
+    if (att != void 0) {
+      this.validateAtt(att, createdElements);
+      for (const key of Object.keys(att)) {
+        if (typeof att[key] === "object") {
+          this.checkComposedAtts(att[key], createdElements);
+        }
+      }
+    }
+  }
+  validateAtt(attribute, createdElements) {
+    if (attribute != void 0) {
+      if (typeof attribute.anchor === "string") {
+        const index = this.checkComposedElements(attribute.anchor, createdElements);
+        attribute.anchor = createdElements[index].element;
+      }
+      if (typeof attribute.fillColor === "string") {
+        attribute.fillColor = this.changeColorValue(attribute.fillColor);
+      }
+      if (typeof attribute.strokeColor === "string") {
+        attribute.strokeColor = this.changeColorValue(attribute.strokeColor);
+      }
+      if (typeof attribute.highlightFillColor === "string") {
+        attribute.highlightFillColor = this.changeColorValue(attribute.highlightFillColor);
+      }
+      if (typeof attribute.highlightStrokeColor === "string") {
+        attribute.highlightStrokeColor = this.changeColorValue(attribute.highlightStrokeColor);
+      }
+    }
+  }
+  changeColorValue(value) {
+    switch (value.toLowerCase()) {
+      case "red":
+        return "var(--color-red)";
+      case "orange":
+        return "var(--color-orange)";
+      case "yellow":
+        return "var(--color-yellow)";
+      case "green":
+        return "var(--color-green)";
+      case "cyan":
+        return "var(--color-cyan)";
+      case "blue":
+        return "var(--color-blue)";
+      case "purple":
+        return "var(--color-purple)";
+      case "pink":
+        return "var(--color-pink)";
+      default:
+        return value;
+    }
+  }
+  checkFunction(item, createdElements) {
+    const f = RegExp("f:");
+    if (typeof item === "string" && f.test(item)) {
+      const re = RegExp(/e[0-9]+/);
+      item = item.replace(f, "");
+      if (typeof item === "string" && re.test(item)) {
+        let composed = re.exec(item);
+        while (composed != null) {
+          const index = this.checkComposedElements(composed[0], createdElements);
+          if (createdElements[index].name == "slider" /* Slider */ || createdElements[index].name == "riemannsum" /* Riemannsum */ || createdElements[index].name == "integral" /* Integral */) {
+            item = item.replace(re, "createdElements[" + index + "].element.Value()");
+          } else {
+            item = item.replace(re, "createdElements[" + index + "].element");
+          }
+          composed = re.exec(item);
+        }
+      }
+      const equation = item;
+      return new Function(...this.argsArray, "createdElements", "x", "y", "z", "return " + equation + ";").bind({}, ...this.mathFunctions, createdElements);
+    }
+    return item;
+  }
+};
+
 // main.ts
-var ObsidianGraphs = class extends import_obsidian2.Plugin {
+var ObsidianGraphs = class extends import_obsidian3.Plugin {
   constructor() {
     super(...arguments);
     this.count = 0;
+    this.utils = new Utils();
   }
   async onload() {
-    await (0, import_obsidian2.loadMathJax)();
+    await this.loadSettings();
+    this.addSettingTab(new ObsidianGraphsSettingsTab(this.app, this));
+    window.CodeMirror.defineMode("graph", (config) => window.CodeMirror.getMode(config, "yaml"));
+    await (0, import_obsidian3.loadMathJax)();
     if (typeof MathJax !== "undefined") {
       MathJax.config.tex.inlineMath = [["$", "$"]];
       MathJax.config.tex.processEscapes = true;
       MathJax.config.chtml.adaptiveCSS = false;
       await MathJax.startup.getComponents();
     }
-    setMathFunctions();
     this.app.workspace.on("file-open", () => {
       const currentFile = this.app.workspace.getActiveFile();
       if (currentFile) {
@@ -69419,15 +72156,15 @@ var ObsidianGraphs = class extends import_obsidian2.Plugin {
         }
       }
     });
-    this.registerMarkdownCodeBlockProcessor("graph", (source, element, context) => {
+    this.registerMarkdownCodeBlockProcessor("graph", (source, element) => {
       let graphInfo;
       try {
-        graphInfo = parseCodeBlock(source);
+        graphInfo = this.utils.parseCodeBlock(source);
       } catch (e) {
         renderError(e, element);
         return;
       }
-      let board;
+      let graph;
       if (this.currentFileName == void 0) {
         const currentFile = this.app.workspace.getActiveFile();
         if (currentFile) {
@@ -69439,16 +72176,15 @@ var ObsidianGraphs = class extends import_obsidian2.Plugin {
       graphDiv.id = "graph" + this.count;
       this.count++;
       try {
-        board = createBoard(graphDiv, graphInfo);
+        graph = this.utils.createBoard(graphDiv, graphInfo);
       } catch (e) {
         renderError(e, element);
         return;
       }
-      const createdElements = [];
       if (graphInfo.elements != void 0) {
         for (let i2 = 0; i2 < graphInfo.elements.length; i2++) {
           try {
-            addElement(board, graphInfo.elements[i2], createdElements);
+            this.utils.addElement(graph, graphInfo.elements[i2]);
           } catch (e) {
             renderError(e, element);
             return;
@@ -69463,5 +72199,14 @@ var ObsidianGraphs = class extends import_obsidian2.Plugin {
       JSXGraph.freeBoard(boards[key]);
       div.remove();
     }
+  }
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    document.documentElement.style.setProperty("--graph-height", this.settings.height + "px");
+    document.documentElement.style.setProperty("--graph-width", this.settings.width + "px");
+    document.documentElement.style.setProperty("--graph-alignment", this.settings.alignment);
+  }
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 };

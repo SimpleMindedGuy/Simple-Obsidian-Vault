@@ -1,0 +1,11 @@
+{
+	"id": "checkbox-sounds",
+	"name": "Checkbox Sounds",
+	"version": "1.0.6",
+	"minAppVersion": "0.15.0",
+	"description": "Adds a nice completion sound when a checkbox is ticked-off",
+	"author": "yasd251",
+	"authorUrl": "https://github.com/yasd251",
+	"fundingUrl": "https://buymeacoffee.com/yasd251",
+	"isDesktopOnly": true
+}

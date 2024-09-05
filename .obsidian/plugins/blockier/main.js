@@ -71,10 +71,65 @@ function tryReplace(editor) {
 }
 
 // src/select.ts
-function runSelectBlock(editor, avoidPrefixes) {
+function runSelectBlock(editor, opts) {
+  var _a;
+  const closestTable = closest((_a = document.getSelection()) == null ? void 0 : _a.anchorNode, "table");
+  if (closestTable || !editor) {
+    console.log("blockier: falling back to selecting closest live preview element");
+    selectClosestCmContent();
+    return;
+  }
   const selections = editor.listSelections();
-  const newSelections = selections.map((sel) => selectLine(editor, sel, avoidPrefixes));
+  if (opts.selectCodeBlock && selections.length === 1) {
+    const successful = trySelectCodeBlock();
+    if (successful)
+      return;
+  }
+  const newSelections = selections.map((sel) => selectLine(editor, sel, opts.avoidPrefixes));
   editor.setSelections(newSelections);
+}
+function selectClosestCmContent() {
+  const selection = document.getSelection();
+  const closestContent = closest(selection == null ? void 0 : selection.anchorNode, ".cm-content");
+  if (!selection || !closestContent)
+    return;
+  const range = document.createRange();
+  range.selectNodeContents(closestContent);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+function trySelectCodeBlock() {
+  const WITHIN_CODE_BLOCK_SELECTOR = ".HyperMD-codeblock.cm-line:not(.HyperMD-codeblock-begin):not(.HyperMD-codeblock-end)";
+  const selection = document.getSelection();
+  const anchorLine = closest(selection == null ? void 0 : selection.anchorNode, WITHIN_CODE_BLOCK_SELECTOR);
+  const focusLine = closest(selection == null ? void 0 : selection.focusNode, WITHIN_CODE_BLOCK_SELECTOR);
+  if (!selection || !anchorLine || !focusLine)
+    return false;
+  let selectionIsWithinBlock = false;
+  let codeStart = anchorLine;
+  while (codeStart && !codeStart.classList.contains("HyperMD-codeblock-begin")) {
+    if (codeStart === focusLine)
+      selectionIsWithinBlock = true;
+    codeStart = codeStart.previousElementSibling;
+  }
+  if (!codeStart)
+    return false;
+  let codeEnd = anchorLine;
+  while (codeEnd && !codeEnd.classList.contains("HyperMD-codeblock-end")) {
+    if (codeEnd === focusLine)
+      selectionIsWithinBlock = true;
+    codeEnd = codeEnd.nextElementSibling;
+  }
+  if (!codeEnd)
+    return false;
+  if (!selectionIsWithinBlock)
+    return false;
+  const range = document.createRange();
+  range.setStartAfter(codeStart);
+  range.setEndAfter(codeEnd.previousElementSibling.lastChild);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return true;
 }
 function selectLine(editor, selection, avoidPrefixes) {
   var _a, _b;
@@ -115,6 +170,17 @@ function orderPositions(anchor, head) {
     return [anchor, head];
   } else {
     return [head, anchor];
+  }
+}
+function closest(node, selector) {
+  var _a, _b;
+  if (!node)
+    return null;
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    const el = node;
+    return el.closest(selector);
+  } else {
+    return (_b = (_a = node.parentElement) == null ? void 0 : _a.closest(selector)) != null ? _b : null;
   }
 }
 
@@ -208,6 +274,7 @@ function offsetCh(position, chs) {
 var DEFAULT_SETTINGS = {
   replaceBlocks: true,
   selectAllAvoidsPrefixes: true,
+  selectFullCodeBlock: false,
   showCheckboxSuggestions: false,
   checkboxVariants: ' x><!-/?*nliISpcb"0123456789',
   showCalloutSuggestions: true,
@@ -222,7 +289,10 @@ var BlockierPlugin = class extends import_obsidian2.Plugin {
       id: "select-block",
       name: "Select block",
       editorCallback: (editor) => {
-        runSelectBlock(editor, this.settings.selectAllAvoidsPrefixes);
+        runSelectBlock(editor, {
+          avoidPrefixes: this.settings.selectAllAvoidsPrefixes,
+          selectCodeBlock: this.settings.selectFullCodeBlock
+        });
       }
     });
     this.registerEditorExtension(
@@ -250,9 +320,10 @@ var BlockierPlugin = class extends import_obsidian2.Plugin {
             run: () => {
               var _a;
               const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
-              if (editor) {
-                runSelectBlock(editor, this.settings.selectAllAvoidsPrefixes);
-              }
+              runSelectBlock(editor, {
+                avoidPrefixes: this.settings.selectAllAvoidsPrefixes,
+                selectCodeBlock: this.settings.selectFullCodeBlock
+              });
               return true;
             }
           }
@@ -305,6 +376,14 @@ var SettingsTab = class extends import_obsidian2.PluginSettingTab {
     new import_obsidian2.Setting(containerEl).setName("Only select paragraphs").setDesc("Whether the Select block command will avoid selecting block prefixes.").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.selectAllAvoidsPrefixes).onChange(async (value) => {
         this.plugin.settings.selectAllAvoidsPrefixes = value;
+        await this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian2.Setting(containerEl).setName("Select full code block").setDesc(
+      "Whether the Select block command will select the entire code block when the cursor is inside one."
+    ).addToggle(
+      (toggle) => toggle.setValue(this.plugin.settings.selectFullCodeBlock).onChange(async (value) => {
+        this.plugin.settings.selectFullCodeBlock = value;
         await this.plugin.saveSettings();
       })
     );

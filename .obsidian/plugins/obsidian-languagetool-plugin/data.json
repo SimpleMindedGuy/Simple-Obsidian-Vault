@@ -1,13 +1,14 @@
 {
   "serverUrl": "https://api.languagetool.org",
   "urlMode": "standard",
-  "glassBg": true,
-  "shouldAutoCheck": true,
+  "glassBg": false,
+  "shouldAutoCheck": false,
   "autoCheckDelay": 3000,
   "pickyMode": true,
   "staticLanguage": "auto",
   "englishVeriety": "en-GB",
   "germanVeriety": "de-DE",
   "portugueseVeriety": "pt-PT",
-  "catalanVeriety": "ca-ES"
+  "catalanVeriety": "ca-ES",
+  "motherTongue": "ar"
 }

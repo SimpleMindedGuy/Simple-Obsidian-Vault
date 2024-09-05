@@ -29,36 +29,15 @@ __export(main_exports, {
 module.exports = __toCommonJS(main_exports);
 var import_obsidian3 = require("obsidian");
 
-// AutoDirPlugin.ts
+// EditorPlugin.ts
 var import_view = require("@codemirror/view");
 var import_state = require("@codemirror/state");
-
-// direction.util.ts
-var RTL_CLASS = "is-rtl";
-var AUTO_CLASS = "is-auto";
-var STRONG_DIR_REGEX = /(?:([\p{sc=Arabic}\p{sc=Hebrew}\p{sc=Syriac}\p{sc=Thaana}])|([\p{sc=Armenian}\p{sc=Bengali}\p{sc=Bopomofo}\p{sc=Braille}\p{sc=Buhid}\p{sc=Canadian_Aboriginal}\p{sc=Cherokee}\p{sc=Cyrillic}\p{sc=Devanagari}\p{sc=Ethiopic}\p{sc=Georgian}\p{sc=Greek}\p{sc=Gujarati}\p{sc=Gurmukhi}\p{sc=Han}\p{sc=Hangul}\p{sc=Hanunoo}\p{sc=Hiragana}\p{sc=Inherited}\p{sc=Kannada}\p{sc=Katakana}\p{sc=Khmer}\p{sc=Lao}\p{sc=Latin}\p{sc=Limbu}\p{sc=Malayalam}\p{sc=Mongolian}\p{sc=Myanmar}\p{sc=Ogham}\p{sc=Oriya}\p{sc=Runic}\p{sc=Sinhala}\p{sc=Tagalog}\p{sc=Tagbanwa}\p{sc=Tamil}\p{sc=Telugu}\p{sc=Thai}\p{sc=Tibetan}\p{sc=Yi}]))/u;
-var detectDirection = (s) => {
-  const match = s.match(STRONG_DIR_REGEX);
-  if (match && match[1]) {
-    return "rtl";
-  } else if (match && match[2]) {
-    return "ltr";
-  }
-  return null;
-};
-var NAMED_LINK_REGEX = /\[\[[^\]]*\|([^\]]*)\]\]/;
-var removeNoneMeaningfullText = (s) => {
-  s = s.replace(NAMED_LINK_REGEX, "$1");
-  return s.replace("- [x]", "");
-};
-
-// AutoDirPlugin.ts
 var import_obsidian = require("obsidian");
-function getAutoDirectionPlugin(rtlPlugin) {
+function getEditorPlugin(rtlPlugin) {
   return import_view.ViewPlugin.fromClass(class {
     constructor(view) {
       this.decorationRegions = [];
-      this.active = false;
+      this.direction = "auto";
       this.rtlDec = import_view.Decoration.line({
         attributes: { dir: "rtl" }
       });
@@ -66,12 +45,9 @@ function getAutoDirectionPlugin(rtlPlugin) {
         attributes: { dir: "ltr" }
       });
       this.emptyDirDec = import_view.Decoration.line({
-        attributes: { dir: "" }
-      });
-      this.autoDec = import_view.Decoration.line({
         attributes: { dir: "auto" }
       });
-      this.decorations = this.buildDecorations();
+      this.decorations = this.buildDecorations(view);
       this.rtlPlugin = rtlPlugin;
       this.view = view;
       const editorInfo = this.view.state.field(import_obsidian.editorInfoField);
@@ -82,213 +58,54 @@ function getAutoDirectionPlugin(rtlPlugin) {
     }
     update(vu) {
       if (vu.viewportChanged || vu.docChanged) {
-        const regions = [];
-        if (vu.docChanged) {
-          vu.changes.iterChanges((fromA, toA, fromB, toB) => {
-            const shift = toB - fromB - (toA - fromA);
-            this.shiftDecorationRegions(shift < 0 ? toB : toA, shift);
-            regions.push(...this.getLineRegions(vu.state.doc, fromB, toB));
-          });
-        }
-        this.updateEx(vu.view, regions);
+        this.decorations = this.buildDecorations(vu.view);
       }
     }
-    destroy() {
-    }
-    setActive(active, view) {
-      const forceUpdate = this.active !== active;
-      this.active = active;
-      this.decorations = this.buildDecorations();
-      if (forceUpdate) {
-        this.updateEx(view);
-      }
-    }
-    updateEx(view, regions = []) {
-      if (regions.length === 0) {
-        const { from, to } = view.viewport;
-        regions = this.getLineRegions(view.state.doc, from, to);
-      }
-      for (const { from, to } of regions) {
-        for (let pos = from; pos <= to; ) {
-          const line = view.state.doc.lineAt(pos);
-          let dec = this.emptyDirDec;
-          if (this.active) {
-            const s = view.state.doc.sliceString(line.from, line.to);
-            const d = this.detectDecoration(s);
-            dec = d ? d : this.lineBeforeDecoration(line.from);
-          }
-          this.addDecorationRegion({ from: line.from, to: line.to, dec });
-          pos = line.to + 1;
-        }
-      }
-      this.decorations = this.buildDecorations();
-    }
-    buildDecorations() {
+    buildDecorations(view) {
       const builder = new import_state.RangeSetBuilder();
-      for (const dr of this.decorationRegions) {
-        builder.add(dr.from, dr.from, dr.dec);
+      if (view == null || view.state == null)
+        return builder.finish();
+      const viewport = view.viewport;
+      if (!viewport)
+        return builder.finish();
+      let decoration = this.emptyDirDec;
+      if (this.direction != "auto") {
+        decoration = this.direction === "ltr" ? this.ltrDec : this.rtlDec;
+      }
+      for (let pos = viewport.from; pos <= viewport.to; ) {
+        const line = view.state.doc.lineAt(pos);
+        builder.add(line.from, line.from, decoration);
+        pos = line.to + 1;
       }
       return builder.finish();
     }
-    addDecorationRegion(dr) {
-      for (let i = 0; i < this.decorationRegions.length; i++) {
-        if (this.decorationRegions[i].from < dr.from) {
-          continue;
-        }
-        if (this.decorationRegions[i].from === dr.from) {
-          this.decorationRegions[i] = dr;
-        } else if (this.decorationRegions[i].from > dr.from) {
-          this.decorationRegions.splice(i, 0, dr);
-        }
-        return;
-      }
-      this.decorationRegions.push(dr);
+    destroy() {
     }
-    shiftDecorationRegions(from, amount) {
-      if (amount === 0) {
-        return;
-      }
-      for (let i = 0; i < this.decorationRegions.length; i++) {
-        if (this.decorationRegions[i].from < from) {
-          continue;
-        }
-        this.decorationRegions[i].from += amount;
-        this.decorationRegions[i].to += amount;
-        if (this.decorationRegions[i].from <= from) {
-          this.decorationRegions.splice(i, 1);
-          i--;
-        }
-      }
-    }
-    detectDecoration(s) {
-      s = removeNoneMeaningfullText(s);
-      const direction = detectDirection(s);
-      switch (direction) {
-        case "rtl":
-          return this.rtlDec;
-        case "ltr":
-          return this.ltrDec;
-      }
-      return null;
-    }
-    lineBeforeDecoration(from, def = this.ltrDec) {
-      const l = this.decorationRegions.length;
-      if (l !== 0 && from > this.decorationRegions[l - 1].from) {
-        return this.decorationRegions[l - 1].dec;
-      }
-      for (let i = 0; i < l; i++) {
-        if (i !== 0 && this.decorationRegions[i].from >= from) {
-          return this.decorationRegions[i - 1].dec;
-        }
-      }
-      return def;
-    }
-    getLineRegions(doc, from, to) {
-      const regions = [];
-      for (let i = from; i <= to; i++) {
-        const l = doc.lineAt(i);
-        i = l.to;
-        regions.push({ from: l.from, to: l.to });
-      }
-      return regions;
+    setDirection(direction, view) {
+      this.direction = direction;
+      this.decorations = this.buildDecorations(view);
     }
   }, { decorations: (v) => v.decorations });
 }
 
-// AutoDirPostProcessor.ts
-var lastDetectedDir = "ltr";
-var specialNodes = ["A", "STRONG", "EM", "DEL", "CODE"];
-function breaksToDivs(el) {
-  if (!el)
-    return;
-  if (el.tagName == "P") {
-    const splitText = el.innerHTML.split("<br>");
-    if (splitText.length > 1) {
-      let newInnerHtml = "";
-      splitText.map((line) => {
-        newInnerHtml += `<div class="esm-split">${line}</div>`;
-      });
-      el.innerHTML = newInnerHtml;
-    }
-  }
-  if (el.children && el.children.length > 0) {
-    for (let i = 0; i < el.children.length; i++)
-      breaksToDivs(el.children[i]);
-  }
-}
-function detectCanvasElement(ctx, setPreviewDirection) {
-  const container = ctx ? ctx.containerEl : null;
-  if (container && container.closest) {
-    const possibleCanvas = container.closest(".canvas-node-content");
-    if (possibleCanvas) {
-      const markdownPreview = container.closest(".markdown-preview-view");
-      if (markdownPreview && markdownPreview instanceof HTMLDivElement) {
-        setPreviewDirection(ctx.sourcePath, markdownPreview);
-      }
-    }
+// MarkdownPostProcessor.ts
+function detectExport(el, ctx, setPreviewDirection) {
+  var _a;
+  if ((el == null ? void 0 : el.classList) && ((_a = el.classList) == null ? void 0 : _a.contains("markdown-preview-view"))) {
+    setPreviewDirection(ctx.sourcePath, el);
   }
 }
 var autoDirectionPostProcessor = (el, ctx, setPreviewDirection) => {
-  let shouldAddDir = false, addedDir = false;
-  detectCanvasElement(ctx, setPreviewDirection);
-  breaksToDivs(el);
-  for (let i = 0; i < el.childNodes.length; i++) {
-    const n = el.childNodes[i];
-    if (!addedDir && n.nodeName === "#text" && n.nodeValue && n.nodeValue !== "\n") {
-      const dir = detectDirection(n.nodeValue);
-      if (dir) {
-        addedDir = true;
-        lastDetectedDir = dir;
-        if (specialNodes.includes(el.nodeName) && el.parentElement) {
-          let target = nonSpecialParent(el.parentElement);
-          if (target && !(target.childNodes.length !== 0 && target.childNodes[0].nodeValue && detectDirection(target.childNodes[0].nodeValue))) {
-            addDirClass(target, dirClass(dir));
-          }
-        } else {
-          addDirClass(el, dirClass(dir));
-          if (el.parentElement && el.parentElement.nodeName === "LI") {
-            addDirClass(el.parentElement, dirClass(dir));
-          }
-        }
-      }
-      shouldAddDir = true;
-      continue;
-    }
-    autoDirectionPostProcessor(n, ctx, setPreviewDirection);
-    if (i === el.childNodes.length - 1 && shouldAddDir && !addedDir) {
-      el.classList.add(dirClass(lastDetectedDir));
-    }
-  }
-  if (el.nodeName === "UL") {
-    const lis = el.querySelectorAll("li");
-    if (lis.length > 0 && lis[0].classList.contains("esm-rtl")) {
-      el.classList.add(dirClass("rtl"));
-    }
-  }
+  detectExport(el, ctx, setPreviewDirection);
 };
-function dirClass(dir) {
-  if (dir === "rtl") {
-    return "esm-rtl";
-  } else {
-    return "esm-ltr";
-  }
-}
-function addDirClass(el, cls) {
-  if (el.classList.contains(cls)) {
-    return;
-  }
-  el.classList.remove("esm-rtl", "esm-ltr");
-  el.classList.add(cls);
-}
-function nonSpecialParent(el) {
-  while (specialNodes.includes(el.nodeName)) {
-    el = el.parentElement;
-  }
-  return el;
-}
 
 // main.ts
-var import_view2 = require("@codemirror/view");
+var import_state2 = require("@codemirror/state");
+
+// direction.util.ts
+var LTR_CLASS = "is-ltr";
+var RTL_CLASS = "is-rtl";
+var AUTO_CLASS = "is-auto";
 
 // settingsTab.ts
 var import_obsidian2 = require("obsidian");
@@ -310,7 +127,6 @@ var RtlSettingsTab = class extends import_obsidian2.PluginSettingTab {
     let { containerEl } = this;
     containerEl.empty();
     containerEl.createEl("h2", { text: "RTL Settings" });
-    this.plugin.syncDefaultDirection();
     new import_obsidian2.Setting(containerEl).setName("Remember text direction per file").setDesc("Store and remember the text direction used for each file individually.").addToggle((toggle) => toggle.setValue(this.settings.rememberPerFile).onChange((value) => {
       this.settings.rememberPerFile = value;
       this.plugin.saveSettings();
@@ -366,22 +182,17 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
         this.switchDocumentDirection(view.editor, view);
       }
     });
-    this.autoDirectionPlugin = getAutoDirectionPlugin(this);
-    this.registerEditorExtension(this.autoDirectionPlugin);
-    this.registerEditorExtension(import_view2.EditorView.perLineTextDirection.of(true));
+    await this.convertLegacySettings();
+    await this.loadSettings();
+    this.editorPlugin = getEditorPlugin(this);
+    this.registerEditorExtension(import_state2.Prec.lowest(this.editorPlugin));
     this.registerMarkdownPostProcessor((el, ctx) => {
       autoDirectionPostProcessor(el, ctx, (path, markdownPreviewElement) => this.setPreviewDirectionByFileSettings(path, markdownPreviewElement));
     });
-    await this.convertLegacySettings();
-    await this.loadSettings();
     this.addSettingTab(new RtlSettingsTab(this.app, this));
     this.app.workspace.on("active-leaf-change", async (leaf) => {
-      this.adjustDirectionToActiveView();
-      this.updateStatusBar();
     });
     this.app.workspace.on("file-open", async (file, ctx) => {
-      this.adjustDirectionToActiveView();
-      this.updateStatusBar();
     });
     this.registerEvent(this.app.vault.on("delete", (file) => {
       if (file && file.path && file.path in this.settings.fileDirections) {
@@ -414,7 +225,7 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
     const view = this.app.workspace.getActiveViewOfType(import_obsidian3.MarkdownView);
     if (view && (view == null ? void 0 : view.editor)) {
       const editorView = view.editor.cm;
-      this.adjustAutoDirection(editorView, "ltr");
+      this.adjustEditorPlugin(editorView, "auto");
     }
     console.log("unloading RTL plugin");
   }
@@ -424,16 +235,15 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
       return;
     this.adjustDirectionToView(view);
   }
-  adjustDirectionToView(view, autoDirectionPlugin) {
+  adjustDirectionToView(view, editorPlugin) {
     if (!view)
       return;
-    this.syncDefaultDirection();
     const file = view == null ? void 0 : view.file;
     const editor = view == null ? void 0 : view.editor;
     const editorView = editor == null ? void 0 : editor.cm;
     if (file && file.path && editorView) {
       const [requiredDirection, _usedDefault] = this.getRequiredFileDirection(file);
-      this.setMarkdownViewDirection(view, editor, editorView, requiredDirection, autoDirectionPlugin);
+      this.setMarkdownViewDirection(view, editor, editorView, requiredDirection, editorPlugin);
     }
   }
   getRequiredFileDirection(file) {
@@ -506,17 +316,17 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
   hideStatusBar() {
     this.statusBarItem.style.display = "none";
   }
-  handleIframeEditor(editorDiv, editorView, file, autoDirectionPlugin) {
+  handleIframeEditor(editorDiv, editorView, file, editorPlugin) {
     const isInIframe = editorDiv.closest(".mod-inside-iframe");
     if (isInIframe) {
       if (editorDiv instanceof HTMLDivElement) {
         const [requiredDirection, _] = this.getRequiredFileDirection(file);
-        this.adjustAutoDirection(editorView, requiredDirection, autoDirectionPlugin);
+        this.adjustEditorPlugin(editorView, requiredDirection, editorPlugin);
         this.setDocumentDirectionForEditorDiv(editorDiv, requiredDirection);
       }
     }
   }
-  setMarkdownViewDirection(view, editor, editorView, newDirection, autoDirectionPlugin) {
+  setMarkdownViewDirection(view, editor, editorView, newDirection, editorPlugin) {
     if (!view || !editor) {
       this.hideStatusBar();
       return;
@@ -526,7 +336,7 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
       title = view.previewMode.containerEl.querySelector(".inline-title");
     }
     title == null ? void 0 : title.setAttribute("dir", newDirection === "auto" ? "auto" : "");
-    this.adjustAutoDirection(editorView, newDirection, autoDirectionPlugin);
+    this.adjustEditorPlugin(editorView, newDirection, editorPlugin);
     const editorDivs = view.contentEl.getElementsByClassName("cm-editor");
     for (const editorDiv of editorDivs) {
       if (editorDiv instanceof HTMLDivElement)
@@ -543,15 +353,16 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
       header[0].style.direction = newDirection;
     }
     editor.refresh();
-    if (newDirection !== "auto") {
-      this.setExportDirection(newDirection);
-    }
   }
-  adjustAutoDirection(editorView, newDirection, autoDirectionPlugin) {
-    const autoDirection = autoDirectionPlugin != null ? autoDirectionPlugin : editorView.plugin(this.autoDirectionPlugin);
-    if (autoDirection) {
-      autoDirection.setActive(newDirection === "auto", editorView);
-      if (!autoDirectionPlugin)
+  adjustEditorPlugin(editorView, newDirection, editorPlugin) {
+    let dispatchUpdate = false;
+    if (!editorPlugin) {
+      editorPlugin = editorView.plugin(this.editorPlugin);
+      dispatchUpdate = true;
+    }
+    if (editorPlugin) {
+      editorPlugin.setDirection(newDirection, editorView);
+      if (dispatchUpdate)
         editorView.dispatch();
     }
   }
@@ -573,44 +384,21 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
   }
   addDirectionClassToEl(el, direction) {
     switch (direction) {
+      case "ltr":
+        el.classList.remove(RTL_CLASS);
+        el.classList.remove(AUTO_CLASS);
+        el.classList.add(LTR_CLASS);
+        break;
       case "rtl":
+        el.classList.remove(LTR_CLASS);
         el.classList.remove(AUTO_CLASS);
         el.classList.add(RTL_CLASS);
         break;
-      case "auto":
+      default:
+        el.classList.remove(LTR_CLASS);
         el.classList.remove(RTL_CLASS);
         el.classList.add(AUTO_CLASS);
-        break;
-      default:
-        el.classList.remove(RTL_CLASS);
-        el.classList.remove(AUTO_CLASS);
     }
-  }
-  setExportDirection(newDirection) {
-    this.replacePageStyleByString("searched and replaced", `/* This is searched and replaced by the plugin */ @media print { body { direction: ${newDirection}; } }`, true);
-  }
-  replacePageStyleByString(searchString, newStyle, addIfNotFound) {
-    let alreadyExists = false;
-    let style = this.findPageStyle(searchString);
-    if (style) {
-      if (style.getText() === searchString)
-        alreadyExists = true;
-      else
-        style.setText(newStyle);
-    } else if (addIfNotFound) {
-      let style2 = document.createElement("style");
-      style2.textContent = newStyle;
-      document.head.appendChild(style2);
-    }
-    return style && !alreadyExists;
-  }
-  findPageStyle(regex) {
-    let styles = document.head.getElementsByTagName("style");
-    for (let style of styles) {
-      if (style.getText().match(regex))
-        return style;
-    }
-    return null;
   }
   switchDocumentDirection(editor, view) {
     let newDirection = this.getDocumentDirection(editor, view);
@@ -685,13 +473,6 @@ var RtlPlugin = class extends import_obsidian3.Plugin {
         return direction;
       } catch (error) {
       }
-    }
-  }
-  syncDefaultDirection() {
-    const obsidianDirection = this.app.vault.getConfig("rightToLeft") ? "rtl" : "ltr";
-    if (obsidianDirection != this.settings.defaultDirection && this.settings.defaultDirection !== "auto") {
-      this.settings.defaultDirection = obsidianDirection;
-      this.saveSettings();
     }
   }
 };

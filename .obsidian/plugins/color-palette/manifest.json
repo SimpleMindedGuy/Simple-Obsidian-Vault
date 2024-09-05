@@ -1,10 +1,14 @@
 {
 	"id": "color-palette",
 	"name": "Color Palette",
-	"version": "2.5.1",
+	"version": "2.14.0",
 	"minAppVersion": "0.15.0",
 	"description": "Create and insert color palettes into your notes.",
 	"author": "ALegendsTale",
 	"authorUrl": "https://github.com/ALegendsTale",
+	"fundingUrl": {
+		"GitHub Sponsor": "https://github.com/sponsors/ALegendsTale",
+		"PayPal": "https://www.paypal.com/donate/?hosted_button_id=BHHFMGX822K4S"
+	},
 	"isDesktopOnly": false
 }

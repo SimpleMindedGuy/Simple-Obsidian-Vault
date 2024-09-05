@@ -1,12 +1,4 @@
 {
-  "table-editor-obsidian:next-cell": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "Tab"
-    }
-  ],
   "table-editor-obsidian:next-row": [
     {
       "modifiers": [
@@ -175,14 +167,13 @@
   ],
   "various-complements:show-suggestions": [],
   "editor:toggle-checklist-status": [],
-  "obsidian-languagetool-plugin:ltclear": [],
   "app:open-help": [],
   "nldates-obsidian:nlp-today": [
     {
       "modifiers": [
         "Alt"
       ],
-      "key": "3"
+      "key": "D"
     }
   ],
   "nldates-obsidian:nlp-dates": [],
@@ -191,7 +182,7 @@
       "modifiers": [
         "Alt"
       ],
-      "key": "2"
+      "key": "F"
     }
   ],
   "switcher:open": [],
@@ -271,20 +262,6 @@
         "Mod"
       ],
       "key": " "
-    }
-  ],
-  "editor:toggle-strikethrough": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "S"
-    },
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "3"
     }
   ],
   "editor:toggle-bullet-list": [
@@ -379,7 +356,7 @@
       "modifiers": [
         "Alt"
       ],
-      "key": "["
+      "key": "]"
     }
   ],
   "obsidian-heading-shifter:decrease-heading": [
@@ -393,7 +370,7 @@
       "modifiers": [
         "Alt"
       ],
-      "key": "]"
+      "key": "["
     }
   ],
   "obsidian-heading-shifter:insert-heading-deeper": [
@@ -480,14 +457,7 @@
       "key": "]"
     }
   ],
-  "nldates-obsidian:nlp-now": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "1"
-    }
-  ],
+  "nldates-obsidian:nlp-now": [],
   "obsidian-rtl:switch-text-direction": [
     {
       "modifiers": [
@@ -497,20 +467,12 @@
       "key": "D"
     }
   ],
-  "obsidian-another-quick-switcher:search-command_file-name-fuzzy-search": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "`"
-    }
-  ],
   "command-palette:open": [
     {
       "modifiers": [
         "Mod"
       ],
-      "key": "`"
+      "key": "P"
     }
   ],
   "obsidian-another-quick-switcher:search-command_link-search": [
@@ -557,7 +519,7 @@
         "Mod",
         "Shift"
       ],
-      "key": "'"
+      "key": "L"
     }
   ],
   "editor:focus-right": [
@@ -566,7 +528,7 @@
         "Mod",
         "Shift"
       ],
-      "key": "L"
+      "key": "'"
     }
   ],
   "workspace:split-horizontal": [
@@ -580,14 +542,7 @@
   ],
   "file-explorer:new-file": [],
   "file-explorer:new-file-in-new-pane": [],
-  "markdown:add-metadata-property": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "P"
-    }
-  ],
+  "markdown:add-metadata-property": [],
   "editor:attach-file": [
     {
       "modifiers": [
@@ -642,7 +597,7 @@
     },
     {
       "modifiers": [
-        "Mod"
+        "Alt"
       ],
       "key": "1"
     }
@@ -650,13 +605,7 @@
   "editor:toggle-italics": [
     {
       "modifiers": [
-        "Mod"
-      ],
-      "key": "I"
-    },
-    {
-      "modifiers": [
-        "Mod"
+        "Alt"
       ],
       "key": "2"
     }
@@ -664,8 +613,7 @@
   "editor:save-file": [
     {
       "modifiers": [
-        "Mod",
-        "Shift"
+        "Mod"
       ],
       "key": "S"
     }
@@ -673,15 +621,67 @@
   "editor:toggle-highlight": [
     {
       "modifiers": [
-        "Mod"
+        "Alt"
       ],
-      "key": "H"
-    },
+      "key": "4"
+    }
+  ],
+  "workspace:goto-last-tab": [],
+  "checkbox-reorder:reorder-checkboxes": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "R"
+    }
+  ],
+  "markdown:toggle-preview": [
     {
       "modifiers": [
         "Mod"
       ],
-      "key": "4"
+      "key": "E"
     }
-  ]
+  ],
+  "editor:toggle-strikethrough": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "5"
+    }
+  ],
+  "editor:toggle-code": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "3"
+    }
+  ],
+  "obsidian-another-quick-switcher:search-command_landmark-search": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "`"
+    }
+  ],
+  "obsidian-another-quick-switcher:in-file-search": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "`"
+    }
+  ],
+  "obsidian-another-quick-switcher:search-command_file-name-fuzzy-search": [
+    {
+      "modifiers": [
+        "Shift"
+      ],
+      "key": "`"
+    }
+  ],
+  "obsidian-another-quick-switcher:search-command_file-name-search": []
 }

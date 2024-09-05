@@ -1,0 +1,16 @@
+{
+  "pdfTitle": "Example Timesheet",
+  "pdfFootnote": "Information present in this timesheet should be considered Commercial in Confidence.",
+  "pdfExportBehavior": "OPEN_PATH",
+  "pdfDateFormat": "YYYY/MM/DD",
+  "pdfRowDateFormat": "YYYY/MM/DD hh:mm A",
+  "timestampFormat": "YYYY-MM-DD hh:mm:ss A",
+  "editableTimestampFormat": "YYYY-MM-DD HH:mm:ss",
+  "csvTitle": true,
+  "csvDelimiter": ",",
+  "reverseSegmentOrder": false,
+  "limitTableSize": true,
+  "showDecimalHours": true,
+  "exportDurationFormat": "SHORT",
+  "formatCopiedJSON": false
+}

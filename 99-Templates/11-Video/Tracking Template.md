@@ -14,9 +14,9 @@
 🏹: 0
 🎯: 1
 tags:
- - Video
- - Activities
- - Tracking
+  - Video
+  - Activities
+  - Tracking
 kanban-plugin: basic
 aliases:
 ---

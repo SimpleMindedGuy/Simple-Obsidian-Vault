@@ -1922,12 +1922,12 @@ var require_readline_sync = __commonJS({
         return type === "string" ? caseSensitive ? res === comp : res.toLowerCase() === comp.toLowerCase() : type === "number" ? parseFloat(res) === comp : type === "function" ? comp(res) : comp instanceof RegExp ? comp.test(res) : false;
       });
     }
-    function replaceHomePath(path, expand) {
+    function replaceHomePath(path2, expand) {
       var homePath = pathUtil.normalize(
         IS_WIN ? (process.env.HOMEDRIVE || "") + (process.env.HOMEPATH || "") : process.env.HOME || ""
       ).replace(/[\/\\]+$/, "");
-      path = pathUtil.normalize(path);
-      return expand ? path.replace(/^~(?=\/|\\|$)/, homePath) : path.replace(new RegExp("^" + escapePattern(homePath) + "(?=\\/|\\\\|$)", IS_WIN ? "i" : ""), "~");
+      path2 = pathUtil.normalize(path2);
+      return expand ? path2.replace(/^~(?=\/|\\|$)/, homePath) : path2.replace(new RegExp("^" + escapePattern(homePath) + "(?=\\/|\\\\|$)", IS_WIN ? "i" : ""), "~");
     }
     function replacePlaceholder(text, generator) {
       var PTN_INNER = "(?:\\(([\\s\\S]*?)\\))?(\\w+|.-.)(?:\\(([\\s\\S]*?)\\))?", rePlaceholder = new RegExp("(\\$)?(\\$<" + PTN_INNER + ">)", "g"), rePlaceholderCompat = new RegExp("(\\$)?(\\$\\{" + PTN_INNER + "\\})", "g");
@@ -2313,11 +2313,11 @@ var require_readline_sync = __commonJS({
           error = "";
           function mkdirParents(dirPath) {
             dirPath.split(/\/|\\/).reduce(function(parents, dir) {
-              var path = pathUtil.resolve(parents += dir + pathUtil.sep);
-              if (!fs2.existsSync(path)) {
-                fs2.mkdirSync(path);
-              } else if (!fs2.statSync(path).isDirectory()) {
-                throw new Error("Non directory already exists: " + path);
+              var path2 = pathUtil.resolve(parents += dir + pathUtil.sep);
+              if (!fs2.existsSync(path2)) {
+                fs2.mkdirSync(path2);
+              } else if (!fs2.statSync(path2).isDirectory()) {
+                throw new Error("Non directory already exists: " + path2);
               }
               return parents;
             }, "");
@@ -2681,8 +2681,8 @@ var require_core = __commonJS({
       };
       tau_file_system = {
         files: new TauDirectory("/", "/", null),
-        open: function(path, type, mode) {
-          var dirs = path.replace(/\/$/, "").split("/");
+        open: function(path2, type, mode) {
+          var dirs = path2.replace(/\/$/, "").split("/");
           var dir = tau_file_system.files;
           var name = dirs[dirs.length - 1];
           for (var i2 = 1; i2 < dirs.length - 1; i2++) {
@@ -2703,8 +2703,8 @@ var require_core = __commonJS({
             file.text = "";
           return file;
         },
-        get: function(path) {
-          var dirs = path.replace(/\/$/, "").split("/");
+        get: function(path2) {
+          var dirs = path2.replace(/\/$/, "").split("/");
           var file = tau_file_system.files;
           for (var i2 = 1; i2 < dirs.length; i2++)
             if (pl.type.is_directory(file))
@@ -2753,12 +2753,12 @@ var require_core = __commonJS({
         }
       };
       nodejs_file_system = {
-        open: function(path, type, mode) {
+        open: function(path2, type, mode) {
           var fd, fs2 = require("fs");
-          if (mode === "read" && !fs2.existsSync(path))
+          if (mode === "read" && !fs2.existsSync(path2))
             return null;
           try {
-            fd = fs2.openSync(path, mode[0]);
+            fd = fs2.openSync(path2, mode[0]);
           } catch (ex) {
             return false;
           }
@@ -2773,7 +2773,7 @@ var require_core = __commonJS({
               return end_of_file ? "end_of_stream" : buffer.toString();
             },
             eof: function(position) {
-              var stats = fs2.statSync(path);
+              var stats = fs2.statSync(path2);
               return position === stats["size"];
             },
             put: function(text, position) {
@@ -4856,25 +4856,25 @@ var require_core = __commonJS({
       Thread.prototype.get_stream_by_alias = function(alias) {
         return this.session.get_stream_by_alias(alias);
       };
-      Session.prototype.file_system_open = function(path, type, mode) {
+      Session.prototype.file_system_open = function(path2, type, mode) {
         if (this.get_flag("nodejs").indicator === "false/0")
-          path = this.absolute_file_name(path);
-        return this.file_system.open(path, type, mode);
+          path2 = this.absolute_file_name(path2);
+        return this.file_system.open(path2, type, mode);
       };
-      Thread.prototype.file_system_open = function(path, type, mode) {
-        return this.session.file_system_open(path, type, mode);
+      Thread.prototype.file_system_open = function(path2, type, mode) {
+        return this.session.file_system_open(path2, type, mode);
       };
       Session.prototype.absolute_file_name = function(filename) {
         var absolute;
         if (this.get_flag("nodejs").indicator === "true/0") {
-          var path = require("path");
+          var path2 = require("path");
           absolute = filename;
           for (var prop in process.env) {
             if (!process.env.hasOwnProperty(prop))
               continue;
             absolute = absolute.replace(new RegExp("\\$" + prop, "g"), process.env[prop]);
           }
-          return path.resolve(absolute);
+          return path2.resolve(absolute);
         } else {
           var cwd = this.working_directory;
           if (filename[0] === "/")
@@ -4896,8 +4896,8 @@ var require_core = __commonJS({
         }
         return absolute;
       };
-      Thread.prototype.absolute_file_name = function(path, cwd) {
-        return this.session.absolute_file_name(path, cwd);
+      Thread.prototype.absolute_file_name = function(path2, cwd) {
+        return this.session.absolute_file_name(path2, cwd);
       };
       Session.prototype.get_char_conversion = function(char) {
         return this.__char_conversion[char] || char;
@@ -11843,11 +11843,11 @@ var SettingsTab = class extends import_obsidian33.PluginSettingTab {
       this.activeLanguageContainer.style.display = "block";
     }
   }
-  sanitizePath(path) {
-    path = path.replace(/\\/g, "/");
-    path = path.replace(/['"`]/, "");
-    path = path.trim();
-    return path;
+  sanitizePath(path2) {
+    path2 = path2.replace(/\\/g, "/");
+    path2 = path2.replace(/['"`]/, "");
+    path2 = path2.trim();
+    return path2;
   }
   makeInjectSetting(containerEl, language) {
     const languageAlt = DISPLAY_NAMES[language];
@@ -12251,6 +12251,7 @@ var import_obsidian39 = require("obsidian");
 // src/executors/Executor.ts
 var import_obsidian38 = require("obsidian");
 var os2 = __toESM(require("os"));
+var path = __toESM(require("path"));
 var import_stream = require("stream");
 var Executor = class extends import_stream.EventEmitter {
   constructor(file, language) {
@@ -12269,7 +12270,7 @@ var Executor = class extends import_stream.EventEmitter {
   getTempFile(ext) {
     if (this.tempFileId === void 0)
       this.tempFileId = Date.now().toString();
-    return `${os2.tmpdir()}\\temp_${this.tempFileId}.${ext}`;
+    return path.join(os2.tmpdir(), `temp_${this.tempFileId}.${ext}`);
   }
 };
 
@@ -12306,21 +12307,29 @@ var killWithChildren_default = (pid) => {
   if (process.platform === "win32") {
     (0, import_child_process.execSync)(`taskkill /pid ${pid} /T /F`);
   } else {
-    (0, import_child_process.execSync)(`pkill -P ${pid}`);
+    try {
+      (0, import_child_process.execSync)(`pkill -P ${pid}`);
+    } catch (err) {
+      if (err.status !== 1)
+        throw err;
+    }
     process.kill(pid);
   }
 };
 
 // src/executors/ReplExecutor.ts
 var ReplExecutor = class extends AsyncExecutor {
-  constructor(settings, path, args, file, language) {
+  constructor(settings, path2, args, file, language) {
+    var _a;
     super(file, language);
     this.settings = settings;
     if (this.settings.wslMode) {
-      args.unshift("-e", path);
-      path = "wsl";
+      args.unshift("-e", path2);
+      path2 = "wsl";
     }
-    this.process = (0, import_child_process2.spawn)(path, args, { env: process.env });
+    if (path2.includes("%USERNAME%") && ((_a = process == null ? void 0 : process.env) == null ? void 0 : _a.USERNAME))
+      path2 = path2.replace("%USERNAME%", process.env.USERNAME);
+    this.process = (0, import_child_process2.spawn)(path2, args, { env: process.env });
     this.process.on("close", () => {
       this.emit("close");
       new import_obsidian39.Notice("Runtime exited");

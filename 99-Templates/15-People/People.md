@@ -1,7 +1,7 @@
 {{{:::
 Dialog :=> {
 
-Chose !(🎫) type 
+Chose !(🎫) type
 }
 
 Menu :=> [Friends,Acquaintances,Work/School,Family,Relative]  
@@ -10,7 +10,7 @@ Select :=> 🎟️
 SetOverviewLayer :=> !(🎫)
 
 Dialog :=> {
-Enter Document Title 
+Enter Document Title
 }
 
 Input :=> 🏷️
@@ -29,11 +29,9 @@ Menu :=> [!(menu)]
 
 Dialog :=> {
 Add Tags to Document
-Alias : 
 }
 
 OptionsAdd :=> tags
-
 
 BuildDocument :=>
 

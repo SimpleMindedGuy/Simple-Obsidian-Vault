@@ -1,5 +1,5 @@
 {
-  "globalQuery": "path does not include 99-Templates/",
+  "globalQuery": "path does not include 99-Templates/ ",
   "globalFilter": "",
   "removeGlobalFilter": true,
   "taskFormat": "tasksPluginEmoji",
@@ -9,10 +9,11 @@
   "autoSuggestInEditor": false,
   "autoSuggestMinMatch": 1,
   "autoSuggestMaxItems": 6,
-  "provideAccessKeys": false,
-  "useFilenameAsScheduledDate": true,
+  "provideAccessKeys": true,
+  "useFilenameAsScheduledDate": false,
+  "filenameAsScheduledDateFormat": "",
   "filenameAsDateFolders": [],
-  "recurrenceOnNextLine": true,
+  "recurrenceOnNextLine": false,
   "statusSettings": {
     "coreStatuses": [
       {
@@ -33,66 +34,38 @@
     "customStatuses": [
       {
         "symbol": " ",
-        "name": "Unchecked",
+        "name": "incomplete",
         "nextStatusSymbol": "x",
         "availableAsCommand": false,
         "type": "TODO"
       },
       {
         "symbol": "x",
-        "name": "Regular",
+        "name": "complete / done",
         "nextStatusSymbol": " ",
         "availableAsCommand": false,
         "type": "DONE"
       },
       {
         "symbol": "-",
-        "name": "Dropped",
+        "name": "cancelled",
         "nextStatusSymbol": " ",
         "availableAsCommand": false,
         "type": "CANCELLED"
       },
       {
         "symbol": ">",
-        "name": "Forward",
-        "nextStatusSymbol": "x",
-        "availableAsCommand": false,
-        "type": "IN_PROGRESS"
-      },
-      {
-        "symbol": "D",
-        "name": "Date",
-        "nextStatusSymbol": "x",
-        "availableAsCommand": false,
-        "type": "TODO"
-      },
-      {
-        "symbol": "?",
-        "name": "Question",
+        "name": "deferred",
         "nextStatusSymbol": "x",
         "availableAsCommand": false,
         "type": "TODO"
       },
       {
         "symbol": "/",
-        "name": "Half Done",
+        "name": "in progress, or half-done",
         "nextStatusSymbol": "x",
         "availableAsCommand": false,
         "type": "IN_PROGRESS"
-      },
-      {
-        "symbol": "+",
-        "name": "Add",
-        "nextStatusSymbol": "x",
-        "availableAsCommand": false,
-        "type": "TODO"
-      },
-      {
-        "symbol": "R",
-        "name": "Research",
-        "nextStatusSymbol": "x",
-        "availableAsCommand": false,
-        "type": "TODO"
       },
       {
         "symbol": "!",
@@ -102,22 +75,92 @@
         "type": "TODO"
       },
       {
-        "symbol": "i",
-        "name": "Idea",
+        "symbol": "?",
+        "name": "question",
         "nextStatusSymbol": "x",
         "availableAsCommand": false,
         "type": "TODO"
       },
       {
-        "symbol": "d",
-        "name": "Doing",
+        "symbol": "R",
+        "name": "review",
         "nextStatusSymbol": "x",
         "availableAsCommand": false,
-        "type": "IN_PROGRESS"
+        "type": "TODO"
       },
       {
-        "symbol": "~",
-        "name": "Conflict",
+        "symbol": "+",
+        "name": "Inbox / task that should be processed later",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "b",
+        "name": "bookmark",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "B",
+        "name": "brainstorm",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "D",
+        "name": "deferred or scheduled",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "I",
+        "name": "Info",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "i",
+        "name": "idea",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "N",
+        "name": "note",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "Q",
+        "name": "quote",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "W",
+        "name": "win / success / reward",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "P",
+        "name": "pro",
+        "nextStatusSymbol": "x",
+        "availableAsCommand": false,
+        "type": "TODO"
+      },
+      {
+        "symbol": "C",
+        "name": "con",
         "nextStatusSymbol": "x",
         "availableAsCommand": false,
         "type": "TODO"
@@ -134,7 +177,8 @@
   },
   "debugSettings": {
     "ignoreSortInstructions": false,
-    "showTaskHiddenData": false
+    "showTaskHiddenData": false,
+    "recordTimings": false
   },
   "loggingOptions": {
     "minLevels": {

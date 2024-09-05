@@ -1,14 +1,52 @@
-.definition-dropdown {
+.definition-popover {
 	background-color: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border-hover);
 	border-radius: var(--radius-m);
 	position: absolute;
-	padding: var(--size-4-2);
+	padding: var(--size-4-2) var(--size-4-3);
 	box-shadow: var(--shadow-s);
-	min-height: 150px;
-	min-width: 200px;
+	min-height: 100px;
+	min-width: 150px;
+	overflow: auto;
+}
+
+.definition-popover-filename {
+	color: var(--text-faint);
+	float: right;
 }
 
 .def-decoration {
 	text-decoration: underline var(--color-yellow) dotted;
+}
+
+.def-link-decoration {
+	text-decoration: underline var(--color-green) dotted;
+	cursor: pointer;
+}
+
+.edit-modal-section-header {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	color: var(--text-muted)
+}
+
+.edit-modal-aliases {
+	width: 100%;
+	resize: none;
+	font-size: var(--font-ui-medium);
+	height: 2em;
+}
+
+.edit-modal-textarea {
+	width: 100%;
+	height: 20vh;
+	resize: none;
+	font-size: var(--font-ui-medium);
+	margin-bottom: 10px;
+}
+
+.edit-modal-save-button {
+	font-size: var(--font-ui-medium);
+	float: right;
+	background-color: var(--interactive-normal);
 }
