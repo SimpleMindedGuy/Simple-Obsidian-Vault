@@ -68,7 +68,7 @@ Is a variable the script will store all input data, as long as there is a `key` 
 > it should look like this
 > `number:one`
 
-> [!Exmaple]
+> [!TIP]
 > 
 > GetValue:=> 🗓️ // gets a property in the current file with the name 🗓️, and stores is in a specific variable called `currenValue`.
 > 
