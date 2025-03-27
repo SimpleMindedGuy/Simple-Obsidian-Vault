@@ -54,13 +54,13 @@ moving a link from one list to another will change a `key` value in the metadata
 ## Meta
 Is a variable the script will store all input data, as long as there is a `key` provided after a command that would take value from (user input /current file/command block).
 
-> [!example]
+> [!Example]
 > Input:=> number
 > will result in a value/variable called `number` with the chosen value
 > it should look like this
 > `number:one`
 
-> [!exmaple]
+> [!Exmaple]
 > GetValue:=> 🗓️ // gets a property in the current file with the name 🗓️, and stores is in a specific variable called `currenValue`.
 > StoreValue:=> createdDate // Stores the current value of the `currentValue` variable, and stores it in a `Key` inside the `Meta` variable.
 
