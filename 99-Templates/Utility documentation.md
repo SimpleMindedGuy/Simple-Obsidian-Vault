@@ -54,13 +54,13 @@ moving a link from one list to another will change a `key` value in the metadata
 ## Meta
 Is a variable the script will store all input data, as long as there is a `key` provided after a command that would take value from (user input /current file/command block).
 
-> [!note] Example 1
+> [!example]
 > Input:=> number
 > will result in a value/variable called `number` with the chosen value
 > it should look like this
 > `number:one`
 
-> [!note] Example 2
+> [!exmaple]
 > GetValue:=> 🗓️ // gets a property in the current file with the name 🗓️, and stores is in a specific variable called `currenValue`.
 > StoreValue:=> createdDate // Stores the current value of the `currentValue` variable, and stores it in a `Key` inside the `Meta` variable.
 
@@ -127,7 +127,7 @@ SetValue:=> `value`or `[value1,value2,…]`
 Sets a value or a list of values in a global variable called `value`, that value can then be stored in another variable using the [StoreValue command](#StoreValue).
 
 
-> [!note] Example
+> [!example]
 > SetValue:=> hello world
 > sets the value of `value` to ‘hello world’
 > StoreValue:=> hello
@@ -150,7 +150,7 @@ Changes the `Key` for or the `Meta` variable name for the document’s Created d
 
 Those are mostly set in the [config](./Config) file, which will be read and "executed" before running anything else.
 
-> [!note] Example
+> [!example]
 > SetCreatedKey:=> 🗓️
 > stead of storing the created date in a
 > `Created: 21/1/2020`
