@@ -3,8 +3,9 @@ tags:
   - Activities
   - Description
 🏷️: Keywords/Terminology
-🖋️: 2024-09-25T14:58:22+00:00
+🖋️: 2025-03-27T14:25
 ---
+
 > [!Important]
 > This part of the script is in "maintenance mode", later on, I might look in to turning this functionality, into some sort of a plugin later on, but that’s far in the future.
 > I don’t intend to add features anytime soon, but feel free to request them.
@@ -103,6 +104,22 @@ the Script is going to look for at least 2 default files.
 
 # Commands
 
+
+
+## Command Block
+All Commands have to be inside the command block, the utility will only for the commands inside only one block in the file that is written in the following form.
+```
+{{{:::
+<command> 
+<command>
+<command>
+<command>
+:::}}}
+```
+
+This is made this way to avoid overwriting text that may look like the commands inside the file, and once the utility is done with the commands, it will remove the block from the file.
+
+
 ## SetValue
 
 SetValue:=> `value`or `[value1,value2,…]`
@@ -119,20 +136,6 @@ Sets a value or a list of values in a global variable called `value`, that value
 > set the value of `value`
 > StoreValue:=> Numbers
 > Stores array [1,2,3,4] in the variable `Numbers`
-
-
-## Command Block
-All Commands have to be inside the command block, the utility will only for the commands inside only one block in the file that is written in the following form.
-```
-{{{:::
-<command> 
-<command>
-<command>
-<command>
-:::}}}
-```
-
-This is made this way to avoid overwriting text that may look like the commands inside the file, and once the utility is done with the commands, it will remove the block from the file.
 
 
 ## Setting Default Keys
@@ -492,3 +495,67 @@ We can take advantages of this functionality, by making multiple notes that have
 To make this work we have to tell the Script that I needs to read the current file.
 
 What happens then is that the button embeds the commands inside the current file, then the script, reads and "executes" all the commands, will stop and remove all commands from the current file.
+
+
+# Templater user scripts
+
+There are a few commands that that can only run using a templater command line 
+
+>[!note]
+>this is only intended for scripts that the "end user" of this vault setup is going to use.
+>
+>For detailed technical documentation, you can find it in the scripts files, they should include comments sufficient to explain almost everything they do.
+>
+>Those files can be found in the scripts' folder @ :
+>
+>`99-Templates/95-Scripts`
+
+## UpdateTarget()
+`<%tp.user.UpdateTarget()%>`
+This is used to update the target and progress value based on the amount of cards and lists that exist in the tracking file if it exists.
+
+If the tracking file does not exist, the script will fail and do nothing.
+
+Update target script file can be found at : 
+`99-Templates/95-Scripts/UpdateTarget.js`
+(might later be moved to the `00-Basic-Functions` directory that exists inside the `95-Scripts` directory.)
+
+## main() / main(true)
+
+`<%tp.user.main()%>`
+This script is intended to start the main function of the utility.
+
+Meaning that it will read the `NewDocument` file, if the parenthesis is left empty, and will start prompting to create a new document, based on the commands that exist in the `NewDocument File`.
+
+If the there is  `true` inside the parenthesis, this will make the script read the current file for commands, and run those commands in that file, or in its directory.
+
+This functionality was intended to be used with the `buttons` plugin, but might later on be removed, because that use case was replaced with the obsidian-toolbar plugin, than also can be used the commander plugin, using the new script called **command**.
+
+The main scrip can be found @ : 
+`99-Templates/95-Scrips/00-Basic-Functons/main.js`
+
+## command("command-file-name")
+
+`<%tp.user.command("<command-file-name>")%>`
+
+This script will look into the `commands folder` that exists @ : 
+`99-Templates/99-Commands`.
+
+And will then look for A command with the provided name `<command-file-name>`.
+
+It will read those commands and run those commands in the currently opened file, or the folder that it is located at, if those commands will create other folders or notes, the working folder will be set to the folder the currently opened file exists at.
+
+
+This script is what replaces the functionality of the `buttons` plugin, and is used for creating sub-notes, sub-documents, and other commands that are supposed to run on the currently opened file.
+
+This setup includes a few commands, intended to sort the files, in a way I see fit, please take a look at those commands and modify to fit your use case.
+
+>[!example]
+>`<%*tp.user.command("MakeSubNote")%>`
+>
+> This is an example for using the MakeSubNote command that exists @: 
+>
+>`99-Templates/99-Commands/MakeSubNote`.
+>
+>This will then prompt to create a sub note related to the current one.
+

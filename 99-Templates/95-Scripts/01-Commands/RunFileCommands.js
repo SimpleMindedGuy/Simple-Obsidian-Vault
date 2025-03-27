@@ -522,6 +522,10 @@ const Commands = {
     let currentFilePath = await window?.pkvs?.load("currentFilePath");
     let currentFile = await app.vault.getAbstractFileByPath(currentFilePath);
 
+    console.log(
+      `01-Commands: RunFileCommands:\nCurrent File\n`, currentFilePath, currentFile
+    );
+
     let parentKey = await window?.pkvs?.load("parentKey");
     let Meta = await window?.pkvs?.load("Meta");
 

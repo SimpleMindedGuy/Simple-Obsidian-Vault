@@ -13,6 +13,7 @@
 tags:
  - SubNote
 aliases:
+notetoolbar: SubNotes
 ---
 
 # !(🏷️)

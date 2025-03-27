@@ -27,7 +27,6 @@ aliases:
 
 ## Introdiction
 
-## Work Time
 
 ```timekeep
 {"entries":[]}
@@ -36,27 +35,4 @@ aliases:
 ## Description
 
 
-
-```button
-name WorkDay
-type append template
-action 99-Commands/Work Day
-```
-```button
-name Sort Images
-type append template
-action 99-Commands/MoveDocumentMedia
-templater true
-```
-```button
-name Make Sub Document
-type append template
-action 99-Commands/MakeSubDocument
-templater true
-```
-```button
-name Update Target
-type append template
-action 99-Commands/UpdateTarget
-```
 

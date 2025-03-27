@@ -139,15 +139,6 @@ customJS.DvDailyCharts.renderWeek({
 > 
 > ```
 
-```button
-name Sort Images
-type append template
-action Commands/MoveWeeklyMedia
-templater true
-```
-^MoveProjectMedia
-
-
 
 {{{:::
 

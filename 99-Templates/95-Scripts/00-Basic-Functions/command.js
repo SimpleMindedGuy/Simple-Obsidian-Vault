@@ -29,6 +29,7 @@ const CommandsFolder = "99-Commands";
  */
 async function command(command) {
 
+  console.log("hello world, this is command file : \n", command)
 
   // Getting Templater object for running functions
   const tp = {}
@@ -46,81 +47,58 @@ async function command(command) {
     return;
   }
 
+  await tp.user.GV_Init();
+
+  /// Config file commands start
+  // Get the default config path
+  const ConfigPath = await window.pkvs?.load("ConfigPath");
+  let Meta = await window?.pkvs?.load("Meta") ?? {};
+
+  // Read the Config file
+  console.log(`00-Basic-Functions: command: \nGetting Config File `);
+  let currentFile = await app.vault.getAbstractFileByPath(ConfigPath);
+
+  await window.pkvs?.store("currentFilePath", currentFile.path);
+
+
+  // use the function from the user Functions to run commands
+  console.log(`00-Basic-Functions: command: \nRunning config file commands `);
+  await tp.user.RunFileCommands(currentFile)
+
+  createdKey = await window?.pkvs?.load("createdKey");
+
+  Meta[createdKey] = await new moment().toISOString();
+
+  /// Config file commands end
+
+  /// Set Command environment start
+  // Setting File where commands are going to run to the currently Opened file 
+  currentFile = await app.workspace.getActiveFile()
+  console.log(`00-Basic-Functions: command:\ncurrentFile:`, currentFile.path);
+  const currentFilePath = currentFile.path;
+
+  await window.pkvs?.store("currentFilePath", currentFilePath);
+  await window.pkvs?.store("Meta", Meta);
+  /// Set Command environment end
+
+
+  /// Running command file start
+  // Run Commands for the current file.
   // chekc if the command file exists inside the templater folder > 99-Commands folder.
   const commandFile = await app.vault.getAbstractFileByPath(`${tp.settings.templates_folder}/${CommandsFolder}/${command}.md`);
-
-
   if (!commandFile) {
-
     console.error(`00-Basic-Functions: command: \nCould not find commands folder or command file (nothing has changed)\n1.ensure that the passed command name matches the name of the required file.\n2.ensure that the commands  folder with the name ${CommandsFolder} exists inside templaters folder, and contains the commands files in it.`);
     return;
   }
-
-
-  // Reading the current active file, and storing the value in global key ( for other scripts to access it later on.)
-  const currentFile = await app.workspace.getActiveFile()
-  await window.pkvs?.store("currentFilePath", currentFile.path);
-
-  console.warn(`00-Basic-Functions: command: \nReading active file.`)
-  const FileText = await app.vault.read(currentFile)
-
   // Run Commands for the current file.
-  await tp.user.RunFileCommands(currentFile)
+  await tp.user.RunFileCommands(commandFile)
+  /// Running command file end
 
-  // Make sure that the Meta value is synced.
-  Meta = await window.pkvs?.load("Meta") ?? {};
-  console.warn(`00-Basic-Functions: command: \nMeta`);
-  console.warn(Meta);
-
-  // Remove the Command Block form the current file
-  await tp.user.RemoveCommandBlock(currentFile)
 
   // Remove all global keys set by the script.
-  await RemoveDefaultsForGlobalValues()
-
-
-  console.log(`00-Basic-Functions: command:\nReading file: ${File.name}`);
-
-  FileText = await app.vault.read(File);
-  console.log(FileText);
-  console.log(
-    `/////////////////////\n00-Basic-Functions: command:\nReading file CommandBlock`
-  );
-
-  const FileCommandsBlock = await tp.user.GetCommandsBlock(FileText);
-
-  console.log(FileCommandsBlock);
-
-  console.log(
-    `/////////////////////\n00-Basic-Functions: command:\nReading file Commands`
-  );
-
-  const CommandLines = await tp.user.GetCommandLines(FileCommandsBlock);
-
-  console.log(CommandLines);
-
-  console.log(
-    `/////////////////////\n00-Basic-Functions: command:\nRunning file Commands`
-  );
-
-  if (!CommandLines) {
-    console.warn(`00-Basic-Functions: command:\nNo command lines provided`);
-    console.warn(CommandLines);
-    return;
-  }
-
-  // run Commands for the current file.
-  await window.pkvs?.store("currentFilePath", currentFile.path);
-
-  // Make sure that the Meta value is synced.
-  Meta = await window.pkvs?.load("Meta");
-  console.warn("00-Basic-Functions: command: \nMeta");
-  console.warn(Meta);
+  // await tp.user.GV_Clear();
 
   return;
 
 }
-
-
-
-
+module.exports = command

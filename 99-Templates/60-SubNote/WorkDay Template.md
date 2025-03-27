@@ -1,4 +1,5 @@
 ---
+🌐: 
 🗓️: 
 🖋️: 
 ✍️: 
@@ -7,15 +8,21 @@
 🏷️: 
 🎫: 
 🎟️: 
+📇: 
+👔: 
 🔖: 
 banner: "[[80-Gallery/Banner/Simplicity.png]]"
 tags:
-  - SubNote
+  - Work/WorkDay
+  - Work/Sub-Note
 aliases:
 ---
 
 # !(🏷️)
-!(🗓️)
+
+```timekeep
+{"entries":[]}
+```
 
 ## Clocked in at {{date: hh:mm a}}
 
