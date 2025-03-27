@@ -54,7 +54,7 @@ moving a link from one list to another will change a `key` value in the metadata
 ## Meta
 Is a variable the script will store all input data, as long as there is a `key` provided after a command that would take value from (user input /current file/command block).
 
-> [!Example]
+> [!TIP]
 > Input:=> number
 > will result in a value/variable called `number` with the chosen value
 > it should look like this
@@ -127,7 +127,7 @@ SetValue:=> `value`or `[value1,value2,…]`
 Sets a value or a list of values in a global variable called `value`, that value can then be stored in another variable using the [StoreValue command](#StoreValue).
 
 
-> [!example]
+> [!TIP]
 > SetValue:=> hello world
 > sets the value of `value` to ‘hello world’
 > StoreValue:=> hello
@@ -150,7 +150,7 @@ Changes the `Key` for or the `Meta` variable name for the document’s Created d
 
 Those are mostly set in the [config](./Config) file, which will be read and "executed" before running anything else.
 
-> [!example]
+> [!TIP]
 > SetCreatedKey:=> 🗓️
 > stead of storing the created date in a
 > `Created: 21/1/2020`
@@ -219,7 +219,7 @@ example of how to get All the `tags` in the whole vault.
 
 
 
-> [!example]
+> [!TIP]
 > SetSearchQuery:=> ("/")
 > SetSearchKey:=> tags
 > GetQueryList:=> menu
@@ -231,7 +231,7 @@ example of how to get All the `tags` in the whole vault.
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd), [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
-> [!example]
+> [!TIP]
 > SetSearchQuery:=> #Activities and #Description
 > SetSearchKey:=> 🏷️
 > GetQueryList:=> menu
@@ -352,7 +352,7 @@ Tells the script to move to the next file in the `layers` list.
 
 the script will look for the next file, in the template folder
 
-> [!Example]
+> [!TIP]
 > if layers have the values \[project,type\]
 > when reading the `NextFile:=>` command, it then looks in the Template file (`99-Template`, in the default configuration.)
 > for a folder called `porject`, then it looks for a note with the name `project`.
@@ -419,7 +419,7 @@ MoveMedia:=> `path`
 
 Moves attachments from where ever they are, to the specified path.
 
-> [!example]
+> [!TIP]
 > when using a "fixed" path
 > just type the path as normal: path/to/folder
 > when using variables use the current format:!(`key`)/!(`key`)/!(`key`)
@@ -472,7 +472,7 @@ By default the parent document key is called `parent`, but in the current config
 
 And it only starts building document folders using the `layers` list, starting for the current document’s file.
 
-> [!example]
+> [!TIP]
 > the default command for making subnote, uses the command
 > `AddLayer:=> SubNote`
 > so that the utility looks for SubNote Templates.
@@ -550,7 +550,7 @@ This script is what replaces the functionality of the `buttons` plugin, and is u
 
 This setup includes a few commands, intended to sort the files, in a way I see fit, please take a look at those commands and modify to fit your use case.
 
->[!example]
+>[!TIP]
 >`<%*tp.user.command("MakeSubNote")%>`
 >
 > This is an example for using the MakeSubNote command that exists @: 
