@@ -1,8 +1,12 @@
 ---
-kanban-plugin: basic
+
+kanban-plugin: board
 🌐: 
 🗓️: 
 🖋️: 
+🛫: 
+🏁: 
+⏳: 
 ✍️: 
 📚: 
 ⬅️: 
@@ -11,21 +15,21 @@ kanban-plugin: basic
 🎟️: 
 🔖: 
 📊: 
-🏁: 
 🏹: 0
 🎯: 1
 tags:
   - Tracking
   - Learning
   - Progress
-aliases:
+aliases: 
+
 ---
 
 ## To-do
 
+- [ ] Goal
 - [ ] Introduction
 - [ ] Usage
-- [ ] Goal
 
 
 ## Reading
@@ -34,16 +38,21 @@ aliases:
 
 ## Exercising
 
+
+
 ## Documenting
+
+
 
 ## Done
 
+**Complete**
 
 
 
 
 %% kanban:settings
 ```
-{"kanban-plugin":"basic"}
+{"kanban-plugin":"board"}
 ```
 %%

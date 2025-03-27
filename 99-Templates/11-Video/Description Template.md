@@ -1,25 +1,31 @@
 ---
-🌐: 
-🗓️: 
-🖋️: 
-✍️: 
-📚: 
-⬅️: 
-🏷️: 
-🎫: 
-🎟️: 
-🔖: 
+🌐:
+🗓️:
+🖋️:
+🛫:
+🏁:
+⏳:
+✍️:
+📚:
+⬅️:
+🏷️:
+🎫:
+🎟️:
+🔖:
 📊: 
-🏁: 
 🏹: 0
 🎯: 1
 banner: "[[80-Gallery/Banner/Description.png]]"
 tags:
- - Video
- - Activities
- - Description
+  - Video
+  - Activities
+  - Description
 aliases:
+
 ---
+
+
+
 
 # !(🏷️)
 
@@ -55,4 +61,8 @@ templater true
 name Update Target
 type append template
 action 99-Commands/UpdateTarget
+```
+
+```timekeep
+{"entries":[]}
 ```

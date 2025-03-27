@@ -6,12 +6,12 @@
 🕌: 
 🍩: 
 🍱: 
-🍴: 
+
 💼: 
 💻: 
 🏦: 
 💰: 
-💸: 
+ 
 💳: 
 💵: 
 🍵: 
@@ -23,8 +23,6 @@
 🏷️: ""
 tags:
  - Monthly
-aliases:
- - <%moment(tp.file.title,"YYYY-MM").add(0,'weeks').format("YYYY-MM") %>
 aliases:
  - "<% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM")%>"
 
@@ -84,12 +82,71 @@ customJS.DvWeeklyCharts.renderMonth({
 })
 ```
 
+## Habit tracking by day
+```dataviewjs
+
+
+customJS.DvDailyCharts.renderMonth({
+	dv,
+	block: this,
+	setValues : false,
+	
+	Date: "<%moment(tp.file.title,'YYYY-MM').format('YYYY-MM')%>",
+	DateFormat: "YYYY-MM-DD",
+	DocumentFormat :"YYYY-MM-DD",
+	labelFormat : "YYYY-MM-DD",
+	
+	group: "#Daily",
+	type: "line",
+	types: {
+		"line" : {
+			stacked : false,
+			target	: true,
+		},
+		"table" : {
+			stacked : false,
+			target	: false,
+		},
+	},
+
+})
+```
+
+
 {{{:::
 
 <%* tp.user.main(true) %>
 
+
+
+Dialog :=>{
+Month's title
+}
+Input :=> 🏷️
+
 Dialog :=> {
-Books to refer to if any
+Add tags that for this month 
+}
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
+
+OptionsAdd :=> tags
+
+
+Dialog :=> {
+Any aliases for this monthly note ?
+}
+
+List :=> aliases
+
+
+Dialog :=> {
+Add books you have read this month
 }
 
 SetSearchQuery :=> ("/")
@@ -104,33 +161,6 @@ GetQueryList :=> menu2
 Menu :=> [!(menu),!(menu2)]
 
 OptionsAdd :=> 📚
-
-Dialog :=> {
-Names to refer to the document
-Alias : 
-}
-
-List :=> aliases
-
-Dialog :=> {
-Names to refer to the document
-Tags : 
-}
-
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-OptionsAdd :=> tags
-
-List :=> tags
-
-Dialog :=>{
-Month's title
-}
-Input :=> 🏷️
 
 BuildInFile :=>
 

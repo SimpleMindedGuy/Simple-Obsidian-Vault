@@ -245,6 +245,10 @@ async function main(Active) {
 
   await window.pkvs?.store("Meta", Meta);
 
+
+  await setTime(() => { }, 1000);
+
+
   if (!Active) {
     // getting the path for new document
     let NewDocumentPath = await window.pkvs?.load("NewDocumentPath")

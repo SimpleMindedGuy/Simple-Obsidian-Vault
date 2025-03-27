@@ -1,28 +1,35 @@
 {{{:::
 Dialog :=> {
-
 Chose !(🎫) type 
 }
 
 Menu :=>  [Health,Addiction,Mental] 
 Select :=> 🎟️
 
-SetOverviewLayer :=> !(🎫)
 
 Dialog :=> {
-Enter Document Title 
+Document's Name / Title
 }
-
 Input :=> 🏷️
 
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
 Dialog :=> {
-Books to refer to if any
+Add Tags to this  !(🎟️) 's !(🎫)
+}
+OptionsAdd :=> tags
+
+Dialog :=> {
+Add books / documentations to this document
 }
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> 📚
 GetQueryList :=> menu
-
 
 SetSearchQuery :=> (" #Book And #Description ")
 SetSearchKey :=> 🏷️
@@ -33,21 +40,9 @@ Menu :=> [!(menu),!(menu2)]
 OptionsAdd :=> 📚
 
 Dialog :=> {
-Names to refer to the document
-Alias : 
+Add Document's Aliases
 }
-
 List :=> aliases
-
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-OptionsAdd :=> tags
-
-List :=> tags
 
 BuildDocument :=>
 

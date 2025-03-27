@@ -1,7 +1,10 @@
 ---
 🌐: 
-🗓️: 
-🖋️: 
+🗓️:
+🖋️:
+🛫:
+🏁:
+⏳:
 ✍️: 
 📚: 
 ⬅️: 
@@ -10,7 +13,6 @@
 🎟️: 
 🔖: 
 📊: 
-🏁: 
 🏹: 0
 🎯: 1
 tags:
@@ -55,4 +57,8 @@ templater true
 name Update Target
 type append template
 action 99-Commands/UpdateTarget
+```
+
+```timekeep
+{"entries":[]}
 ```

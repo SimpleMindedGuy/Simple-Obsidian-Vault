@@ -1,4 +1,4 @@
-for (let Note of dv.pages("#diary").where(p => p.file.size > 5000 && p.file.path.indexOf("Templates")).groupBy(p => p.name)) {
+for (let Note of dv.pages("#Daily").where(p => p.file.size > 5000 && p.file.path.indexOf("Templates")).groupBy(p => p.name)) {
 	
 	dv.container.className = "block-language-dataviewjs node-insert-event dvTableCards diaryCards "
 	

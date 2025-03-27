@@ -1,5 +1,7 @@
 {{{:::
 
+<% tp.user.main(true) %>
+
 GetValue :=> 🏷️
 StoreValue :=> 🔖
 
@@ -24,4 +26,3 @@ BuildSubNote :=>
 
 :::}}}
 
-<%* tp.user.main(true) -%>

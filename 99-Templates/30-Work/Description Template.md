@@ -2,6 +2,8 @@
 🌐: 
 🗓️: 
 🖋️: 
+🏁: 
+⏳: 
 ✍️: 
 📚: 
 ⬅️: 
@@ -9,28 +11,36 @@
 🎫: 
 🎟️: 
 📇: 
+👔: 
 🔖: 
 📊: 
-🏁: 
 🏹: 0
 🎯: 1
 banner: "[[80-Gallery/Banner/typewriter.jpg]]"
 tags:
-  - Activities
-  - Description
-  - Work
+ - Activities
+ - Description
+ - Work
 aliases:
 ---
 # !(🏷️)
+
+## Introdiction
+
+## Work Time
+
+```timekeep
+{"entries":[]}
+```
 
 ## Description
 
 
 
 ```button
-name Sub Note
+name WorkDay
 type append template
-action 99-Commands/MakeSubNote
+action 99-Commands/Work Day
 ```
 ```button
 name Sort Images
@@ -49,3 +59,4 @@ name Update Target
 type append template
 action 99-Commands/UpdateTarget
 ```
+

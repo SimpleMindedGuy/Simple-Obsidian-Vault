@@ -1,38 +1,41 @@
 {{{:::
-Dialog :=> {
 
-Chose !(🎫) type
+Dialog:=> {
+
+Chose!(🎫) type
+
 }
 
-Menu :=> [Friends,Acquaintances,Work/School,Family,Relative]  
-Select :=> 🎟️
+Menu:=> [Friend,Acquaintances,Work,Family,Relative]  
+SelectLayer:=> 🎟️
 
-SetOverviewLayer :=> !(🎫)
-
-Dialog :=> {
-Enter Document Title
+Dialog:=> {
+Person's name
 }
 
-Input :=> 🏷️
+Input:=> 🏷️
 
-Dialog :=> {
-Add Document's Aliases
+
+SetSearchQuery:=> ("/")
+
+SetSearchKey:=> tags
+
+GetQueryList:=> menu
+
+Menu:=> [!(menu)]
+
+Dialog:=> {
+add tags to this person
 }
 
-List :=> aliases
+OptionsAdd:=> tags
 
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-Dialog :=> {
-Add Tags to Document
+Dialog:=> {
+Add nick names for this perons
 }
 
-OptionsAdd :=> tags
+List:=> aliases
 
-BuildDocument :=>
+BuildDocument:=>
 
 :::}}}

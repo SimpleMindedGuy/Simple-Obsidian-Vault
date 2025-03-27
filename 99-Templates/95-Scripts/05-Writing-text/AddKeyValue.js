@@ -63,23 +63,23 @@ async function AddKeyValue(Values, File) {
     return File;
   }
 
-  
-  for(const [key,value] of Object.entries(Values) )
-  {
-    const keyRegExp = new RegExp(`\\!\\(${key}\\)`,'gm');
+
+  for (const [key, value] of Object.entries(Values)) {
+    const keyRegExp = new RegExp(`\\!\\(${key}\\)`, 'gm');
 
     const isMatch = Text.match(keyRegExp)
 
     func = async () => {
-      return Text.match(KeysRegExp);
+      return Text.match(keyRegExp);
     };
-  
-    if(!isMatch)
-    {
+
+    if (!isMatch) {
       continue;
     }
-    console.log(`05-Writing-text: AddKeyValue:\nreplacing value/s for \nkey\t:\t${key}\nvalue\t:\t${value}`)
-    Text = Text.replace(keyRegExp, value);
+    Text = await Text.replace(keyRegExp, value);
+
+    console.log(`05-Writing-text: AddKeyValue:\nreplacing value/s for \nkey\t:\t${key}\nExpression :\n`, keyRegExp, `\nvalue\t:\t`, value);
+    // console.log(`05-Writing-text: AddKeyValue:\nreplacing value/s for \nkey\t:\t${key}\nvalue\t:\t`, value, `\nReplaced Text : \n`, Text)
 
   }
 

@@ -90,6 +90,9 @@ async function MakeDocumentFiles(Template, DocumentDirectory, addToOverview, isN
   }
   // Makes the note using the template
 
+  // Trim any spaces at the start or end of file's name.
+  DirName = DirName.trim();
+
   file = await tp.user.CreateTemplateNote(`${DirName}`, DocumentDirectory, Template, false)
 
   // Replace meta keys with values in document text

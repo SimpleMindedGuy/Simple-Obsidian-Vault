@@ -50,7 +50,7 @@ async function ReplaceValues(text) {
     return text
   }
   // Find key to match for values
-  const KeysRegExp = new RegExp(/(?<=\!\(\ *)([\u0000-\u0009|\u0010-\u0029|\u0030-\uffff])*\ *(?=\))/gm)
+  const KeysRegExp = new RegExp(/(?<=\!\(\ *)([\u0000-\u0009|\u0010-\u0029|\u0030-\uffff])*?[^)|(]\ *(?=\))/gm)
 
 
   let func = async () => {

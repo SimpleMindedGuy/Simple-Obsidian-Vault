@@ -11,13 +11,15 @@
 🎫: 
 🎟️: 
 📇: 
+👔: 
 🔖: 
 📊: 
 🏹: 0
 🎯: 1
 banner: "[[80-Gallery/Banner/typewriter.jpg]]"
 tags:
-  - SubNote
+ - Work
+ - Activities
 aliases: 
 kanban-plugin: advanced
 ---
@@ -30,7 +32,7 @@ kanban-plugin: advanced
 
 
 
-## In-Progress
+## In-Progres
 
 
 

@@ -1,29 +1,33 @@
 {{{:::
 Dialog :=> {
-
 Chose !(🎫) type 
 }
-
 Menu :=> [Program,Building,Automation,Home server]
-
 Select :=> 🎟️
 
-SetOverviewLayer :=> !(🎫)
-
 Dialog :=> {
-Enter Document Title 
+Document's Name / Title
 }
-
 Input :=> 🏷️
 
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
+
 Dialog :=> {
-Books to refer to if any
+Add Tags to this  !(🎟️) 's !(🎫)
+}
+OptionsAdd :=> tags
+
+Dialog :=> {
+Add books / documentations to this document
 }
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> 📚
 GetQueryList :=> menu
-
 
 SetSearchQuery :=> (" #Book And #Description ")
 SetSearchKey :=> 🏷️
@@ -36,22 +40,7 @@ OptionsAdd :=> 📚
 Dialog :=> {
 Add Document's Aliases
 }
-
 List :=> aliases
-
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-Dialog :=> {
-Add Tags to Document
-Alias : 
-}
-
-OptionsAdd :=> tags
-
 
 
 BuildDocument :=>

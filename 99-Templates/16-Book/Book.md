@@ -9,40 +9,21 @@ Select :=> 🎟️
 SetOverviewLayer :=> !(🎫)
 
 Dialog :=> {
-Enter Document Title 
+Book's name
 }
 
 Input :=> 🏷️
 
 Dialog :=> {
-Books to refer to if any
+Add Tags to this  !(🎟️) 's !(🎫)
 }
 
-SetSearchQuery :=> ("/")
-SetSearchKey :=> 📚
-GetQueryList :=> menu
-
-
-SetSearchQuery :=> (" #Book And #Description ")
-SetSearchKey :=> 🏷️
-GetQueryList :=> menu2
-
-Menu :=> [!(menu),!(menu2)]
-
-OptionsAdd :=> 📚
-
-Dialog :=> {
-Add Document's Aliases
-}
-
-List :=> aliases
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> tags
 GetQueryList :=> menu
 
 Menu :=> [!(menu)]
-
 Dialog :=> {
 Add Tags to Document
 Alias : 
@@ -50,6 +31,30 @@ Alias :
 
 OptionsAdd :=> tags
 
+SetSearchQuery :=> ("/")
+SetSearchKey :=> ✍️
+GetQueryList :=> menu
+
+SetSearchQuery :=> (" #People And #Description ")
+SetSearchKey :=> 🏷️
+GetQueryList :=> menu2
+
+Menu :=> [!(menu),!(menu2)]
+
+
+
+Dialog :=> {
+Add the book's author/s.
+}
+
+OptionsAdd :=> ✍️
+
+
+Dialog :=> {
+Any aliases for this book ?
+}
+
+List :=> aliases
 
 BuildDocument :=>
 

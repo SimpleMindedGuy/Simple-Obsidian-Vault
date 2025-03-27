@@ -1,33 +1,34 @@
 {{{:::
-Dialog :=> {
 
+Dialog :=> {
 Chose !(🎫) type 
 }
-
 Menu :=>  [Simple Rant,Simple Talk,The Simple Podcast,Clips,Memory,General] 
-
 SelectLayer :=> 🎟️
 
-SetOverviewLayer :=> !(🎫)
-
 Dialog :=> {
-Enter Document Title 
+Document's Name / Title
 }
-
 Input :=> 🏷️
 
-Dialog :=> {
-Books to refer to if any
-}
+SetSearchQuery :=> ("/")
+SetSearchKey :=> tags
+GetQueryList :=> menu
+
+Menu :=> [!(menu)]
 
 Dialog :=> {
-Books to refer to if any
+Add Tags to this  !(🎟️) 's !(🎫)
+}
+OptionsAdd :=> tags
+
+Dialog :=> {
+Add books / documentations to this document
 }
 
 SetSearchQuery :=> ("/")
 SetSearchKey :=> 📚
 GetQueryList :=> menu
-
 
 SetSearchQuery :=> (" #Book And #Description ")
 SetSearchKey :=> 🏷️
@@ -40,21 +41,7 @@ OptionsAdd :=> 📚
 Dialog :=> {
 Add Document's Aliases
 }
-
 List :=> aliases
-
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-Dialog :=> {
-Add Tags to Document
-Alias : 
-}
-
-OptionsAdd :=> tags
 
 
 BuildDocument :=>

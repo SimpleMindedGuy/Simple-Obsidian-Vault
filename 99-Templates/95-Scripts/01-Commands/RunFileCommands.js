@@ -205,6 +205,9 @@ const Commands = {
     let Meta = (await window?.pkvs?.load("Meta")) ?? {};
 
     if (!choice || Array.isArray(choice)) {
+
+      new Notice(`Canceling Document`);
+      await window?.pkvs?.store("BreakScript", true);
       return;
     }
     Meta[Argument] = choice;

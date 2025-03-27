@@ -76,11 +76,21 @@ async function GetPrayerTasks(prayerDate, Country, City) {
     console.log("08-Data-Fetching: GetPrayerTasks:\ntiming data is empty");
   }
 
-  for (const [key, value] of Object.entries(timings)) {
-    if (taskNames.includes(key)) {
-      tasks += `\n- [ ] ${key} prayer ⏰ ${prayerDate} ${value} ⏫ 📅 ${prayerDate}`
+  /// looping over  key and values pairs
+  /// key is prayer Name
+  // the value is the prayer time.
+  for (const [PrayerName, PrayerTime] of Object.entries(timings)) {
+
+    const startTime = moment(PrayerTime, ["HH:mm:ss", "HH:mm", "hh:mm A", "hh:mm a"]).add(0, 'minutes').format("hh:mm A");
+    const endTime = moment(startTime, ["HH:mm:ss", "HH:mm", "hh:mm A", "hh:mm a"]).add(15, 'minutes').format("hh:mm A");
+
+    if (taskNames.includes(PrayerName)) {
+      tasks += `\n- [ ] ${PrayerName} prayer [timeStamp:: ${startTime}-${endTime}] [priority:: high]  [due:: ${prayerDate}]`
     }
 
+
+
+    // tasks += `\n- [ ] ${startTime} - ${endTime} ${key} prayer ⏰ ${prayerDate} ${value} ⏫ 📅 ${prayerDate}`
     // if (reminderNames.includes(key)) {
     //   reminders = `\n- ${key} ⏰ ${prayerDate} ${value} ⏫ 📅 ${prayerDate}`
     // }

@@ -1,19 +1,40 @@
+
 {{{:::
 
-SetDate :=>
+GetValue :=> 🏷️
+StoreValue :=> 🔖
 
-SetDateFormat :=> YYYY-MM-DD
+GetValue :=> 🎫
+StoreValue :=> 🎫
+
+GetValue :=> 🎟️
+StoreValue :=> 🎟️
+
+
+GetValue :=> 📇
+StoreValue :=>📇
+
+
+GetValue :=> 👔
+StoreValue :=> 👔
+
+GetValue :=> tags
+StoreValue :=> tags
+
+AddLayer :=> WorkDay
+
+
+GetValue => 🗓️
+StoreValue => 🗓️
+
+SetDate :=> !(🗓️)
+
+SetDateFormat :=> YYYY-MM-DD (dddd)
 StoreFormattedDate :=> 🏷️
 
-SetSearchQuery :=> ("/")
-SetSearchKey :=> tags
-GetQueryList :=> menu
-
-Menu :=> [!(menu)]
-
-OptionsAdd :=> tags
-
 BuildSubNote :=> 
+
+
 :::}}}
 
-<%* tp.user.main(true) %>
+<%* tp.user.main(true) -%>

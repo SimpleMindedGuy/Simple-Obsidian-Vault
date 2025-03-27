@@ -5,7 +5,7 @@
 ⛔: 
 🕌: 
 🍩: 
-🍴: 
+
 💻: 
 💳: 
 💵: 
@@ -13,9 +13,8 @@
 🏋️‍♂️: 
 💼: 
 🏦: 
-💸: 
 📖: 
-🥞: 
+
 🍱: 
 🍵: 
 😶: 
@@ -92,32 +91,16 @@ customJS.DvMonthlyCharts.renderYear({
 {{{:::
 
 <%* tp.user.main(true) %>
-Dialog :=> {
-Books to refer to if any
+
+
+Dialog :=>{
+Year's title
 }
+Input :=> 🏷️
 
-SetSearchQuery :=> ("/")
-SetSearchKey :=> 📚
-GetQueryList :=> menu
-
-SetSearchQuery :=> #Book And #Description
-SetSearchKey :=> 🏷️
-GetQueryList :=> menu2
-
-Menu :=> [!(menu),!(menu2)]
-
-OptionsAdd :=> 📚
 
 Dialog :=> {
-Names to refer to the document
-Alias :
-}
-
-List :=> aliases
-
-Dialog :=> {
-Names to refer to the document
-Tags :
+Add tags for this year's note
 }
 
 SetSearchQuery :=> ("/")
@@ -128,12 +111,28 @@ Menu :=> [!(menu)]
 
 OptionsAdd :=> tags
 
-List :=> tags
 
-Dialog :=>{
-Enter year's title
+Dialog :=> {
+Any aliases for this year ?
 }
-Input :=> 🏷️
+
+List :=> aliases
+
+Dialog :=> {
+Add books you have read this year
+}
+
+SetSearchQuery :=> ("/")
+SetSearchKey :=> 📚
+GetQueryList :=> menu
+
+SetSearchQuery :=> "#Book" And "#Description"
+SetSearchKey :=> 🏷️
+GetQueryList :=> menu2
+
+Menu :=> [!(menu),!(menu2)]
+
+OptionsAdd :=> 📚
 
 BuildInFile :=>
 

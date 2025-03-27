@@ -1,45 +1,47 @@
 {{{:::
 Dialog :=> {
-Choose/Add what company you're doing the work for
+Chose Type of work.
+}
+Menu :=> [FreeLancing,Employment]
+SelectLayer :=> 🎟️
 
+
+Dialog :=> {
+Who is your Customer/Company you are doing this work for
 }
 
 SetSearchQuery :=> #Work and #Description
+SetSearchKey :=> 👔
+GetQueryList :=> menu
+
+
+SetSearchQuery :=> #People and #Description
 SetSearchKey :=> 🏷️
 GetQueryList :=> menu
 
 Menu :=> [!(menu)]
 
-SelectAdd :=> 🎟️
+SelectAdd :=> 👔
 
-AddLayer :=> !(🎟️)
+AddLayer :=> !(👔)
 
-SetOverviewLayer :=> !(🎫)
 
 Dialog :=> {
-What Type of work are you doing. 
+What is your role.
 }
 
-Menu :=>[Front-End,Back-End,Full-Stack,Design,Integrated-System]
+Menu :=>[Front-End,Back-End,Full-Stack,Design,Engineer]
 Select :=> 📇
 
 
 Dialog :=> {
-Enter Document Title
+Project Name
 }
-
 Input :=> 🏷️
 
 Dialog :=> {
-Books to refer to if any
+Any aliases for this work ?
 }
-
-List :=> 📚
-
-Dialog :=> {
-Add Document's Aliases
-}
-
 List :=> aliases
 
 SetSearchQuery :=> ("/")
@@ -49,10 +51,9 @@ GetQueryList :=> menu
 Menu :=> [!(menu)]
 
 Dialog :=> {
-Add Tags to Document
+Add tags for this job
 Alias : 
 }
-
 OptionsAdd :=> tags
 
 

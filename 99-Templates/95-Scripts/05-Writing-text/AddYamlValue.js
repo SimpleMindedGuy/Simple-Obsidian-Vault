@@ -39,6 +39,9 @@ async function AddYamlValue(Values, File) {
     return;
   }
 
+
+  console.info(`05-Writing-text: AddYamlValue:\nvalues are : `, Values);
+
   // reading File
   let Text = await app.vault.read(File);
 
@@ -90,7 +93,7 @@ async function AddYamlValue(Values, File) {
       continue;
     }
 
-    console.log(`05-Writing-text: AddYamlValue:\nkey  : ${key}\nVal  :\n `);
+    console.log(`05-Writing-text: AddYamlValue:\nkey : ${key}\nVal : `);
     console.log(Values[key]);
 
     const KeyRegExp = new RegExp(
@@ -103,14 +106,18 @@ async function AddYamlValue(Values, File) {
       for (const entry of Values[key]) {
         text += ` - ${entry}\n`;
       }
-      newBlock = newBlock.replace(KeyRegExp, `${key}: \n${text}`);
+      newBlock = await newBlock.replace(KeyRegExp, `${key}: \n${text}`);
 
       continue;
     }
-    newBlock = newBlock.replace(KeyRegExp, `${key}: ${Values[key]}\n`);
+    newBlock = await newBlock.replace(KeyRegExp, `${key}: ${Values[key]}\n`);
+
+    console.warn('matching for the yaml Block');
+    console.warn(KeyRegExp);
+    console.log(newBlock.match(KeyRegExp));
   }
 
-  const newText = Text.replace(isYmlBlock, newBlock);
+  const newText = await Text.replace(isYmlBlock, newBlock);
 
   func = async () => {
     app.vault

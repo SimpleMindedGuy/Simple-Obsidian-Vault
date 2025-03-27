@@ -1,18 +1,18 @@
 ---
 🌐: 
-⚖️: 0 
+⚖️: 100 
 🏋️‍♂️: false
 📖: false
-📕: 0 
-🍱: 0 
-🍩: 0 
-🍵: 0 
+📕: 2 
+🍱: 3
+🍩: 3 
+🍵: 2
 💼: 0 
-💻: 0 
+💻: 2 
 💰: 0 
 💵: 0 
 💳: 0 
-🕌: 0 
+🕌: 5 
 ⛔: 0
 😶: ""
 🗓️: <%   tp.date.now ("") %>
@@ -20,6 +20,7 @@
 🏷️: ""
 tags:
  - Daily
+ - TODO
 aliases:
  - "<% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>"
 dayName: "<% tp.date.now("dddd",0,tp.file.title, "YYYY-MM-DD")%>"
@@ -37,10 +38,12 @@ banner_icon: 📆
 # !(🏷️)
 <% tp.date.now("[W]ww / DD - dddd / MM - MMMM / YYYY",0,tp.file.title, "YYYY-MM-DD")%> - <% tp.date.now("hh:mm a") %>
 
+## Introduction
 
 ```timekeep
 {"entries":[]}
 ```
+^timekeep
 
 ## What happened today 
 
@@ -73,41 +76,46 @@ moment(tp.file.title,"YYYY-MM-DD").format("yyyy-MM-DD"), // date
 )
 %>
 
+- [ ] Read 5-20 Pages of the Quran  [priority:: high]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
+
+
+- Sleep [timeStamp:: 11:00 PM ] [priority:: high]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
+
 ### Medium priority
-- [ ] Tidy up the room 🔼 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Write Journal  🔼 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Learn something (reading) for 1-2 Hours 🔼 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%> 
-- [ ] Work on a project for 1-2 Hours  🔼  📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
-- [ ] Read 5-20 Pages of the Quran  🔼  📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Tidy up the room [timeStamp::06:00 AM - 06:15 AM] [priority:: medium]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
+- [ ] Work Hours  [timeStamp::07:00 AM - 11:00 AM] [priority:: medium]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
+- [ ] Learn something (reading) for 1-2 Hours  [timeStamp::12:00 PM - 02:00 PM] [priority:: medium]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
+- [ ] Work on a project for 1-2 Hours  [timeStamp::03:00 PM - 05:00 PM] [priority:: medium]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
+- [ ] Write Journal [timeStamp::08:00 PM - 09:30 PM] [priority:: medium]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
 
 ### Normal priority
-- [ ] Take out the trash 📅 <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+- [ ] Take out the trash [priority:: normal]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>] 
+- [ ] Read something to sleep  [timeStamp::09:30 PM - 11:00 PM] [priority:: normal]  [due:: <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>]
 
-### Tasks done today
 
-> [!important] Today's tasks
+## Overview
+
+
+> [!important] Tasks Done Today
 > ```tasks
 > 
 > done on <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+> group by priority
 > 
 > ``` 
 
-```button
-name Diary Media
-type append template
-action 99-Commands/MoveDiaryMedia
-templater true
-```
-^DiaryMedia
+> [!failure] Cancelled  tasks
+> ```tasks
+> 
+> CANCELLED on <% tp.date.now("YYYY-MM-DD",0,tp.file.title, "YYYY-MM-DD")%>
+> group by priority
+> 
+> ``` 
 
-
-{{{:::
 
 <%* tp.user.main(true) %>
-Dialog :=> {
-how much did you weight today
-}
 
+{{{:::
 
 Dialog :=> {
 What tags you want to use ?
@@ -147,3 +155,11 @@ BuildInFile :=>
 
 :::}}}
 
+
+```button
+name Diary Media
+type append template
+action 99-Commands/MoveDiaryMedia
+templater true
+```
+^DiaryMedia
