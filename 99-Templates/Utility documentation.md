@@ -8,15 +8,21 @@ tags:
 
 > [!Important]
 > This part of the script is in "maintenance mode", later on, I might look in to turning this functionality, into some sort of a plugin later on, but that’s far in the future.
+> 
 > I don’t intend to add features anytime soon, but feel free to request them.
 
 
 > [!Important]
 > To be able to use the commands, you need to have a templater command
+>
 > - `<%* tp.user.NewDocument(tp,true) %>`
+>
 > if you are trying to read the commands in the current file
+>
 > - `<%* tp.user.NewDocument(tp,false) %>`
-> if you are trying to read the commands in the ‘NewDocument’ File
+>
+> if you are trying to read the commands in the ‘NewDocument’ File.
+>
 > the script it self is located at [./95-Scripts/NewDocument.js](./95-Scripts/NewDocument.js)
 
 # Keywords/Terminology
@@ -56,12 +62,16 @@ Is a variable the script will store all input data, as long as there is a `key` 
 
 > [!TIP]
 > Input:=> number
+>
 > will result in a value/variable called `number` with the chosen value
+>
 > it should look like this
 > `number:one`
 
 > [!Exmaple]
+> 
 > GetValue:=> 🗓️ // gets a property in the current file with the name 🗓️, and stores is in a specific variable called `currenValue`.
+> 
 > StoreValue:=> createdDate // Stores the current value of the `currentValue` variable, and stores it in a `Key` inside the `Meta` variable.
 
 The values in the `Meta` variable are then used to write those values to the corresponding key inside the template of the generated document.
@@ -129,12 +139,19 @@ Sets a value or a list of values in a global variable called `value`, that value
 
 > [!TIP]
 > SetValue:=> hello world
+>
 > sets the value of `value` to ‘hello world’
+>
 > StoreValue:=> hello
+>
 > stores the value of `value` in the variable `sayHello`
+>
 > SetValue:=> [1,2,3,4]
+>
 > set the value of `value`
+>
 > StoreValue:=> Numbers
+>
 > Stores array [1,2,3,4] in the variable `Numbers`
 
 
@@ -152,9 +169,13 @@ Those are mostly set in the [config](./Config) file, which will be read and "exe
 
 > [!TIP]
 > SetCreatedKey:=> 🗓️
+>
 > stead of storing the created date in a
+> 
 > `Created: 21/1/2020`
+> 
 > it stores it like this
+> 
 > `🗓️: 21/1/2020`
 
 
@@ -181,8 +202,11 @@ Adds the ability to put a value of a variable into the document instead of just 
 for example
 > [!note]
 > using the commands
+> 
 > Date:=> Day
+> 
 > \$(Day)
+> 
 > will replace ` $(Day)` with: 2020/11/10 - 05:10 am
 
 
@@ -221,25 +245,41 @@ example of how to get All the `tags` in the whole vault.
 
 > [!TIP]
 > SetSearchQuery:=> ("/")
+> 
 > SetSearchKey:=> tags
+> 
 > GetQueryList:=> menu
+> 
 > Menu:=> \[!(menu)\]
+> 
 > in this example, we specify that we want all the files that are children or nested children of the "root" folder of the current vault.
+> 
 > we then store all the values of tags for each file, and store them in a list
+> 
 > then it is stored in a `meta` `key` with the name menu.
+> 
 > Then uses the `key`(menu) to make the next List/Menu for the user to chsoe from
+> 
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd), [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
 > [!TIP]
 > SetSearchQuery:=> #Activities and #Description
+> 
 > SetSearchKey:=> 🏷️
+> 
 > GetQueryList:=> menu
+> 
 > Menu:=> \[!(menu)\]
+> 
 > in this example, we specify that we want all the files that have the tag `#Activities` and also have the tag `Description` in the whole vault
+> 
 > we then store all the values of 🏷️ for each file, and store them in a list
+> 
 > then it is stored in a `meta` `key` with the name menu.
+> 
 > Then uses the `key`(menu) to make the next List/Menu for the user to chsoe from
+> 
 > this will then work with the next [Select](#Select), [SelectAdd](#SelectAdd), [Options](#Options), [OptionsAdd](#OptionsAdd).
 
 
@@ -277,6 +317,7 @@ Displays a prompt that has a text of `dialogue` as well as the options in `Menu`
 
 > [!warning]
 > Performance vs Order
+> 
 > Too many layers will negatively affect the performance of your vault.
 
 The value is then added to `layers`.
@@ -354,17 +395,26 @@ the script will look for the next file, in the template folder
 
 > [!TIP]
 > if layers have the values \[project,type\]
+> 
 > when reading the `NextFile:=>` command, it then looks in the Template file (`99-Template`, in the default configuration.)
+> 
 > for a folder called `porject`, then it looks for a note with the name `project`.
+> 
 > then it tries to look for a command block in that note.
+> 
 > ```dirtree
+> 
 > - / template folder
+> 
 > 	- / project
-> 		- project 
+> 
+> 		- project
+> 
 > ```
 
 > [!important]
 > When looking for templates, the script, will look again for folders with the names of values inside the `layers` list.
+> 
 > when cannot find a folder, it stops at the last folder it finds, and uses it to look for templates later.
 
 
@@ -421,9 +471,13 @@ Moves attachments from where ever they are, to the specified path.
 
 > [!TIP]
 > when using a "fixed" path
+> 
 > just type the path as normal: path/to/folder
+> 
 > when using variables use the current format:!(`key`)/!(`key`)/!(`key`)
+> 
 > MoveMedia:=>!(`key`)/!(`key`)/!(`key`)
+> 
 > MoveMedia:=> ExampleFolder/nested
 
 
@@ -447,6 +501,7 @@ BuildDocument:=>
 
 > [!Note]
 > Template files MUST include the suffix Template in their file name.
+> 
 > and any "default" metadata should be written into the file it self.
 
 
@@ -474,10 +529,15 @@ And it only starts building document folders using the `layers` list, starting f
 
 > [!TIP]
 > the default command for making subnote, uses the command
+> 
 > `AddLayer:=> SubNote`
+> 
 > so that the utility looks for SubNote Templates.
+> 
 > within the folder called SubNote.
+> 
 > then also builds a folder Called SubNote, inside the Current Document’s Folder.
+> 
 > and then it makes a Numbered file, using the Chosen Template, in the SubNote Folder.
 
 
